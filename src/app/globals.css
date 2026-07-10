@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/*
+  Lantern-lit Night Garden — design tokens
+  Mapped into Tailwind v4's @theme so every token is available as a utility,
+  e.g. bg-night-900, text-gold-500, rounded-lg, shadow-soft.
+*/
+@theme {
+  /* Base / surfaces */
+  --color-night-900: #0b1f2a;
+  --color-night-800: #102c3a;
+  --color-night-700: #163a4c;
+  --color-night-600: #1f4d63;
+  --color-cream-50: #fdfbf5;
+  --color-cream-100: #f6efe0;
+  --color-cream-200: #ece0c8;
+
+  /* Gold — primary accent */
+  --color-gold-300: #ffe9a8;
+  --color-gold-400: #ffd66b;
+  --color-gold-500: #f5b833;
+  --color-gold-600: #d9971a;
+
+  /* Subject jewel tones */
+  --color-quran: #2f9e8f;
+  --color-quran-soft: #d5efeb;
+  --color-arabic: #7b6cd9;
+  --color-arabic-soft: #e5e1fa;
+  --color-studies: #d97742;
+  --color-studies-soft: #fbe6d8;
+  --color-duas: #c0559b;
+  --color-duas-soft: #f8dfef;
+
+  /* Feedback */
+  --color-success: #35b37a;
+  --color-warn: #e5a13a;
+  --color-error: #dc5b52;
+
+  /* Text */
+  --color-ink: #0b1f2a;
+  --color-ink-soft: #4a5f68;
+
+  /* Typography — bound to next/font CSS variables */
+  --font-display: var(--font-fredoka), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-amiri), serif;
+
+  /* Radius */
+  --radius-sm: 0.625rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+
+  /* Shadows — warm, teal-tinted, never black */
+  --shadow-soft: 0 2px 8px rgba(11, 31, 42, 0.08);
+  --shadow-lift: 0 8px 24px rgba(11, 31, 42, 0.12);
+  --shadow-glow: 0 0 32px rgba(245, 184, 51, 0.35);
+}
+
+/* Base document */
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--color-cream-100);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* Headings default to the display face */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+/* Sacred text helper — Amiri, RTL, spacious. Never celebrated. */
+.text-arabic {
+  font-family: var(--font-arabic);
+  direction: rtl;
+  line-height: 2.2;
+}
+
+/* Motion primitives — all gated behind prefers-reduced-motion */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 1; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-twinkle { animation: twinkle 3s ease-in-out infinite; }
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-cream-200) 25%,
+      var(--color-cream-100) 50%,
+      var(--color-cream-200) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+}
+
+/* ---- Night-sky auth screen animations (from the student/parent portals) ---- */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lantern-glow {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(245, 184, 51, 0.5)); }
+    50% { filter: drop-shadow(0 0 28px rgba(245, 184, 51, 0.85)); }
+  }
+  @keyframes shake-x {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .animate-glow { animation: lantern-glow 3s ease-in-out infinite; }
+  .animate-shake { animation: shake-x 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-gold-500);
+  outline-offset: 2px;
+}

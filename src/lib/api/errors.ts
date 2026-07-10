@@ -1,0 +1,9 @@
+/** Error thrown by the universal api helper when the backend responds non-2xx. */
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.name = "ApiError";
+  }
+}
