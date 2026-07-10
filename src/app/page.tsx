@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+const RootPage = () => {
+  return <div>This is maktab page</div>;
+};
 
-export default function RootPage() {
-  redirect("/login");
-}
+export default RootPage;
