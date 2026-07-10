@@ -46,7 +46,7 @@ export function StudentLoginForm() {
       {error && (
         <p
           role="alert"
-          className="mt-1 rounded-[var(--radius-md)] bg-[var(--color-error)]/15 px-3 py-2 text-sm text-error"
+          className="mt-1 rounded-(--radius-md) bg-error/15 px-3 py-2 text-sm text-error"
         >
           {error}
         </p>
@@ -56,7 +56,7 @@ export function StudentLoginForm() {
         type="button"
         onClick={submit}
         disabled={pending}
-        className="mt-6 min-h-[52px] w-full rounded-full bg-gold-500 py-3.5 font-display text-lg font-semibold text-night-900 transition-transform enabled:hover:scale-[1.02] enabled:active:scale-95 disabled:opacity-50"
+        className="mt-6 min-h-13 w-full rounded-full bg-gold-500 py-3.5 font-display text-lg font-semibold text-night-900 transition-transform enabled:hover:scale-[1.02] enabled:active:scale-95 disabled:opacity-50"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>

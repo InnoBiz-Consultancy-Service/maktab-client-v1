@@ -12,7 +12,8 @@ interface DarkInputProps extends InputHTMLAttributes<HTMLInputElement> {
  */
 export const DarkInput = forwardRef<HTMLInputElement, DarkInputProps>(
   function DarkInput({ label, error, className, id, ...props }, ref) {
-    const inputId = id ?? props.name ?? label.toLowerCase().replace(/\s+/g, "-");
+    const inputId =
+      id ?? props.name ?? label.toLowerCase().replace(/\s+/g, "-");
     return (
       <label className="mb-4 block text-sm font-medium text-cream-100/80">
         {label}
@@ -20,7 +21,7 @@ export const DarkInput = forwardRef<HTMLInputElement, DarkInputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "mt-1.5 min-h-[48px] w-full rounded-[var(--radius-md)] border-2 bg-night-800 px-4 py-3",
+            "mt-1.5 min-h-12 w-full rounded-(--radius-md) border-2 bg-night-800 px-4 py-3",
             "text-cream-50 placeholder:text-cream-100/40 outline-none transition-colors",
             "focus:border-gold-400 focus-visible:outline-none",
             error ? "border-error" : "border-night-600",

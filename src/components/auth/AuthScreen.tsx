@@ -21,7 +21,7 @@ export function AuthScreen({
 
       <div className="relative z-10 flex w-full max-w-sm flex-col items-center">
         {/* Glowing lantern crest */}
-        <div className="animate-glow flex h-20 w-20 items-center justify-center rounded-[var(--radius-xl)] bg-gradient-to-br from-gold-300 to-gold-500 text-night-900">
+        <div className="animate-glow flex h-20 w-20 items-center justify-center rounded-(--radius-xl) bg-linear-to-br from-gold-300 to-gold-500 text-night-900">
           <LanternMark width={44} height={44} />
         </div>
 
