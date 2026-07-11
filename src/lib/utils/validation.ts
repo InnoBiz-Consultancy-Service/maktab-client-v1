@@ -27,3 +27,69 @@ export const registerParentSchema = z.object({
   emergencyContact: z.string().min(6).max(20),
 });
 export type RegisterParentInput = z.infer<typeof registerParentSchema>;
+
+export const registerTeacherSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name is too long"),
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  gender: z.enum(["MALE", "FEMALE"], { message: "Select a gender" }),
+  education: z
+    .string()
+    .min(2, "Education must be at least 2 characters")
+    .max(150, "Education is too long"),
+  phone: z
+    .string()
+    .min(6, "Enter a valid phone number")
+    .max(20, "Phone is too long"),
+  address: z
+    .string()
+    .min(2, "Address must be at least 2 characters")
+    .max(255, "Address is too long"),
+});
+export type RegisterTeacherInput = z.infer<typeof registerTeacherSchema>;
+
+// ---- Student creation (by an institute). Mirrors POST /api/v1/students ----
+
+/** Inline parent — only used when the parent doesn't exist yet (Path 2). */
+export const newParentSchema = z.object({
+  name: z.string().min(2, "Parent name must be at least 2 characters").max(100),
+  email: z.string().email("Enter a valid parent email"),
+  phone: z.string().min(6, "Enter a valid phone number").max(20),
+  relation: z
+    .string()
+    .min(2, "Relation must be at least 2 characters")
+    .max(50, "Relation is too long"),
+});
+export type NewParentInput = z.infer<typeof newParentSchema>;
+
+const studentBase = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name is too long"),
+  class: z.string().min(1, "Enter a class").max(50, "Class is too long"),
+  dob: z.coerce.date({ message: "Enter a valid date of birth" }),
+  gender: z.enum(["MALE", "FEMALE"], { message: "Select a gender" }),
+  allergies: z.string().max(255, "Too long").optional().or(z.literal("")),
+  photoConsent: z.boolean(),
+  teacherId: z.string().min(1, "Select a teacher"),
+});
+
+/**
+ * The backend requires EXACTLY ONE of `parentId` (existing parent) or `parent`
+ * (create a new one inline). This refine enforces that on the client too, so
+ * the user gets a clear message instead of a 400 from the API.
+ */
+export const createStudentSchema = studentBase
+  .extend({
+    parentId: z.string().optional(),
+    parent: newParentSchema.optional(),
+  })
+  .refine((v) => Boolean(v.parentId) !== Boolean(v.parent), {
+    message: "Select an existing parent, or add a new one — not both.",
+    path: ["parentId"],
+  });
+export type CreateStudentInput = z.infer<typeof createStudentSchema>;
