@@ -27,7 +27,7 @@ export function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-night-800 bg-night-900 lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-night-800 bg-night-900 lg:flex">
       {/* Brand */}
       <div className="flex items-center gap-2 px-6 py-6 text-cream-50">
         <LanternMark className="animate-float text-gold-400" />
@@ -35,7 +35,7 @@ export function Sidebar({
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3" aria-label="Main">
+      <nav className="flex-1 overflow-y-auto px-3" aria-label="Main">
         <ul className="flex flex-col gap-1">
           {items.map((item) => {
             const Icon = navIcons[item.icon];
