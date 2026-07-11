@@ -15,8 +15,8 @@ export function SignOutButton() {
       onClick={() => startTransition(() => logoutAction())}
       className="border-cream-100/20 text-cream-50 hover:bg-night-800"
     >
-      <LogOut className="h-4 w-4" aria-hidden />
-      <span className="hidden sm:inline">Sign out</span>
+      <LogOut className="h-4 w-4 text-white" aria-hidden />
+      <span className="hidden text-white sm:inline">Sign out</span>
     </Button>
   );
 }
