@@ -1,0 +1,35 @@
+import {
+  LayoutDashboard,
+  GraduationCap,
+  Users,
+  Baby,
+  CalendarCheck,
+  Settings,
+  Building2,
+  BookOpen,
+  ClipboardList,
+  Video,
+  Wallet,
+  MessageSquare,
+  Trophy,
+  type LucideIcon,
+} from "lucide-react";
+import { NavIconName } from "./nav-item";
+
+
+export const navIcons: Record<NavIconName, LucideIcon> = {
+  home: LayoutDashboard,
+  students: Baby,
+  teachers: GraduationCap,
+  parents: Users,
+  attendance: CalendarCheck,
+  marks: ClipboardList,
+  settings: Settings,
+  institutes: Building2,
+  content: Video,
+  children: Baby,
+  payments: Wallet,
+  messages: MessageSquare,
+  learn: BookOpen,
+  progress: Trophy,
+};

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AuthScreen } from "@/components/auth/AuthScreen";
 import { LoginForm } from "@/components/auth/LoginForm";
 
-export default function LoginPage() {
+export default async function LoginPage() {
   return (
     <AuthScreen title="Welcome back" subtitle="Sign in to continue">
       <LoginForm />

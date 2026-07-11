@@ -20,7 +20,7 @@ export function LoginForm() {
       const res = await loginAction({ email, password });
       if (res.ok) {
         toast.success("Welcome back");
-        router.push("/dashboard");
+        router.push(`/dashboard`);
       } else {
         setError(res.error);
         setShake(true);
