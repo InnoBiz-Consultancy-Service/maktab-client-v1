@@ -44,7 +44,7 @@ function readRoleFromToken(token: string): Role | null {
 /**
  * Routes that don't need a session — login, register, student login, etc.
  */
-const PUBLIC_PATHS = ["/login", "/register"];
+const PUBLIC_PATHS = ["/login", "/register", "/teacher/change-password"];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some(
