@@ -13,9 +13,9 @@ import {
   MessageSquare,
   Trophy,
   type LucideIcon,
+  Layers,
 } from "lucide-react";
 import { NavIconName } from "./nav-item";
-
 
 export const navIcons: Record<NavIconName, LucideIcon> = {
   home: LayoutDashboard,
@@ -32,4 +32,5 @@ export const navIcons: Record<NavIconName, LucideIcon> = {
   messages: MessageSquare,
   learn: BookOpen,
   progress: Trophy,
+  batches: Layers,
 };

@@ -71,6 +71,7 @@ export async function createTeacherAction(
     data: parsed.data,
     requireAuth: true,
   });
+  console.log(result.data)
 
   if (!result.success) {
     const msg = result.message ?? "Could not create the teacher.";

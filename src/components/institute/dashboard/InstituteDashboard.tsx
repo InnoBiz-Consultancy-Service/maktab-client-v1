@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Inbox,
   BookOpen,
+  Layers,
 } from "lucide-react";
 import { Card } from "@/components/ui";
 
@@ -94,7 +95,7 @@ export function InstituteDashboard({
         <h2 className="mb-3 font-display text-lg font-bold text-night-900">
           Quick actions
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Link href="/dashboard/institute/students/new" className="block">
             <Card interactive className="h-full">
               <div className="flex items-center gap-3">
@@ -134,6 +135,26 @@ export function InstituteDashboard({
               </div>
             </Card>
           </Link>
+
+          <Link href="/dashboard/institute/batches/new" className="block">
+            <Card interactive className="h-full">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-duas-soft text-duas">
+                  <Layers className="h-5 w-5" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-night-900">Create a batch</p>
+                  <p className="truncate text-sm text-ink-soft">
+                    Group students under a teacher.
+                  </p>
+                </div>
+                <ArrowRight
+                  className="h-4 w-4 shrink-0 text-ink-soft"
+                  aria-hidden
+                />
+              </div>
+            </Card>
+          </Link>
         </div>
       </section>
 
@@ -144,10 +165,7 @@ export function InstituteDashboard({
         <Card className="p-0">
           <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-3">
             <div className="flex items-center gap-2">
-              <BookOpen
-                className="h-4.5 w-4.5 text-ink-soft"
-                aria-hidden
-              />
+              <BookOpen className="h-4.5 w-4.5 text-ink-soft" aria-hidden />
               <h2 className="font-display font-bold text-night-900">Classes</h2>
             </div>
             <span className="rounded-full bg-cream-100 px-2.5 py-1 text-xs font-medium text-ink-soft">

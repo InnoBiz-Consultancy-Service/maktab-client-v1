@@ -44,7 +44,7 @@ export async function universalApi<T = unknown>({
       cache: "no-store",
     };
 
-    if (data && ["POST", "PUT", "PATCH"].includes(method)) {
+    if (data && ["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
       options.body = JSON.stringify(data);
     }
 
