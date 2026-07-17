@@ -1,5 +1,6 @@
 import { LanternMark } from "@/components/shared/LanternMark";
 import { SignOutButton } from "@/components/layout/SignOutButton";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import type { Session } from "@/types/auth";
 
 /**
@@ -15,7 +16,11 @@ export function MobileHeader({ session }: { session: Session }) {
           <LanternMark className="animate-float text-gold-400" />
           <span className="font-display text-lg font-bold">Maktab</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
+          <NotificationBell
+            role={session.role}
+            className="text-cream-100/70 hover:text-cream-50 hover:bg-night-800"
+          />
           <span className="hidden text-sm text-cream-100/70 sm:inline">
             {session.label}
           </span>

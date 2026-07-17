@@ -1,10 +1,9 @@
-import { getTeacherOverviewAction } from "@/actions/teacher/overview";
-import { AttendanceSheet } from "@/components/teacher/Attendance/AttendanceSheet";
-import { PreviewBanner } from "@/components/teacher/PreviewBanner/PreviewBanner";
+import { getTodayAction } from "@/actions/attendance/get-today";
+import { TodayBatchList } from "@/components/teacher/Attendance/TodayBatchList";
 import { Card } from "@/components/ui";
 
 export default async function TeacherAttendancePage() {
-  const res = await getTeacherOverviewAction();
+  const res = await getTodayAction();
 
   if (!res.ok) {
     return (
@@ -16,25 +15,21 @@ export default async function TeacherAttendancePage() {
     );
   }
 
-  const { students } = res.data;
-  const today = new Date().toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  const { date, batches } = res.data;
+
+  const formattedDate = new Date(date + "T00:00:00").toLocaleDateString(
+    "en-GB",
+    { weekday: "long", day: "numeric", month: "long" },
+  );
 
   return (
     <div className="mx-auto w-full max-w-3xl">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-night-900">Attendance</h1>
-        <p className="mt-1 text-sm text-ink-soft">
-          {today} · everyone starts as present, just tap the exceptions.
-        </p>
+        <p className="mt-1 text-sm text-ink-soft">{formattedDate}</p>
       </header>
 
-      <PreviewBanner what="Attendance" />
-
-      <AttendanceSheet students={students} />
+      <TodayBatchList batches={batches} />
     </div>
   );
 }

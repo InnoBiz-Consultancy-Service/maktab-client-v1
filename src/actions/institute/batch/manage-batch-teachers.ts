@@ -39,7 +39,7 @@ export async function addBatchTeachersAction(
 
   const result = await universalApi<unknown>({
     endpoint: `/batches/${batchId}/teachers`,
-    method: "POST",
+    method: "PATCH",
     data: parsed.data,
     requireAuth: true,
   });
