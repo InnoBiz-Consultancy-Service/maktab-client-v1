@@ -93,3 +93,31 @@ export const createStudentSchema = studentBase
     path: ["parentId"],
   });
 export type CreateStudentInput = z.infer<typeof createStudentSchema>;
+
+// ---- Batches (classes). Mirrors POST/PATCH /api/v1/batches ----
+
+export const createBatchSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(150, "Name is too long"),
+  teacherIds: z.array(z.string()).min(1).optional(),
+  studentIds: z.array(z.string()).min(1).optional(),
+});
+export type CreateBatchInput = z.infer<typeof createBatchSchema>;
+
+export const updateBatchSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(150, "Name is too long"),
+});
+export type UpdateBatchInput = z.infer<typeof updateBatchSchema>;
+
+/** Used for both assign and unassign — at least one id is required either way. */
+export const batchTeacherIdsSchema = z.object({
+  teacherIds: z.array(z.string()).min(1, "Select at least one teacher"),
+});
+export const batchStudentIdsSchema = z.object({
+  studentIds: z.array(z.string()).min(1, "Select at least one student"),
+});

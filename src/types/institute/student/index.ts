@@ -1,5 +1,22 @@
 import { Gender } from "@/types/shared";
 
+export interface StudentSearchResult {
+  id: string;
+  studentCode: string;
+  instituteId: string;
+  teacherId: string;
+  parentId: string;
+  name: string;
+  class: string;
+  dob: string;
+  gender: Gender;
+  allergies: string | null;
+  photoConsent: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /** Parent info nested in a created-student response. */
 export interface CreatedStudentParent {
   id: string;

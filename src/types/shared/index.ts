@@ -2,7 +2,7 @@
 
 export type Role = "ADMIN" | "INSTITUTE" | "TEACHER" | "PARENT" | "STUDENT";
 export type Gender = "MALE" | "FEMALE";
-export type AttendanceStatus = "PRESENT" | "ABSENT";
+export type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE";
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED";
 
 /** The backend's uniform response envelope. */

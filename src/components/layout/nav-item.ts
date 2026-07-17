@@ -1,6 +1,5 @@
 import type { Role } from "@/types/shared";
 
-
 export type NavIconName =
   | "home"
   | "students"
@@ -15,7 +14,8 @@ export type NavIconName =
   | "payments"
   | "messages"
   | "learn"
-  | "progress";
+  | "progress"
+  | "batches";
 
 export interface NavItem {
   href: string;
@@ -79,6 +79,11 @@ const instituteNav: RoleNav = {
       href: "/dashboard/institute/attendance",
       label: "Attendance",
       icon: "attendance",
+    },
+    {
+      href: "/dashboard/institute/batches",
+      label: "Batches",
+      icon: "batches",
     },
     {
       href: "/dashboard/institute/settings",

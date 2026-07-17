@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LanternMark } from "@/components/shared/LanternMark";
 import { SignOutButton } from "@/components/layout/SignOutButton";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { cn } from "@/lib/utils/cn";
 import type { Session } from "@/types/auth";
 import { NavItem } from "./nav-item";
@@ -29,9 +30,15 @@ export function Sidebar({
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-night-800 bg-night-900 lg:flex">
       {/* Brand */}
-      <div className="flex items-center gap-2 px-6 py-6 text-cream-50">
-        <LanternMark className="animate-float text-gold-400" />
-        <span className="font-display text-xl font-bold">Maktab</span>
+      <div className="flex items-center justify-between px-6 py-6 text-cream-50">
+        <div className="flex items-center gap-2">
+          <LanternMark className="animate-float text-gold-400" />
+          <span className="font-display text-xl font-bold">Maktab</span>
+        </div>
+        <NotificationBell
+          role={session.role}
+          className="text-cream-100/70 hover:text-cream-50 hover:bg-night-800"
+        />
       </div>
 
       {/* Nav */}
