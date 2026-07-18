@@ -21,7 +21,7 @@ export function TeacherDashboard({
   name: string;
   overview: TeacherOverview;
 }) {
-  const { counts, todaySessions, recentMarks, exams } = overview;
+  const { counts, todayBatches, recentMarks, exams } = overview;
   const scheduledExams = exams.filter((e) => e.status === "scheduled");
 
   return (
@@ -33,7 +33,7 @@ export function TeacherDashboard({
         <p className="mt-1 text-ink-soft">Here&rsquo;s your day at a glance.</p>
       </header>
 
-      <PreviewBanner what="The teacher area" />
+      {/* <PreviewBanner what="The teacher area" /> */}
 
       {/* Stats */}
       <section
@@ -68,38 +68,53 @@ export function TeacherDashboard({
         />
       </section>
 
-      {/* Today's sessions — the main call to action */}
+      {/* Today's batches — the main call to action */}
       <section aria-label="Today" className="mb-6">
         <h2 className="mb-3 font-display text-lg font-bold text-night-900">
-          Today&rsquo;s sessions
+          Today&rsquo;s batches
         </h2>
         <Card className="p-0">
           <ul className="divide-y divide-cream-200">
-            {todaySessions.map((s) => (
-              <li key={s.id} className="flex items-center gap-3 px-5 py-4">
+            {todayBatches.map((b) => (
+              <li
+                key={b.batch.id}
+                className="flex items-center gap-3 px-5 py-4"
+              >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cream-100 text-ink-soft">
                   <Clock className="h-4.5 w-4.5" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-night-900">
-                    {s.class}
+                    {b.batch.name}
                   </p>
                   <p className="truncate text-sm text-ink-soft">
-                    {s.time} · {s.studentCount} students
+                    {b.totalStudents} students
+                    {b.state === "IN_PROGRESS" && b.progress
+                      ? ` · ${b.progress.marked}/${b.progress.total} marked`
+                      : ""}
+                    {b.state === "OFF_DAY" && b.reason ? ` · ${b.reason}` : ""}
                   </p>
                 </div>
 
-                {s.attendanceTaken ? (
+                {b.state === "DONE" ? (
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-success/15 px-2.5 py-1 text-xs font-semibold text-success">
                     <Check className="h-3.5 w-3.5" aria-hidden />
                     Taken
+                  </span>
+                ) : b.state === "OFF_DAY" ? (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cream-200 px-2.5 py-1 text-xs font-semibold text-ink-soft">
+                    Off day
+                  </span>
+                ) : b.state === "IN_PROGRESS" && b.canEdit === false ? (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cream-200 px-2.5 py-1 text-xs font-semibold text-ink-soft">
+                    {b.takenBy?.name} is taking it
                   </span>
                 ) : (
                   <Link
                     href="/dashboard/teacher/attendance"
                     className="inline-flex min-h-9.5 shrink-0 items-center gap-1.5 rounded-full bg-gold-500 px-4 text-sm font-semibold text-night-900 transition-transform hover:scale-[1.02] active:scale-95"
                   >
-                    Take
+                    {b.state === "IN_PROGRESS" ? "Continue" : "Take"}
                     <ArrowRight className="h-3.5 w-3.5" aria-hidden />
                   </Link>
                 )}

@@ -1,4 +1,4 @@
-import { getMyChildrenAction } from "@/actions/attendance/get-my-children";
+import { getMyChildrenAction } from "@/actions/parent/get-my-children";
 import { ChildCard } from "@/components/parent/attendance/ChildCard";
 import { EmptyState } from "@/components/shared/attendance/EmptyState";
 import { Card } from "@/components/ui";

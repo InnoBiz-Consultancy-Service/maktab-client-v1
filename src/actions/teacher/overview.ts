@@ -2,35 +2,34 @@
 
 import {
   dummyMyStudents,
-  dummyTodaySessions,
   dummyMarks,
   dummyExams,
   type MyStudent,
-  type TodaySession,
   type MarkEntry,
   type ExamItem,
 } from "@/lib/dummy/teacher";
+import { getTodayAction } from "@/actions/attendance/get-today";
 import type { ActionResult } from "@/types/shared";
+import type { TodayBatch } from "@/types/attendance";
 
 export interface TeacherOverview {
   counts: {
     students: number;
-    /** Sessions today that still need attendance taken. */
+    /** Batches today that haven't finished attendance (not started or in progress). */
     attendancePending: number;
     /** Class average across all recorded marks, 0–100. */
     classAverage: number;
   };
   students: MyStudent[];
-  todaySessions: TodaySession[];
+  todayBatches: TodayBatch[];
   recentMarks: MarkEntry[];
   exams: ExamItem[];
 }
 
 /**
- * ⚠️ Returns PLACEHOLDER data — the teacher endpoints don't exist yet.
- *
- * It's shaped like a real action (async, ActionResult) so that when the API
- * lands, only the body of this function changes — no caller has to move.
+ * ⚠️ `students`, `recentMarks`, and `exams` are still PLACEHOLDER data — those
+ * teacher endpoints don't exist yet. `todayBatches` is real, backed by the
+ * attendance module's GET /attendance/today.
  */
 export async function getTeacherOverviewAction(): Promise<
   ActionResult<TeacherOverview>
@@ -44,17 +43,24 @@ export async function getTeacherOverviewAction(): Promise<
         )
       : 0;
 
+  const todayRes = await getTodayAction();
+  if (!todayRes.ok) {
+    return { ok: false, error: todayRes.error };
+  }
+  const todayBatches = todayRes.data.batches;
+
   return {
     ok: true,
     data: {
       counts: {
         students: students.length,
-        attendancePending: dummyTodaySessions.filter((s) => !s.attendanceTaken)
-          .length,
+        attendancePending: todayBatches.filter(
+          (b) => b.state === "NOT_STARTED" || b.state === "IN_PROGRESS",
+        ).length,
         classAverage,
       },
       students,
-      todaySessions: dummyTodaySessions,
+      todayBatches,
       recentMarks: dummyMarks,
       exams: dummyExams,
     },

@@ -8,10 +8,9 @@ import {
   GraduationCap,
   Baby,
   Check,
-  Loader2,
   ArrowRight,
 } from "lucide-react";
-import { Card, Input } from "@/components/ui";
+import { Button, Card, Input } from "@/components/ui";
 import {
   MultiSearchPicker,
   type PickerItem,
@@ -120,23 +119,26 @@ export function CreateBatchForm() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button
+          <Button
             type="button"
+            block
+            className="flex-1"
             onClick={() =>
               router.push(`/dashboard/institute/batches/${created.id}`)
             }
-            className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full bg-gold-500 px-6 font-display font-semibold text-night-900 shadow-soft transition-transform hover:scale-[1.01] active:scale-95"
           >
             Manage this batch
             <ArrowRight className="h-4 w-4" aria-hidden />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            block
+            className="flex-1"
             onClick={reset}
-            className="min-h-[48px] flex-1 rounded-full border border-cream-200 px-6 font-display font-semibold text-night-900 transition-colors hover:bg-cream-100"
           >
             Create another
-          </button>
+          </Button>
         </div>
       </Card>
     );
@@ -184,21 +186,15 @@ export function CreateBatchForm() {
         />
 
         <div className="mt-2 flex flex-col gap-3 sm:flex-row-reverse sm:items-center">
-          <button
+          <Button
             type="button"
+            size="lg"
             onClick={submit}
-            disabled={submitting}
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-gold-500 px-8 font-display text-[15px] font-semibold text-night-900 shadow-soft transition-all hover:scale-[1.01] hover:shadow-[0_0_28px_rgba(245,184,51,0.4)] active:scale-95 disabled:pointer-events-none disabled:opacity-60 sm:w-auto"
+            loading={submitting}
+            className="w-full sm:w-auto"
           >
-            {submitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />{" "}
-                Creating…
-              </>
-            ) : (
-              "Create batch"
-            )}
-          </button>
+            {submitting ? "Creating…" : "Create batch"}
+          </Button>
           <p className="flex items-center gap-1.5 text-xs text-ink-soft">
             <GraduationCap className="h-3.5 w-3.5 shrink-0" aria-hidden />
             <Baby className="h-3.5 w-3.5 shrink-0" aria-hidden />

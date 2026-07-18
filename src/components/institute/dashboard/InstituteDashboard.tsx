@@ -19,7 +19,7 @@ import {
   dummyActivity,
   dummyAttendanceToday,
   dummyClasses,
-} from "@/lib/dummy/instititue";
+} from "@/lib/dummy/institute";
 import { ActivityPanel } from "./ActivityPanel";
 
 function EmptyPanel({
