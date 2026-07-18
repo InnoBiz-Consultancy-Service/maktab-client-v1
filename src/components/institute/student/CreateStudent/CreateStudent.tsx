@@ -10,13 +10,12 @@ import {
   ClipboardCheck,
   ArrowLeft,
   ArrowRight,
-  Loader2,
   Copy,
   Check,
   AlertTriangle,
   KeyRound,
 } from "lucide-react";
-import { Card, Input, Select } from "@/components/ui";
+import { Button, Card, Input, Select } from "@/components/ui";
 import {
   SearchPicker,
   type PickerItem,
@@ -71,15 +70,16 @@ const emptyNewParent: NewParentFields = {
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="sm"
       onClick={async () => {
         await navigator.clipboard.writeText(value);
         setCopied(true);
         toast.success(`${label} copied`);
         setTimeout(() => setCopied(false), 2000);
       }}
-      className="inline-flex items-center gap-1.5 rounded-full border border-cream-200 px-3 py-1.5 text-sm font-medium text-night-900 transition-colors hover:bg-cream-100"
       aria-label={`Copy ${label}`}
     >
       {copied ? (
@@ -88,7 +88,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
         <Copy className="h-4 w-4" aria-hidden />
       )}
       {copied ? "Copied" : "Copy"}
-    </button>
+    </Button>
   );
 }
 
@@ -313,20 +313,18 @@ export function CreateStudentWizard() {
         )}
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={reset}
-            className="min-h-[48px] flex-1 rounded-full bg-gold-500 px-6 font-display font-semibold text-night-900 shadow-soft transition-transform hover:scale-[1.01] active:scale-95"
-          >
+          <Button type="button" block className="flex-1" onClick={reset}>
             Add another student
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            block
+            className="flex-1"
             onClick={() => router.push("/dashboard/institute")}
-            className="min-h-[48px] flex-1 rounded-full border border-cream-200 px-6 font-display font-semibold text-night-900 transition-colors hover:bg-cream-100"
           >
             Back to dashboard
-          </button>
+          </Button>
         </div>
       </Card>
     );
@@ -512,18 +510,19 @@ export function CreateStudentWizard() {
               onSelect={setParent}
               error={errors.parent}
               emptyAction={
-                <button
+                <Button
                   type="button"
+                  variant="night"
+                  size="sm"
                   onClick={() => {
                     setAddingNewParent(true);
                     setParent(null);
                     setErrors({});
                   }}
-                  className="inline-flex min-h-[40px] items-center gap-2 rounded-full bg-night-900 px-5 text-sm font-semibold text-cream-50 transition-colors hover:bg-night-800"
                 >
                   <Users className="h-4 w-4" aria-hidden />
                   Add a new parent
-                </button>
+                </Button>
               }
             />
           ) : (
@@ -659,30 +658,14 @@ export function CreateStudentWizard() {
         </button>
 
         {step < 3 ? (
-          <button
-            type="button"
-            onClick={next}
-            className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-gold-500 px-7 font-display font-semibold text-night-900 shadow-soft transition-transform hover:scale-[1.02] active:scale-95"
-          >
+          <Button type="button" onClick={next}>
             Continue
             <ArrowRight className="h-4 w-4" aria-hidden />
-          </button>
+          </Button>
         ) : (
-          <button
-            type="button"
-            onClick={submit}
-            disabled={submitting}
-            className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-gold-500 px-7 font-display font-semibold text-night-900 shadow-soft transition-transform hover:scale-[1.02] active:scale-95 disabled:pointer-events-none disabled:opacity-60"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                Creating…
-              </>
-            ) : (
-              "Create student"
-            )}
-          </button>
+          <Button type="button" onClick={submit} loading={submitting}>
+            {submitting ? "Creating…" : "Create student"}
+          </Button>
         )}
       </div>
     </Card>

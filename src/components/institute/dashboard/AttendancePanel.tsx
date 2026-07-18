@@ -1,6 +1,6 @@
 import { CalendarCheck } from "lucide-react";
 import { Card } from "@/components/ui";
-import { AttendanceToday } from "@/lib/dummy/instititue";
+import { AttendanceToday } from "@/lib/dummy/institute";
 
 /**
  * Today's attendance at a glance. Placeholder data for now — swap the prop for

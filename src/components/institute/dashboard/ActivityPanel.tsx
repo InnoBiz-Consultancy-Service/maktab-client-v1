@@ -6,7 +6,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui";
-import { ActivityEntry } from "@/lib/dummy/instititue";
+import { ActivityEntry } from "@/lib/dummy/institute";
 
 
 const kindStyles: Record<

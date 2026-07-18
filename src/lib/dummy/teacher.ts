@@ -30,14 +30,6 @@ export interface MyStudent {
   attendanceRate: number;
 }
 
-export interface TodaySession {
-  id: string;
-  class: string;
-  time: string;
-  studentCount: number;
-  attendanceTaken: boolean;
-}
-
 export interface MarkEntry {
   id: string;
   studentId: string;
@@ -109,24 +101,6 @@ export const dummyMyStudents: MyStudent[] = [
     progress: 66,
     average: 78,
     attendanceRate: 91,
-  },
-];
-
-/** TODO: replace with GET /api/v1/sessions/today (FR-TE-05) */
-export const dummyTodaySessions: TodaySession[] = [
-  {
-    id: "t1",
-    class: "Nursery — morning",
-    time: "09:00",
-    studentCount: 5,
-    attendanceTaken: true,
-  },
-  {
-    id: "t2",
-    class: "Nursery — afternoon",
-    time: "14:30",
-    studentCount: 5,
-    attendanceTaken: false,
   },
 ];
 
