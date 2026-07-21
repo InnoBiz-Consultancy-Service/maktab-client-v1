@@ -33,10 +33,15 @@ function unwrap<T>(raw: unknown): T {
   return raw as T;
 }
 
+
+
 export async function createTeacherAction(
   _prev: CreateTeacherState,
   formData: FormData,
 ): Promise<CreateTeacherState> {
+  const assignedClasses = JSON.parse(
+    String(formData.get("assignedClasses") ?? "[]")
+  );
   const values = {
     name: String(formData.get("name") ?? "").trim(),
     email: String(formData.get("email") ?? "").trim(),
@@ -48,6 +53,7 @@ export async function createTeacherAction(
     notes: String(formData.get("notes") ?? "").trim(),
     phone: String(formData.get("phone") ?? "").trim(),
     address: String(formData.get("address") ?? "").trim(),
+    assignedClasses,
   };
 
   const parsed = registerTeacherSchema.safeParse(values);

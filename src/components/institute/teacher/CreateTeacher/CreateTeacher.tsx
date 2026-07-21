@@ -53,6 +53,31 @@ export function CreateTeacherForm({ batch }: { batch: Batch[] }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   // console.log("batch", batch);
+  const [selectedClasses, setSelectedClasses] = useState<
+    { id: string; name: string }[]
+  >([]);
+
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+
+    if (!value) return;
+
+    const selected = batch.find((item) => String(item.id) === value);
+
+    if (!selected) return;
+
+    setSelectedClasses((prev) => {
+      if (prev.some((item) => item.id === selected.id)) return prev;
+      return [...prev, selected];
+    });
+
+    // select reset
+    e.target.value = "";
+  };
+
+  const removeClass = (id: string) => {
+    setSelectedClasses((prev) => prev.filter((item) => item.id !== id));
+  };
 
   useEffect(() => {
     if (state.success && state.createdTeacher) {
@@ -196,20 +221,55 @@ export function CreateTeacherForm({ batch }: { batch: Batch[] }) {
           />
         </div>
 
-        <Select
-          label="Classes"
-          name="batchId"
-          defaultValue={v.batchId}
-          error={err.batchId}
-        >
-          <option value="">Select Classes</option>
+        <div>
+          {/* Selected Tags */}
+          <div
+            className={`${selectedClasses.length > 0 && "mb-2"}  flex flex-wrap gap-2`}
+          >
+            {selectedClasses.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-2 rounded bg-blue-100 px-3 py-1 text-sm"
+              >
+                <span>{item.name}</span>
 
-          {batch.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </Select>
+                <button
+                  type="button"
+                  onClick={() => removeClass(item.id)}
+                  className="font-bold text-red-500 text-lg"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <Select
+            label="Classes"
+            name="batchId"
+            defaultValue=""
+            onChange={handleSelect}
+          >
+            <option value="">Select Classes</option>
+
+            {batch.map((item) => (
+              <option
+                key={item.id}
+                value={item.id}
+                disabled={selectedClasses.some(
+                  (selected) => selected.id === item.id,
+                )}
+              >
+                {item.name}
+              </option>
+            ))}
+          </Select>
+          <input
+            type="hidden"
+            name="assignedClasses"
+            value={JSON.stringify(selectedClasses.map((item) => item.id))}
+          />
+        </div>
 
         <Input
           label="Address"
