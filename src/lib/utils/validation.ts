@@ -40,6 +40,27 @@ export const registerTeacherSchema = z.object({
     .string()
     .min(2, "Education must be at least 2 characters")
     .max(150, "Education is too long"),
+  jobTitle: z
+    .string()
+    .trim()
+    .min(2, "Job title is required")
+    .max(100, "Job title must not exceed 100 characters"),
+
+  startDate: z
+    .string()
+    .min(2, "Start date is required")
+    .refine(
+      (value) => !isNaN(Date.parse(value)),
+      "Please select a valid start date"
+    )
+    .transform((value) => new Date(value)),
+
+  notes: z
+    .string()
+    .trim()
+    .max(500, "Notes must not exceed 500 characters")
+    .optional()
+    .or(z.literal("")),
   phone: z
     .string()
     .min(6, "Enter a valid phone number")

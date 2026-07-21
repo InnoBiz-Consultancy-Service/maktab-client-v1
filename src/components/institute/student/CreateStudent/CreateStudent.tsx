@@ -507,7 +507,7 @@ export function CreateStudentWizard() {
                 setStudent({ ...student, address: e.target.value })
               }
               error={errors.address}
-              placeholder="Home address"
+              placeholder="Street, city, postcode"
               rows={3}
             />
 

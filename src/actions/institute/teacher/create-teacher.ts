@@ -43,6 +43,9 @@ export async function createTeacherAction(
     password: String(formData.get("password") ?? ""),
     gender: String(formData.get("gender") ?? ""),
     education: String(formData.get("education") ?? "").trim(),
+    jobTitle: String(formData.get("jobTitle") ?? "").trim(),
+    startDate: String(formData.get("startDate") ?? "").trim(),
+    notes: String(formData.get("notes") ?? "").trim(),
     phone: String(formData.get("phone") ?? "").trim(),
     address: String(formData.get("address") ?? "").trim(),
   };
@@ -63,6 +66,8 @@ export async function createTeacherAction(
       values,
     };
   }
+
+  console.log("parsed.data", parsed.data)
 
   // instituteId is NOT sent — backend derives it from the logged-in token.
   const result = await universalApi<unknown>({
