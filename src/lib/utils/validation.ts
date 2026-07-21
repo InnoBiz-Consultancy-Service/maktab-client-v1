@@ -72,6 +72,31 @@ const studentBase = z.object({
     .max(100, "Name is too long"),
   class: z.string().min(1, "Enter a class").max(50, "Class is too long"),
   dob: z.coerce.date({ message: "Enter a valid date of birth" }),
+  joinDate: z.coerce.date({
+    message: "Enter a valid join date",
+  }),
+  address: z
+    .string()
+    .min(1, "Enter an address")
+    .max(500, "Address must not exceed 500 characters"),
+
+  medicalConditions: z
+    .string()
+    .max(500, "Medical conditions must not exceed 500 characters")
+    .optional()
+    .or(z.literal("")),
+
+  medications: z
+    .string()
+    .max(500, "Medications must not exceed 500 characters")
+    .optional()
+    .or(z.literal("")),
+
+  additionalNotes: z
+    .string()
+    .max(1000, "Additional notes must not exceed 1000 characters")
+    .optional()
+    .or(z.literal("")),
   gender: z.enum(["MALE", "FEMALE"], { message: "Select a gender" }),
   allergies: z.string().max(255, "Too long").optional().or(z.literal("")),
   photoConsent: z.boolean(),
