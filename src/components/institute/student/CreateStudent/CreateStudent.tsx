@@ -25,6 +25,7 @@ import { CreatedStudent } from "@/types/institute/student";
 import { searchTeachersAction } from "@/actions/institute/teacher/get-teacher";
 import { searchParentsAction } from "@/actions/institute/parent/get-parents";
 import { createStudentAction } from "@/actions/institute/student/create-student";
+import { Textarea } from "@/components/ui/Textarea";
 
 type StepId = 0 | 1 | 2 | 3;
 
@@ -42,6 +43,14 @@ interface StudentFields {
   gender: string;
   allergies: string;
   photoConsent: boolean;
+  joinDate?: string;
+  address?: string;
+  medicalConditions?: string;
+  medications?: string;
+  additionalNotes?: string;
+  teacherId: string;
+  batchId?: string;
+  parentId: string;
 }
 
 interface NewParentFields {
@@ -58,6 +67,14 @@ const emptyStudent: StudentFields = {
   gender: "",
   allergies: "",
   photoConsent: false,
+  joinDate: "",
+  address: "",
+  medicalConditions: "",
+  medications: "",
+  additionalNotes: "",
+  teacherId: "",
+  batchId: "",
+  parentId: "",
 };
 const emptyNewParent: NewParentFields = {
   name: "",
@@ -205,6 +222,11 @@ export function CreateStudentWizard() {
       name: student.name.trim(),
       class: student.class.trim(),
       dob: student.dob,
+      joinDate: student.joinDate!,
+      address: student.address,
+      medicalConditions: student.medicalConditions,
+      medications: student.medications,
+      additionalNotes: student.additionalNotes,
       gender: student.gender,
       allergies: student.allergies.trim() || undefined,
       photoConsent: student.photoConsent,
@@ -424,16 +446,85 @@ export function CreateStudentWizard() {
             />
           </div>
 
-          <Select
-            label="Gender"
-            value={student.gender}
-            onChange={(e) => setStudent({ ...student, gender: e.target.value })}
-            error={errors.gender}
-          >
-            <option value="">Select…</option>
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
-          </Select>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input
+              label="Join Date (optional)"
+              type="date"
+              value={student.joinDate}
+              onChange={(e) =>
+                setStudent({ ...student, joinDate: e.target.value })
+              }
+              error={errors.joinDate}
+              max={new Date().toISOString().split("T")[0]}
+            />
+
+            <Select
+              label="Gender"
+              value={student.gender}
+              onChange={(e) =>
+                setStudent({ ...student, gender: e.target.value })
+              }
+              error={errors.gender}
+            >
+              <option value="">Select…</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </Select>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input
+              label="Medical Conditions (optional)"
+              value={student.medicalConditions}
+              onChange={(e) =>
+                setStudent({
+                  ...student,
+                  medicalConditions: e.target.value,
+                })
+              }
+              error={errors.medicalConditions}
+              placeholder="e.g. Asthma, Diabetes"
+            />
+
+            <Input
+              label="Medications (optional)"
+              value={student.medications}
+              onChange={(e) =>
+                setStudent({
+                  ...student,
+                  medications: e.target.value,
+                })
+              }
+              error={errors.medications}
+              placeholder="e.g. Paracetamol"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Textarea
+              label="Address (optional)"
+              value={student.address}
+              onChange={(e) =>
+                setStudent({ ...student, address: e.target.value })
+              }
+              error={errors.address}
+              placeholder="Street, city, postcode"
+              rows={3}
+            />
+
+            <Textarea
+              label="Additional Notes (optional)"
+              value={student.additionalNotes}
+              onChange={(e) =>
+                setStudent({
+                  ...student,
+                  additionalNotes: e.target.value,
+                })
+              }
+              error={errors.additionalNotes}
+              placeholder="Any additional information..."
+              rows={4}
+            />
+          </div>
 
           <Input
             label="Allergies (optional)"
@@ -610,6 +701,10 @@ export function CreateStudentWizard() {
               ["Date of birth", student.dob],
               ["Gender", student.gender === "MALE" ? "Male" : "Female"],
               ["Allergies", student.allergies || "None"],
+              ["Join Date", student.joinDate || "None"],
+              ["Address", student.address || "None"],
+              ["Medical Conditions", student.medicalConditions || "None"],
+              ["Additional Notes", student.additionalNotes || "None"],
               ["Photo consent", student.photoConsent ? "Given" : "Not given"],
               ["Teacher", teacher?.title ?? "—"],
               [
