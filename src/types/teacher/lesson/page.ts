@@ -7,4 +7,5 @@ export interface Lesson {
   hasQuiz: boolean;
   attempted: boolean;
   createdAt: string;
+  quizId: string;
 }

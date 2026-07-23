@@ -77,7 +77,7 @@ export async function createLessonAction(
 
   const createdLesson = unwrap<Lesson>(result.data);
 
-  revalidatePath("/dashboard/teacher/lessons");
+  revalidatePath("/dashboard/teacher/create-lesson");
 
   return {
     success: true,
