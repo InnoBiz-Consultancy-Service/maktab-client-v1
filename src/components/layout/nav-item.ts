@@ -15,7 +15,8 @@ export type NavIconName =
   | "messages"
   | "learn"
   | "progress"
-  | "batches";
+  | "batches"
+  | "homework";
 
 export interface NavItem {
   href: string;
@@ -123,6 +124,12 @@ const teacherNav: RoleNav = {
       icon: "attendance",
       mobile: true,
     },
+    {
+      href: "/dashboard/teacher/homework",
+      label: "Homework",
+      icon: "homework",
+      mobile: true,
+    },
     { href: "/dashboard/teacher/marks", label: "Marks", icon: "marks" },
     {
       href: "/dashboard/teacher/settings",
@@ -150,6 +157,12 @@ const parentNav: RoleNav = {
       icon: "payments",
       mobile: true,
     },
+    {
+      href: "/dashboard/parent/homework",
+      label: "Homework",
+      icon: "homework",
+      mobile: true,
+    },
     { href: "/dashboard/parent/messages", label: "Messages", icon: "messages" },
     {
       href: "/dashboard/parent/settings",
@@ -175,6 +188,12 @@ const studentNav: RoleNav = {
       href: "/dashboard/student/progress",
       label: "Progress",
       icon: "progress",
+      mobile: true,
+    },
+    {
+      href: "/dashboard/student/homework",
+      label: "Homework",
+      icon: "homework",
       mobile: true,
     },
     {

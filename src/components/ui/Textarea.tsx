@@ -3,11 +3,12 @@ import {
   forwardRef,
   type ReactNode,
   type TextareaHTMLAttributes,
+  useId,
 } from "react";
 
 interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label: string;
+  label?: string;
   error?: string;
   /** Optional leading icon (e.g. a lucide icon element). */
   icon?: ReactNode;
@@ -20,17 +21,20 @@ export const Textarea = forwardRef<
   { label, error, icon, className, id, ...props },
   ref,
 ) {
+  const generatedId = useId();
   const textareaId =
-    id ?? props.name ?? label.toLowerCase().replace(/\s+/g, "-");
+    id ?? props.name ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label
-        htmlFor={textareaId}
-        className="text-sm font-medium text-night-900"
-      >
-        {label}
-      </label>
+      {label && (
+        <label
+          htmlFor={textareaId}
+          className="text-sm font-medium text-night-900"
+        >
+          {label}
+        </label>
+      )}
 
       <div className="relative">
         {icon && (
