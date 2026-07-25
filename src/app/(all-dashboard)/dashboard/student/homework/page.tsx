@@ -27,6 +27,26 @@ export default async function StudentHomeworkListPage({ searchParams }: PageProp
   });
 
   if (!result.ok) {
+    const isSessionNotFound =
+      result.error?.toLowerCase().includes("session not found") ||
+      result.error?.toLowerCase().includes("not found");
+
+    if (isSessionNotFound) {
+      return (
+        <div className="mx-auto max-w-2xl mt-6">
+          <Card className="flex flex-col items-center justify-center py-16 text-center shadow-soft border border-cream-200">
+            <BookOpen className="h-12 w-12 text-ink-soft/40" />
+            <h3 className="mt-4 text-lg font-bold text-night-900">
+              No homework assigned
+            </h3>
+            <p className="mt-1 text-sm text-ink-soft">
+              You don't have any homework assigned to you right now. Take a break!
+            </p>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <div className="mx-auto max-w-2xl">
         <Card className="py-10 text-center text-sm text-ink-soft">

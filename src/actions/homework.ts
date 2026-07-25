@@ -21,7 +21,7 @@ import {
   ParentOverviewResponse,
 } from "@/types/shared/homework";
 
-// Helper helper to unwrap nested data property
+// Helper to unwrap nested data property
 function unwrap<T>(raw: any): T {
   if (raw && typeof raw === "object" && "data" in raw) {
     return raw.data as T;
@@ -29,10 +29,33 @@ function unwrap<T>(raw: any): T {
   return raw as T;
 }
 
+// Helper to unwrap lists from standard API envelopes
+function unwrapList<T>(raw: any): T[] {
+  if (!raw) return [];
+  let payload = raw;
+  if (raw && typeof raw === "object" && "data" in raw) {
+    payload = raw.data;
+  }
+  if (Array.isArray(payload)) return payload as T[];
+  if (payload && typeof payload === "object") {
+    // Look for any key that contains an array
+    for (const key of Object.keys(payload)) {
+      if (Array.isArray(payload[key])) {
+        return payload[key] as T[];
+      }
+    }
+  }
+  return [];
+}
+
 // =========================================================================
 // TEACHER ACTIONS
 // =========================================================================
 
+/**
+ * GET /homeworks/teacher
+ * Retrieves all homework assignments created by the authenticated teacher, with optional filters.
+ */
 export async function getTeacherHomeworks(filters?: {
   search?: string;
   status?: string;
@@ -59,11 +82,10 @@ export async function getTeacherHomeworks(filters?: {
     }
 
     const payload = res.data || {};
-    const results = payload.results !== undefined ? payload.results : (payload.data?.results || []);
     const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
     return {
       ok: true,
-      data: results,
+      data: unwrapList<TeacherHomeworkListItem>(res.data),
       message: payload.message,
       meta,
     } as any;
@@ -72,6 +94,10 @@ export async function getTeacherHomeworks(filters?: {
   }
 }
 
+/**
+ * GET /homeworks/teacher/:id
+ * Retrieves details for a specific homework assignment created by the teacher.
+ */
 export async function getHomeworkDetail(id: string): Promise<ActionResult<TeacherHomeworkDetail>> {
   try {
     const res = await universalApi<any>({
@@ -83,12 +109,16 @@ export async function getHomeworkDetail(id: string): Promise<ActionResult<Teache
       return { ok: false, error: res.message || "Failed to fetch homework details" };
     }
 
-    return { ok: true, data: unwrap<TeacherHomeworkDetail>(res.data) };
+    return { ok: true, data: unwrap<TeacherHomeworkDetail>(res.data), message: res.data?.message };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to fetch homework details" };
   }
 }
 
+/**
+ * GET /teachers/my-batches
+ * Retrieves the list of batches assigned to the authenticated teacher.
+ */
 export async function getBatches(): Promise<ActionResult<Batch[]>> {
   try {
     const res = await universalApi<any>({
@@ -100,14 +130,16 @@ export async function getBatches(): Promise<ActionResult<Batch[]>> {
       return { ok: false, error: res.message || "Failed to fetch batches" };
     }
 
-    const payload = res.data || {};
-    const results = payload.results !== undefined ? payload.results : (payload.data?.results || (Array.isArray(payload) ? payload : []));
-    return { ok: true, data: results };
+    return { ok: true, data: unwrapList<Batch>(res.data) };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to fetch batches" };
   }
 }
 
+/**
+ * GET /lessons/teacher
+ * Retrieves all lessons associated with the authenticated teacher (used to link lessons to homework).
+ */
 export async function getLessons(): Promise<ActionResult<Lesson[]>> {
   try {
     const res = await universalApi<any>({
@@ -119,14 +151,16 @@ export async function getLessons(): Promise<ActionResult<Lesson[]>> {
       return { ok: false, error: res.message || "Failed to fetch lessons" };
     }
 
-    const payload = res.data || {};
-    const results = payload.results !== undefined ? payload.results : (payload.data?.results || (Array.isArray(payload) ? payload : []));
-    return { ok: true, data: results };
+    return { ok: true, data: unwrapList<Lesson>(res.data) };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to fetch lessons" };
   }
 }
 
+/**
+ * GET /homeworks/teacher/batches/:batchId/students
+ * Retrieves the students enrolled in a specific batch for the teacher.
+ */
 export async function getBatchStudents(batchId: string, search?: string): Promise<ActionResult<Student[]>> {
   try {
     const query = new URLSearchParams();
@@ -134,23 +168,21 @@ export async function getBatchStudents(batchId: string, search?: string): Promis
     const qs = query.toString();
     const endpoint = `/homeworks/teacher/batches/${batchId}/students${qs ? `?${qs}` : ""}`;
 
-    const res = await universalApi<any>({
-      endpoint,
-      method: "GET",
-    });
-
+    const res = await universalApi<any>({ endpoint, method: "GET" });
     if (!res.success) {
       return { ok: false, error: res.message || "Failed to fetch batch students" };
     }
 
-    const payload = res.data || {};
-    const results = payload.results !== undefined ? payload.results : (payload.data?.results || (Array.isArray(payload) ? payload : []));
-    return { ok: true, data: results };
+    return { ok: true, data: unwrapList<Student>(res.data) };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to fetch batch students" };
   }
 }
 
+/**
+ * POST /homeworks
+ * Creates a new homework assignment for a batch or specific students.
+ */
 export async function createHomework(data: {
   title: string;
   instruction: string;
@@ -186,6 +218,10 @@ export async function createHomework(data: {
   }
 }
 
+/**
+ * PATCH /homeworks/teacher/:id
+ * Updates an existing homework assignment's details.
+ */
 export async function updateHomework(
   id: string,
   data: {
@@ -227,6 +263,10 @@ export async function updateHomework(
   }
 }
 
+/**
+ * DELETE /homeworks/teacher/:id
+ * Deletes a homework assignment and its associated submissions.
+ */
 export async function deleteHomework(id: string): Promise<ActionResult<{ id: string; deletedSubmissions: number }>> {
   try {
     const res = await universalApi<any>({
@@ -245,6 +285,10 @@ export async function deleteHomework(id: string): Promise<ActionResult<{ id: str
   }
 }
 
+/**
+ * GET /homeworks/teacher/:homeworkId/submissions
+ * Retrieves the submission roster (summary, students, status) for a specific homework assignment.
+ */
 export async function getHomeworkSubmissions(
   homeworkId: string,
   filters?: { status?: string; track?: string; page?: number; limit?: number }
@@ -271,7 +315,7 @@ export async function getHomeworkSubmissions(
     const payload = res.data || {};
     const homework = payload.homework !== undefined ? payload.homework : payload.data?.homework;
     const summary = payload.summary !== undefined ? payload.summary : payload.data?.summary;
-    const results = payload.results !== undefined ? payload.results : (payload.data?.results || []);
+    const results = unwrapList<any>(payload.results !== undefined ? payload.results : payload.data?.results);
     const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
     return {
       ok: true,
@@ -284,6 +328,10 @@ export async function getHomeworkSubmissions(
   }
 }
 
+/**
+ * GET /homeworks/teacher/submissions/:submissionId
+ * Retrieves detailed submission data (student answer, files, note) for grading.
+ */
 export async function getSubmissionDetails(submissionId: string): Promise<ActionResult<SubmissionDetails>> {
   try {
     const res = await universalApi<any>({
@@ -301,6 +349,10 @@ export async function getSubmissionDetails(submissionId: string): Promise<Action
   }
 }
 
+/**
+ * PATCH /homeworks/teacher/submissions/:submissionId/grade
+ * Grades a student's homework submission (sets score and feedback).
+ */
 export async function gradeSubmission(
   submissionId: string,
   payload: {
@@ -332,6 +384,10 @@ export async function gradeSubmission(
   }
 }
 
+/**
+ * PATCH /homeworks/teacher/submissions/bulk-grade
+ * Bulk grades multiple homework submissions at once.
+ */
 export async function bulkGradeSubmissions(grades: {
   submissionId: string;
   isCompleted?: boolean;
@@ -356,6 +412,10 @@ export async function bulkGradeSubmissions(grades: {
   }
 }
 
+/**
+ * GET /homeworks/teacher/history
+ * Retrieves a history timeline of homework assignments for the teacher.
+ */
 export async function getTeacherHomeworkHistory(filters?: {
   batchId?: string;
   from?: string;
@@ -384,7 +444,7 @@ export async function getTeacherHomeworkHistory(filters?: {
     }
 
     const payload = res.data || {};
-    const days = payload.days !== undefined ? payload.days : (payload.data?.days || []);
+    const days = unwrapList<any>(payload.days !== undefined ? payload.days : payload.data?.days);
     const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
     return {
       ok: true,
@@ -397,6 +457,10 @@ export async function getTeacherHomeworkHistory(filters?: {
   }
 }
 
+/**
+ * GET /homeworks/teacher/overview
+ * Retrieves an overview summary of homework metrics (stats/graphs) for the teacher.
+ */
 export async function getTeacherHomeworkOverview(month?: string, batchId?: string): Promise<ActionResult<TeacherOverviewResponse>> {
   try {
     const query = new URLSearchParams();
@@ -424,6 +488,10 @@ export async function getTeacherHomeworkOverview(month?: string, batchId?: strin
 // STUDENT ACTIONS
 // =========================================================================
 
+/**
+ * GET /homeworks/student
+ * Retrieves all homework assignments assigned to the authenticated student.
+ */
 export async function getStudentHomeworks(filters?: {
   status?: string;
   track?: string;
@@ -450,11 +518,10 @@ export async function getStudentHomeworks(filters?: {
     }
 
     const payload = res.data || {};
-    const results = payload.results !== undefined ? payload.results : (payload.data?.results || []);
     const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
     return {
       ok: true,
-      data: results,
+      data: unwrapList<StudentHomeworkListItem>(res.data),
       meta,
       message: payload.message,
     } as any;
@@ -463,6 +530,10 @@ export async function getStudentHomeworks(filters?: {
   }
 }
 
+/**
+ * GET /homeworks/student/:homeworkId
+ * Retrieves detailed homework information and submission status for the student.
+ */
 export async function getStudentHomeworkDetail(homeworkId: string): Promise<ActionResult<StudentHomeworkDetail>> {
   try {
     const res = await universalApi<any>({
@@ -480,6 +551,10 @@ export async function getStudentHomeworkDetail(homeworkId: string): Promise<Acti
   }
 }
 
+/**
+ * POST /homeworks/student/:homeworkId/submit
+ * Submits homework answers and attachments for a student.
+ */
 export async function submitStudentHomework(
   homeworkId: string,
   payload: {
@@ -510,6 +585,10 @@ export async function submitStudentHomework(
   }
 }
 
+/**
+ * GET /homeworks/student/overview
+ * Retrieves an overview summary of homework metrics (stats/graphs) for the student.
+ */
 export async function getStudentHomeworkOverview(month?: string): Promise<ActionResult<StudentOverviewResponse>> {
   try {
     const query = new URLSearchParams();
@@ -551,6 +630,10 @@ export interface ParentHomeworkData {
   }[];
 }
 
+/**
+ * GET /homeworks/parent
+ * Retrieves parent's children listing and children's homework list (status, scores, feedback).
+ */
 export async function getParentHomeworkData(filters?: {
   studentId?: string;
   status?: string;
@@ -579,8 +662,8 @@ export async function getParentHomeworkData(filters?: {
     }
 
     const payload = res.data || {};
-    const children = payload.children !== undefined ? payload.children : (payload.data?.children || []);
-    const results = payload.results !== undefined ? payload.results : (payload.data?.results || []);
+    const children = unwrapList<Student>(payload.children !== undefined ? payload.children : payload.data?.children);
+    const results = unwrapList<any>(payload.results !== undefined ? payload.results : payload.data?.results);
     const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
     return {
       ok: true,
@@ -593,6 +676,10 @@ export async function getParentHomeworkData(filters?: {
   }
 }
 
+/**
+ * GET /homeworks/parent/overview
+ * Retrieves homework performance overview metrics for a parent's student children.
+ */
 export async function getParentHomeworkOverview(studentId?: string, month?: string): Promise<ActionResult<ParentOverviewResponse>> {
   try {
     const query = new URLSearchParams();

@@ -62,13 +62,20 @@ export function EditHomeworkForm({
       setLoadingStudents(false);
       if (res.ok) {
         setStudents(res.data);
+        // If this is the batch from the original homework and it was targetType BATCH, select all.
+        // If they change the batch, select all new students by default.
+        if (batchId === homework.batch.id && homework.targetType === "BATCH") {
+          setSelectedStudentIds(res.data.map((s) => s.id));
+        } else if (batchId !== homework.batch.id) {
+          setSelectedStudentIds(res.data.map((s) => s.id));
+        }
       } else {
         toast.error("Failed to load students for this batch");
       }
     };
 
     fetchStudents();
-  }, [batchId, hasSubmissions]);
+  }, [batchId, hasSubmissions, homework.batch.id, homework.targetType]);
 
   const handleStudentToggle = (studentId: string) => {
     if (hasSubmissions) return; // Cannot edit target audience
@@ -98,7 +105,7 @@ export function EditHomeworkForm({
       }
     }
 
-    if (targetType === "SPECIFIC" && selectedStudentIds.length === 0) {
+    if (selectedStudentIds.length === 0) {
       newErrors.students = "Please select at least one student";
     }
 
@@ -114,6 +121,10 @@ export function EditHomeworkForm({
     }
 
     setLoading(true);
+    const isAllSelected = selectedStudentIds.length === students.length;
+    const finalTargetType = isAllSelected ? "BATCH" : "SPECIFIC";
+    const finalStudentIds = isAllSelected ? null : selectedStudentIds;
+
     const result = await updateHomework(homework.id, {
       title,
       instruction,
@@ -124,8 +135,8 @@ export function EditHomeworkForm({
       status,
       maxScore: gradingType === "graded" ? Number(maxScore) : null,
       allowLateSubmission,
-      targetType: hasSubmissions ? undefined : targetType,
-      studentIds: hasSubmissions ? undefined : (targetType === "SPECIFIC" ? selectedStudentIds : null),
+      targetType: hasSubmissions ? undefined : finalTargetType,
+      studentIds: hasSubmissions ? undefined : finalStudentIds,
     });
 
     setLoading(false);
@@ -163,7 +174,7 @@ export function EditHomeworkForm({
   };
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/teacher/homework"
@@ -338,65 +349,67 @@ export function EditHomeworkForm({
             <span>Audience & Publishing</span>
           </div>
 
-          {/* Target Type */}
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Target Audience</label>
-            <Select
-              value={targetType}
-              onChange={(e) => setTargetType(e.target.value as any)}
-              disabled={loading || hasSubmissions}
-            >
-              <option value="BATCH">Assign to Entire Batch</option>
-              <option value="SPECIFIC">Assign to Specific Students</option>
-            </Select>
-          </div>
-
-          {/* Student list if SPECIFIC */}
-          {targetType === "SPECIFIC" && (
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-night-900">Select Students *</label>
-              <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20 min-h-[100px] items-center justify-center">
-                {loadingStudents ? (
-                  <div className="col-span-2 flex flex-col items-center justify-center gap-2 py-4">
-                    <Loader2 className="h-5 w-5 text-gold-500 animate-spin" />
-                    <p className="text-xs text-ink-soft">Loading students...</p>
-                  </div>
-                ) : students.length === 0 ? (
-                  <div className="col-span-2 text-center text-xs text-ink-soft py-4">
-                    No students found in this batch
-                  </div>
-                ) : (
-                  students.map((student) => {
-                    const isSelected = selectedStudentIds.includes(student.id);
-                    return (
-                      <div
-                        key={student.id}
-                        onClick={() => handleStudentToggle(student.id)}
-                        className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
-                          isSelected
-                            ? "bg-gold-500/10 border-gold-500/30 text-night-900"
-                            : "bg-white border-cream-200 hover:bg-cream-50/50"
-                        } ${hasSubmissions ? "pointer-events-none opacity-80" : ""}`}
-                      >
-                        <div>
-                          <p className="text-sm font-semibold">{student.name}</p>
-                          <p className="text-xs text-ink-soft">{student.studentCode}</p>
-                        </div>
-                        {isSelected && (
-                          <div className="rounded-full bg-gold-500 p-0.5 text-white">
-                            <Check className="h-3.5 w-3.5 stroke-[3]" />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-              {(errors.students || errors.studentIds) && (
-                <p className="text-xs text-error">{errors.students || errors.studentIds}</p>
+          {/* Student list */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-4 mb-1">
+              <label className="text-sm font-semibold text-night-900">Assign to Students *</label>
+              {students.length > 0 && !hasSubmissions && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedStudentIds.length === students.length) {
+                      setSelectedStudentIds([]);
+                    } else {
+                      setSelectedStudentIds(students.map((s) => s.id));
+                    }
+                  }}
+                  className="text-xs font-semibold text-gold-600 hover:text-gold-700 transition-colors"
+                >
+                  {selectedStudentIds.length === students.length ? "Deselect All" : "Select All"}
+                </button>
               )}
             </div>
-          )}
+            <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20 min-h-[100px] items-center justify-center">
+              {loadingStudents ? (
+                <div className="col-span-2 flex flex-col items-center justify-center gap-2 py-4">
+                  <Loader2 className="h-5 w-5 text-gold-500 animate-spin" />
+                  <p className="text-xs text-ink-soft">Loading students...</p>
+                </div>
+              ) : students.length === 0 ? (
+                <div className="col-span-2 text-center text-xs text-ink-soft py-4">
+                  No students found in this batch
+                </div>
+              ) : (
+                students.map((student) => {
+                  const isSelected = selectedStudentIds.includes(student.id);
+                  return (
+                    <div
+                      key={student.id}
+                      onClick={() => handleStudentToggle(student.id)}
+                      className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
+                        isSelected
+                          ? "bg-gold-500/10 border-gold-500/30 text-night-900"
+                          : "bg-white border-cream-200 hover:bg-cream-50/50"
+                      } ${hasSubmissions ? "pointer-events-none opacity-80" : ""}`}
+                    >
+                      <div>
+                        <p className="text-sm font-semibold">{student.name}</p>
+                        <p className="text-xs text-ink-soft">{student.studentCode}</p>
+                      </div>
+                      {isSelected && (
+                        <div className="rounded-full bg-gold-500 p-0.5 text-white">
+                          <Check className="h-3.5 w-3.5 stroke-[3]" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+            {(errors.students || errors.studentIds) && (
+              <p className="text-xs text-error">{errors.students || errors.studentIds}</p>
+            )}
+          </div>
 
           {/* Publish status */}
           <div className="space-y-1">

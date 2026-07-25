@@ -53,6 +53,8 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
       setLoadingStudents(false);
       if (res.ok) {
         setStudents(res.data);
+        // Automatically select all students initially
+        setSelectedStudentIds(res.data.map((s) => s.id));
       } else {
         toast.error("Failed to load students for this batch");
       }
@@ -90,7 +92,7 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
       }
     }
 
-    if (targetType === "SPECIFIC" && selectedStudentIds.length === 0) {
+    if (selectedStudentIds.length === 0) {
       newErrors.students = "Please select at least one student";
     }
 
@@ -106,6 +108,10 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
     }
 
     setLoading(true);
+    const isAllSelected = selectedStudentIds.length === students.length;
+    const finalTargetType = isAllSelected ? "BATCH" : "SPECIFIC";
+    const finalStudentIds = isAllSelected ? null : selectedStudentIds;
+
     const result = await createHomework({
       title,
       instruction,
@@ -116,8 +122,8 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
       status,
       maxScore: gradingType === "graded" ? Number(maxScore) : null,
       allowLateSubmission,
-      targetType,
-      studentIds: targetType === "SPECIFIC" ? selectedStudentIds : null,
+      targetType: finalTargetType,
+      studentIds: finalStudentIds,
     });
 
     setLoading(false);
@@ -141,7 +147,7 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/teacher/homework"
@@ -217,171 +223,177 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
         </div>
       </Card>
 
-      <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-        <div className="flex items-center gap-2 text-studies font-bold text-sm bg-studies-soft/30 px-3 py-1.5 rounded-md w-fit">
-          <Sparkles className="h-4 w-4" />
-          <span>Grading & Timeline</span>
-        </div>
-
-        {/* Dates */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Start Date</label>
-            <Input
-              type="date"
-              value={assignedDate}
-              onChange={(e) => setAssignedDate(e.target.value)}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Due Date *</label>
-            <Input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              disabled={loading}
-            />
-            {errors.dueDate && <p className="text-xs text-error">{errors.dueDate}</p>}
-          </div>
-        </div>
-
-        {/* Grading settings */}
-        <div className="grid gap-4 sm:grid-cols-2 items-end">
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Grading Option</label>
-            <Select
-              value={gradingType}
-              onChange={(e) => setGradingType(e.target.value as any)}
-              disabled={loading}
-            >
-              <option value="graded">Score Grading</option>
-              <option value="completion">Completion Only (Ungraded)</option>
-            </Select>
-          </div>
-
-          {gradingType === "graded" && (
-            <div className="space-y-1">
-              <label className="text-sm font-semibold text-night-900">Maximum Score</label>
-              <Input
-                type="number"
-                min="1"
-                value={maxScore}
-                onChange={(e) => setMaxScore(e.target.value)}
-                disabled={loading}
-              />
-              {errors.maxScore && <p className="text-xs text-error">{errors.maxScore}</p>}
+      {batchId && (
+        <>
+          <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
+            <div className="flex items-center gap-2 text-studies font-bold text-sm bg-studies-soft/30 px-3 py-1.5 rounded-md w-fit">
+              <Sparkles className="h-4 w-4" />
+              <span>Grading & Timeline</span>
             </div>
-          )}
-        </div>
 
-        {/* Allow late submission */}
-        <div className="flex items-center gap-3 bg-cream-50/50 p-3 rounded-lg border border-cream-200/50">
-          <input
-            type="checkbox"
-            id="allowLate"
-            checked={allowLateSubmission}
-            onChange={(e) => setAllowLateSubmission(e.target.checked)}
-            className="h-4.5 w-4.5 rounded border-cream-300 text-gold-500 accent-gold-500"
-            disabled={loading}
-          />
-          <label htmlFor="allowLate" className="text-sm font-medium text-night-900 select-none">
-            Allow Late Submissions
-            <span className="block text-xs font-normal text-ink-soft">
-              When checked, students can submit homework after the due date, marked as "Submitted late".
-            </span>
-          </label>
-        </div>
-      </Card>
+            {/* Dates */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-night-900">Start Date</label>
+                <Input
+                  type="date"
+                  value={assignedDate}
+                  onChange={(e) => setAssignedDate(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
 
-      <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-        <div className="flex items-center gap-2 text-arabic font-bold text-sm bg-arabic-soft/30 px-3 py-1.5 rounded-md w-fit">
-          <Sparkles className="h-4 w-4" />
-          <span>Audience & Publishing</span>
-        </div>
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-night-900">Due Date *</label>
+                <Input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  disabled={loading}
+                />
+                {errors.dueDate && <p className="text-xs text-error">{errors.dueDate}</p>}
+              </div>
+            </div>
 
-        {/* Target Type */}
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-night-900">Target Audience</label>
-          <Select
-            value={targetType}
-            onChange={(e) => setTargetType(e.target.value as any)}
-            disabled={loading}
-          >
-            <option value="BATCH">Assign to Entire Batch</option>
-            <option value="SPECIFIC">Assign to Specific Students</option>
-          </Select>
-        </div>
+            {/* Grading settings */}
+            <div className="grid gap-4 sm:grid-cols-2 items-end">
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-night-900">Grading Option</label>
+                <Select
+                  value={gradingType}
+                  onChange={(e) => setGradingType(e.target.value as any)}
+                  disabled={loading}
+                >
+                  <option value="graded">Score Grading</option>
+                  <option value="completion">Completion Only (Ungraded)</option>
+                </Select>
+              </div>
 
-        {/* Student list if SPECIFIC */}
-        {targetType === "SPECIFIC" && (
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-night-900">Select Students *</label>
-            <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20 min-h-[100px] items-center justify-center">
-              {loadingStudents ? (
-                <div className="col-span-2 flex flex-col items-center justify-center gap-2 py-4">
-                  <Loader2 className="h-5 w-5 text-gold-500 animate-spin" />
-                  <p className="text-xs text-ink-soft">Loading students...</p>
+              {gradingType === "graded" && (
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-night-900">Maximum Score</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={maxScore}
+                    onChange={(e) => setMaxScore(e.target.value)}
+                    disabled={loading}
+                  />
+                  {errors.maxScore && <p className="text-xs text-error">{errors.maxScore}</p>}
                 </div>
-              ) : students.length === 0 ? (
-                <div className="col-span-2 text-center text-xs text-ink-soft py-4">
-                  No students found in this batch
-                </div>
-              ) : (
-                students.map((student) => {
-                  const isSelected = selectedStudentIds.includes(student.id);
-                  return (
-                    <div
-                      key={student.id}
-                      onClick={() => !loading && handleStudentToggle(student.id)}
-                      className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
-                        isSelected
-                          ? "bg-gold-500/10 border-gold-500/30 text-night-900"
-                          : "bg-white border-cream-200 hover:bg-cream-50/50"
-                      }`}
-                    >
-                      <div>
-                        <p className="text-sm font-semibold">{student.name}</p>
-                        <p className="text-xs text-ink-soft">{student.studentCode}</p>
-                      </div>
-                      {isSelected && (
-                        <div className="rounded-full bg-gold-500 p-0.5 text-white">
-                          <Check className="h-3.5 w-3.5 stroke-[3]" />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
               )}
             </div>
-            {(errors.students || errors.studentIds) && (
-              <p className="text-xs text-error">{errors.students || errors.studentIds}</p>
-            )}
+
+            {/* Allow late submission */}
+            <div className="flex items-center gap-3 bg-cream-50/50 p-3 rounded-lg border border-cream-200/50">
+              <input
+                type="checkbox"
+                id="allowLate"
+                checked={allowLateSubmission}
+                onChange={(e) => setAllowLateSubmission(e.target.checked)}
+                className="h-4.5 w-4.5 rounded border-cream-300 text-gold-500 accent-gold-500"
+                disabled={loading}
+              />
+              <label htmlFor="allowLate" className="text-sm font-medium text-night-900 select-none">
+                Allow Late Submissions
+                <span className="block text-xs font-normal text-ink-soft">
+                  When checked, students can submit homework after the due date, marked as "Submitted late".
+                </span>
+              </label>
+            </div>
+          </Card>
+
+          <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
+            <div className="flex items-center gap-2 text-arabic font-bold text-sm bg-arabic-soft/30 px-3 py-1.5 rounded-md w-fit">
+              <Sparkles className="h-4 w-4" />
+              <span>Audience & Publishing</span>
+            </div>
+
+            {/* Student list */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-4 mb-1">
+                <label className="text-sm font-semibold text-night-900">Assign to Students *</label>
+                {students.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedStudentIds.length === students.length) {
+                        setSelectedStudentIds([]);
+                      } else {
+                        setSelectedStudentIds(students.map((s) => s.id));
+                      }
+                    }}
+                    className="text-xs font-semibold text-gold-600 hover:text-gold-700 transition-colors"
+                  >
+                    {selectedStudentIds.length === students.length ? "Deselect All" : "Select All"}
+                  </button>
+                )}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20 min-h-[100px] items-center justify-center">
+                {loadingStudents ? (
+                  <div className="col-span-2 flex flex-col items-center justify-center gap-2 py-4">
+                    <Loader2 className="h-5 w-5 text-gold-500 animate-spin" />
+                    <p className="text-xs text-ink-soft">Loading students...</p>
+                  </div>
+                ) : students.length === 0 ? (
+                  <div className="col-span-2 text-center text-xs text-ink-soft py-4">
+                    No students found in this batch
+                  </div>
+                ) : (
+                  students.map((student) => {
+                    const isSelected = selectedStudentIds.includes(student.id);
+                    return (
+                      <div
+                        key={student.id}
+                        onClick={() => !loading && handleStudentToggle(student.id)}
+                        className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
+                          isSelected
+                            ? "bg-gold-500/10 border-gold-500/30 text-night-900"
+                            : "bg-white border-cream-200 hover:bg-cream-50/50"
+                        }`}
+                      >
+                        <div>
+                          <p className="text-sm font-semibold">{student.name}</p>
+                          <p className="text-xs text-ink-soft">{student.studentCode}</p>
+                        </div>
+                        {isSelected && (
+                          <div className="rounded-full bg-gold-500 p-0.5 text-white">
+                            <Check className="h-3.5 w-3.5 stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              {(errors.students || errors.studentIds) && (
+                <p className="text-xs text-error">{errors.students || errors.studentIds}</p>
+              )}
+            </div>
+
+            {/* Publish status */}
+            <div className="space-y-1">
+              <label className="text-sm font-semibold text-night-900">Status</label>
+              <Select value={status} onChange={(e) => setStatus(e.target.value as any)} disabled={loading}>
+                <option value="PUBLISHED">Published (Visible to students immediately)</option>
+                <option value="DRAFT">Draft (Only visible to you)</option>
+              </Select>
+            </div>
+          </Card>
+
+          <div className="flex items-center gap-3 justify-end pt-4">
+            <Link
+              href="/dashboard/teacher/homework"
+              className="inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[44px] px-6 text-[15px]"
+            >
+              Cancel
+            </Link>
+            <Button type="submit" loading={loading} className="px-8">
+              Save Assignment
+            </Button>
           </div>
-        )}
-
-        {/* Publish status */}
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-night-900">Status</label>
-          <Select value={status} onChange={(e) => setStatus(e.target.value as any)} disabled={loading}>
-            <option value="PUBLISHED">Published (Visible to students immediately)</option>
-            <option value="DRAFT">Draft (Only visible to you)</option>
-          </Select>
-        </div>
-      </Card>
-
-      <div className="flex items-center gap-3 justify-end pt-4">
-        <Link
-          href="/dashboard/teacher/homework"
-          className="inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[44px] px-6 text-[15px]"
-        >
-          Cancel
-        </Link>
-        <Button type="submit" loading={loading} className="px-8">
-          Save Assignment
-        </Button>
-      </div>
+        </>
+      )}
     </form>
   );
 }

@@ -30,9 +30,20 @@ export default async function SubmissionsRosterPage({ params, searchParams }: Pa
 
   if (!result.ok) {
     return (
-      <div className="mx-auto max-w-2xl">
-        <Card className="py-10 text-center text-sm text-ink-soft">
-          Failed to load submissions. Please try again.
+      <div className="mx-auto max-w-2xl space-y-4">
+        <Link
+          href="/dashboard/teacher/homework"
+          className="inline-flex items-center gap-1 text-sm text-ink-soft transition-colors hover:text-night-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Homework</span>
+        </Link>
+        <Card className="py-12 text-center">
+          <ClipboardList className="mx-auto h-10 w-10 text-ink-soft/30 mb-3" />
+          <h3 className="font-display font-semibold text-night-900 mb-1">Submissions Unavailable</h3>
+          <p className="text-sm text-ink-soft max-w-sm mx-auto">
+            The submissions roster for this homework could not be loaded. This feature may not be available yet.
+          </p>
         </Card>
       </div>
     );
