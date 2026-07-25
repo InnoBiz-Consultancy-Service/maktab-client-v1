@@ -4,20 +4,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Batch, Lesson, Student } from "@/types/shared/homework";
 import { Button, Card, Input, Textarea, Select } from "@/components/ui";
-import { createHomework } from "@/actions/homework";
+import { createHomework, getBatchStudents } from "@/actions/homework";
 import { toast } from "sonner";
-import { ArrowLeft, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Sparkles, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 interface CreateHomeworkFormProps {
   batches: Batch[];
   lessons: Lesson[];
-  students: Student[];
+  students?: Student[];
 }
 
-export function CreateHomeworkForm({ batches, lessons, students }: CreateHomeworkFormProps) {
+export function CreateHomeworkForm({ batches, lessons, students: initialStudents = [] }: CreateHomeworkFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [students, setStudents] = useState<Student[]>(initialStudents);
 
   // Form states
   const [title, setTitle] = useState("");
@@ -35,6 +38,28 @@ export function CreateHomeworkForm({ batches, lessons, students }: CreateHomewor
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Dynamic student loading on batch change
+  useEffect(() => {
+    if (!batchId) {
+      setStudents([]);
+      setSelectedStudentIds([]);
+      return;
+    }
+
+    const fetchStudents = async () => {
+      setLoadingStudents(true);
+      const res = await getBatchStudents(batchId);
+      setLoadingStudents(false);
+      if (res.ok) {
+        setStudents(res.data);
+      } else {
+        toast.error("Failed to load students for this batch");
+      }
+    };
+
+    fetchStudents();
+  }, [batchId]);
 
   const handleStudentToggle = (studentId: string) => {
     setSelectedStudentIds((prev) =>
@@ -98,11 +123,20 @@ export function CreateHomeworkForm({ batches, lessons, students }: CreateHomewor
     setLoading(false);
 
     if (result.ok) {
-      toast.success("Homework created successfully!");
+      toast.success(result.message || "Homework created successfully!");
       router.push("/dashboard/teacher/homework");
       router.refresh();
     } else {
-      toast.error(result.error);
+      if ((result as any).errorSource && (result as any).errorSource.length > 0) {
+        const fieldErrors: Record<string, string> = {};
+        (result as any).errorSource.forEach((err: any) => {
+          fieldErrors[err.path] = err.message;
+        });
+        setErrors(fieldErrors);
+        toast.error("Please resolve the validation errors");
+      } else {
+        toast.error(result.error);
+      }
     }
   };
 
@@ -284,33 +318,46 @@ export function CreateHomeworkForm({ batches, lessons, students }: CreateHomewor
         {targetType === "SPECIFIC" && (
           <div className="space-y-2">
             <label className="text-sm font-semibold text-night-900">Select Students *</label>
-            <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20">
-              {students.map((student) => {
-                const isSelected = selectedStudentIds.includes(student.id);
-                return (
-                  <div
-                    key={student.id}
-                    onClick={() => !loading && handleStudentToggle(student.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
-                      isSelected
-                        ? "bg-gold-500/10 border-gold-500/30 text-night-900"
-                        : "bg-white border-cream-200 hover:bg-cream-50/50"
-                    }`}
-                  >
-                    <div>
-                      <p className="text-sm font-semibold">{student.name}</p>
-                      <p className="text-xs text-ink-soft">{student.studentCode}</p>
-                    </div>
-                    {isSelected && (
-                      <div className="rounded-full bg-gold-500 p-0.5 text-white">
-                        <Check className="h-3.5 w-3.5 stroke-[3]" />
+            <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20 min-h-[100px] items-center justify-center">
+              {loadingStudents ? (
+                <div className="col-span-2 flex flex-col items-center justify-center gap-2 py-4">
+                  <Loader2 className="h-5 w-5 text-gold-500 animate-spin" />
+                  <p className="text-xs text-ink-soft">Loading students...</p>
+                </div>
+              ) : students.length === 0 ? (
+                <div className="col-span-2 text-center text-xs text-ink-soft py-4">
+                  No students found in this batch
+                </div>
+              ) : (
+                students.map((student) => {
+                  const isSelected = selectedStudentIds.includes(student.id);
+                  return (
+                    <div
+                      key={student.id}
+                      onClick={() => !loading && handleStudentToggle(student.id)}
+                      className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
+                        isSelected
+                          ? "bg-gold-500/10 border-gold-500/30 text-night-900"
+                          : "bg-white border-cream-200 hover:bg-cream-50/50"
+                      }`}
+                    >
+                      <div>
+                        <p className="text-sm font-semibold">{student.name}</p>
+                        <p className="text-xs text-ink-soft">{student.studentCode}</p>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                      {isSelected && (
+                        <div className="rounded-full bg-gold-500 p-0.5 text-white">
+                          <Check className="h-3.5 w-3.5 stroke-[3]" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
-            {errors.students && <p className="text-xs text-error">{errors.students}</p>}
+            {(errors.students || errors.studentIds) && (
+              <p className="text-xs text-error">{errors.students || errors.studentIds}</p>
+            )}
           </div>
         )}
 

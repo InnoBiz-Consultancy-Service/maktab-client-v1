@@ -22,6 +22,8 @@ function buildFormData(overrides: Record<string, string> = {}): FormData {
     education: "BA Islamic Studies",
     phone: "01711223344",
     address: "Dhaka",
+    jobTitle: "Instructor",
+    startDate: "2026-01-01",
     ...overrides,
   };
   for (const [key, value] of Object.entries(values)) fd.set(key, value);

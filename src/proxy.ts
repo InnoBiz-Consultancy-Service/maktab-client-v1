@@ -68,11 +68,21 @@ export function proxy(request: NextRequest) {
   }
 
   // ---- Signed in ----
-  const home = `/dashboard/${role.toLowerCase()}`; // e.g. /dashboard/institute
+  const home =
+    role === "PARENT"
+      ? "/dashboard/parent/children"
+      : `/dashboard/${role.toLowerCase()}`;
 
   // If a signed-in user lands on a public/auth page, push them to their dashboard
   if (isPublic(pathname)) {
     return NextResponse.redirect(new URL(home, request.url));
+  }
+
+  // Redirect /dashboard/parent to parent children landing page to avoid 404
+  if (pathname === "/dashboard/parent") {
+    return NextResponse.redirect(
+      new URL("/dashboard/parent/children", request.url),
+    );
   }
 
   // Guard the dashboard: a user may only be inside their own role's section.

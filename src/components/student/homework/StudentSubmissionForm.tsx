@@ -8,6 +8,7 @@ import { submitStudentHomework } from "@/actions/homework";
 import { toast } from "sonner";
 import { StatusChip } from "@/components/shared/homework/StatusChip";
 import { YouTubeEmbed } from "@/components/shared/homework/YouTubeEmbed";
+import { formatCalendarDate } from "@/lib/utils/date";
 import {
   ArrowLeft,
   Calendar,
@@ -32,14 +33,14 @@ interface StudentSubmissionFormProps {
   homework: Homework;
   canSubmit: boolean;
   submission: Submission | null;
-  studentId: string;
+  submitBlockedReason?: string | null;
 }
 
 export function StudentSubmissionForm({
   homework,
   canSubmit,
   submission,
-  studentId,
+  submitBlockedReason = null,
 }: StudentSubmissionFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -143,7 +144,7 @@ export function StudentSubmissionForm({
     }
 
     setLoading(true);
-    const result = await submitStudentHomework(studentId, homework.id, {
+    const result = await submitStudentHomework(homework.id, {
       note: note.trim() || null,
       attachments,
     });
@@ -168,9 +169,7 @@ export function StudentSubmissionForm({
   }
 
   // Formatting date helper
-  const formattedDueDate = new Date(homework.dueDate).toLocaleDateString("en-US", {
-    dateStyle: "long",
-  });
+  const formattedDueDate = formatCalendarDate(homework.dueDate);
 
   return (
     <div className="space-y-6">
@@ -242,11 +241,7 @@ export function StudentSubmissionForm({
               <div className="flex items-center justify-between border-b border-cream-100 pb-3">
                 <h3 className="font-bold text-night-900">Your Submission</h3>
                 <div className="flex items-center gap-2">
-                  <StatusChip
-                    status={submission.status}
-                    isLate={submission.isLate}
-                    dueDate={homework.dueDate}
-                  />
+                  <StatusChip chip={submission.status === "GRADED" ? (submission.isLate ? "GRADED_LATE" : "GRADED") : (submission.isLate ? "SUBMITTED_LATE" : "SUBMITTED")} />
                 </div>
               </div>
 
@@ -469,9 +464,9 @@ export function StudentSubmissionForm({
             <Card className="p-6 border border-error/20 bg-error/5 shadow-soft flex items-start gap-4">
               <AlertTriangle className="h-6 w-6 text-error shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <h3 className="font-bold text-error">Late Submissions Blocked</h3>
+                <h3 className="font-bold text-error">Submissions Locked</h3>
                 <p className="text-sm text-ink leading-relaxed">
-                  This homework is past the due date ({formattedDueDate}) and late submissions are disabled by your teacher. You can no longer submit work for this assignment.
+                  {submitBlockedReason || `This homework is past the due date (${formattedDueDate}) and late submissions are disabled by your teacher. You can no longer submit work for this assignment.`}
                 </p>
               </div>
             </Card>

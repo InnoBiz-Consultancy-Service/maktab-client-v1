@@ -9,9 +9,7 @@ interface PageProps {
 export default async function StudentHomeworkDetailPage({ params }: PageProps) {
   const { id } = await params;
   
-  // For mock development, we'll default to student "stu_01" (Rahim Uddin)
-  const studentId = "stu_01";
-  const result = await getStudentHomeworkDetail(studentId, id);
+  const result = await getStudentHomeworkDetail(id);
 
   if (!result.ok) {
     return (
@@ -23,14 +21,14 @@ export default async function StudentHomeworkDetailPage({ params }: PageProps) {
     );
   }
 
-  const { homework, canSubmit, submission } = result.data;
+  const { homework, canSubmit, submission, submitBlockedReason } = result.data;
 
   return (
     <StudentSubmissionForm
       homework={homework}
       canSubmit={canSubmit}
       submission={submission}
-      studentId={studentId}
+      submitBlockedReason={submitBlockedReason}
     />
   );
 }

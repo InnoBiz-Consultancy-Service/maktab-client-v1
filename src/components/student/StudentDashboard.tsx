@@ -3,11 +3,19 @@ import { Play, ArrowRight, Target, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui";
 import { subjects } from "@/lib/dummy/student";
 import type { StudentOverview } from "@/actions/student/overview";
+import type { StudentOverviewResponse } from "@/types/shared/homework";
+import { formatCalendarDate } from "@/lib/utils/date";
 import { XpRing } from "./animation/XpRing";
 import { StreakFlame } from "./animation/StreakFlame";
 import { BadgeGrid } from "./BadgeGrid/BadgeGrid";
 
-export function StudentDashboard({ overview }: { overview: StudentOverview }) {
+export function StudentDashboard({
+  overview,
+  homeworkOverview,
+}: {
+  overview: StudentOverview;
+  homeworkOverview?: StudentOverviewResponse;
+}) {
   const { profile, rank, badges, nextLesson, counts } = overview;
   const goalPct = Math.min(
     100,
@@ -144,6 +152,61 @@ export function StudentDashboard({ overview }: { overview: StudentOverview }) {
           <BadgeGrid badges={badges} />
         </Card>
       </section>
+      {/* Homework Overview Section */}
+      {homeworkOverview && (
+        <section className="mb-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold text-night-900">Homework Progress ({homeworkOverview.month})</h2>
+            <Link href="/dashboard/student/homework" className="text-xs font-bold text-gold-600 hover:underline">
+              View All &rarr;
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
+              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Assigned</span>
+              <span className="text-xl font-bold text-night-900 block mt-1">{homeworkOverview.summary.assigned}</span>
+            </Card>
+            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
+              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Submitted</span>
+              <span className="text-xl font-bold text-night-900 block mt-1">{homeworkOverview.summary.submitted}</span>
+            </Card>
+            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
+              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Submission Rate</span>
+              <span className="text-xl font-bold text-quran block mt-1">{homeworkOverview.summary.submissionRate}%</span>
+            </Card>
+            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
+              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Overdue</span>
+              <span className={`text-xl font-bold block mt-1 ${homeworkOverview.summary.overdue > 0 ? 'text-error animate-pulse font-extrabold' : 'text-night-900'}`}>
+                {homeworkOverview.summary.overdue}
+              </span>
+            </Card>
+          </div>
+
+          {/* Upcoming assignments */}
+          {homeworkOverview.upcoming.length > 0 && (
+            <Card className="p-0 border border-cream-200 overflow-hidden shadow-sm">
+              <div className="border-b border-cream-100 bg-cream-50/50 px-4 py-3">
+                <h3 className="text-sm font-bold text-night-900">Upcoming Homework Tasks</h3>
+              </div>
+              <ul className="divide-y divide-cream-100">
+                {homeworkOverview.upcoming.map((item) => (
+                  <li key={item.assignmentId} className="hover:bg-cream-50/30 transition-all">
+                    <Link href={`/dashboard/student/homework/${item.homework.id}`} className="flex items-center justify-between px-4 py-3.5 text-xs">
+                      <div>
+                        <p className="font-semibold text-night-900">{item.homework.title}</p>
+                        <p className="text-[10px] text-ink-soft mt-0.5">Due: {formatCalendarDate(item.homework.dueDate)}</p>
+                      </div>
+                      <span className="shrink-0 bg-gold-500/10 text-gold-600 font-bold px-2.5 py-1 rounded text-[10px]">
+                        {item.daysLeft} day{item.daysLeft !== 1 ? 's' : ''} left
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+        </section>
+      )}
     </div>
   );
 }

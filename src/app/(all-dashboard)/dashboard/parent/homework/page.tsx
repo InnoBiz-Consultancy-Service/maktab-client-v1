@@ -9,7 +9,7 @@ export default async function ParentHomeworkPage() {
     return (
       <div className="mx-auto max-w-2xl">
         <Card className="py-10 text-center text-sm text-ink-soft">
-          Failed to load children's homework. Please try again.
+          Failed to load children's homework. {result.error}
         </Card>
       </div>
     );

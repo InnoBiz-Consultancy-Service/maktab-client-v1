@@ -9,6 +9,7 @@ interface PageProps {
     search?: string;
     status?: string;
     batchId?: string;
+    page?: string;
   }>;
 }
 
@@ -17,12 +18,20 @@ export default async function TeacherHomeworkPage({ searchParams }: PageProps) {
   const search = params.search || "";
   const status = params.status || "";
   const batchId = params.batchId || "";
+  const page = params.page ? parseInt(params.page, 10) : 1;
 
-  const homeworksResult = await getTeacherHomeworks({ search, status, batchId });
+  const homeworksResult = await getTeacherHomeworks({
+    search,
+    status,
+    batchId,
+    page,
+    limit: 12,
+  });
   const batchesResult = await getBatches();
 
   const homeworkList = homeworksResult.ok ? homeworksResult.data : [];
   const batchesList = batchesResult.ok ? batchesResult.data : [];
+  const meta = homeworksResult.ok ? (homeworksResult as any).meta : undefined;
 
   return (
     <div className="space-y-6">
@@ -32,13 +41,22 @@ export default async function TeacherHomeworkPage({ searchParams }: PageProps) {
           <h1 className="text-2xl font-bold text-night-900 sm:text-3xl">Homework Module</h1>
           <p className="text-sm text-ink-soft">Create, manage, and grade homework assignments for your batches.</p>
         </div>
-        <Link
-          href="/dashboard/teacher/homework/create"
-          className="inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-gold-500 text-night-900 shadow-soft hover:shadow-[0_0_28px_rgba(245,184,51,0.4)] min-h-[44px] px-6 text-[15px]"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Create Homework</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/teacher/homework/history"
+            className="inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-white text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[44px] px-6 text-[15px]"
+          >
+            <Calendar className="h-4 w-4 text-ink-soft" />
+            <span>Timeline</span>
+          </Link>
+          <Link
+            href="/dashboard/teacher/homework/create"
+            className="inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-gold-500 text-night-900 shadow-soft hover:shadow-[0_0_28px_rgba(245,184,51,0.4)] min-h-[44px] px-6 text-[15px]"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Create Homework</span>
+          </Link>
+        </div>
       </div>
 
       {/* Filters section */}
@@ -95,7 +113,7 @@ export default async function TeacherHomeworkPage({ searchParams }: PageProps) {
         <Card className="flex flex-col items-center justify-center py-16 text-center shadow-soft">
           <BookOpen className="h-12 w-12 text-ink-soft/40" />
           <h3 className="mt-4 text-lg font-bold text-night-900">
-            {search || status || batchId ? "No results found for this filter" : "No homework yet"}
+            {search || status || batchId ? "Nothing matches this filter" : "No homework yet"}
           </h3>
           <p className="mt-1 text-sm text-ink-soft">
             {search || status || batchId
@@ -167,6 +185,39 @@ export default async function TeacherHomeworkPage({ searchParams }: PageProps) {
               </div>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {meta && meta.totalPages > 1 && (
+        <div className="flex items-center justify-between border-t border-cream-200 pt-4 mt-6">
+          <p className="text-xs text-ink-soft">
+            Showing Page <strong className="text-night-900">{meta.page}</strong> of <strong className="text-night-900">{meta.totalPages}</strong> ({meta.total} total items)
+          </p>
+          <div className="flex gap-2">
+            <Link
+              href={{
+                pathname: "/dashboard/teacher/homework",
+                query: { ...params, page: Math.max(1, meta.page - 1) },
+              }}
+              className={`inline-flex items-center justify-center font-display font-semibold rounded-full border border-cream-200 bg-white text-night-900 text-xs px-4 py-2 hover:bg-cream-50 transition-all ${
+                meta.page <= 1 ? "pointer-events-none opacity-40" : ""
+              }`}
+            >
+              Previous
+            </Link>
+            <Link
+              href={{
+                pathname: "/dashboard/teacher/homework",
+                query: { ...params, page: Math.min(meta.totalPages, meta.page + 1) },
+              }}
+              className={`inline-flex items-center justify-center font-display font-semibold rounded-full border border-cream-200 bg-white text-night-900 text-xs px-4 py-2 hover:bg-cream-50 transition-all ${
+                meta.page >= meta.totalPages ? "pointer-events-none opacity-40" : ""
+              }`}
+            >
+              Next
+            </Link>
+          </div>
         </div>
       )}
     </div>

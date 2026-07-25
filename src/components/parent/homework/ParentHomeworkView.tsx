@@ -5,6 +5,7 @@ import { ParentHomeworkData } from "@/actions/homework";
 import { Card, Button } from "@/components/ui";
 import { StatusChip } from "@/components/shared/homework/StatusChip";
 import { Calendar, Award, User, BookOpen, MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
+import { formatCalendarDate } from "@/lib/utils/date";
 
 interface ParentHomeworkViewProps {
   data: ParentHomeworkData;
@@ -110,15 +111,11 @@ export function ParentHomeworkView({ data }: ParentHomeworkViewProps) {
                     <span className="text-xs font-semibold text-quran bg-quran-soft px-2 py-0.5 rounded">
                       {hw.batch.name}
                     </span>
-                    <StatusChip
-                      status={row.status}
-                      isLate={row.isLate}
-                      dueDate={hw.dueDate}
-                    />
+                    <StatusChip chip={row.chip} />
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-ink-soft">
                     <Calendar className="h-3.5 w-3.5" />
-                    <span>Due: {hw.dueDate}</span>
+                    <span>Due: {formatCalendarDate(hw.dueDate)}</span>
                   </div>
                 </div>
 
@@ -134,20 +131,22 @@ export function ParentHomeworkView({ data }: ParentHomeworkViewProps) {
                   </div>
 
                   {/* Score view */}
-                  <div className="text-right shrink-0">
-                    {isGraded ? (
-                      <div>
-                        <span className="text-xs text-ink-soft block uppercase tracking-wider font-semibold">Grade</span>
-                        <span className="text-lg font-extrabold text-success">
-                          {hw.maxScore !== null ? `${row.score} / ${hw.maxScore}` : "Complete"}
-                        </span>
-                      </div>
-                    ) : row.status === "SUBMITTED" ? (
-                      <span className="text-xs font-semibold text-warn bg-warn/10 px-2 py-1 rounded">Awaiting Grade</span>
-                    ) : (
-                      <span className="text-xs font-semibold text-ink-soft bg-cream-200/50 px-2 py-1 rounded">Pending Work</span>
-                    )}
-                  </div>
+                  {hw.maxScore !== null && (
+                    <div className="text-right shrink-0">
+                      {isGraded ? (
+                        <div>
+                          <span className="text-xs text-ink-soft block uppercase tracking-wider font-semibold">Grade</span>
+                          <span className="text-lg font-extrabold text-success">
+                            {row.score} / {hw.maxScore}
+                          </span>
+                        </div>
+                      ) : row.status === "SUBMITTED" ? (
+                        <span className="text-xs font-semibold text-warn bg-warn/10 px-2 py-1 rounded">Awaiting Grade</span>
+                      ) : (
+                        <span className="text-xs font-semibold text-ink-soft bg-cream-200/50 px-2 py-1 rounded">Pending Work</span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Feedback accordion */}

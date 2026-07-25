@@ -14,6 +14,8 @@ const basePayload: CreateStudentPayload = {
   name: "Abdullah Rahman",
   class: "Nursery",
   dob: "2018-05-01",
+  joinDate: "2026-01-01",
+  address: "Dhaka, Bangladesh",
   gender: "MALE",
   photoConsent: true,
   teacherId: "t1",
