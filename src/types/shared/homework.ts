@@ -67,6 +67,7 @@ export interface Homework {
 export interface TeacherHomeworkListItem {
   id: string;
   title: string;
+  instruction: string;
   batch: Batch;
   assignedDate: string;
   dueDate: string;
@@ -116,6 +117,7 @@ export interface StudentHomeworkListItem {
     allowLateSubmission: boolean;
     teacher: Teacher;
     hasLesson: boolean;
+    batch: Batch;
   };
 }
 

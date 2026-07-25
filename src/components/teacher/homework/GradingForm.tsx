@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SubmissionDetails } from "@/actions/homework";
+import { SubmissionDetails } from "@/types/shared/homework";
 import { Button, Card, Input, Textarea } from "@/components/ui";
 import { gradeSubmission } from "@/actions/homework";
 import { toast } from "sonner";

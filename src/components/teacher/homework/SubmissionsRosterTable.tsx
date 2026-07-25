@@ -83,7 +83,7 @@ export function SubmissionsRosterTable({ homeworkId, homework, results }: Submis
             </Button>
             <Button
               size="sm"
-              variant="outline"
+              variant="ghost"
               disabled={selectedIds.length === 0 || isPending}
               onClick={() => handleBulkGrade(false)}
               className="flex items-center gap-1.5 border-cream-300 hover:border-gold-500 hover:text-gold-600"
