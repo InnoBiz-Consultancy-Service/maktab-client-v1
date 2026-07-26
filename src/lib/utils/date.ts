@@ -3,7 +3,7 @@
  * This is timezone-safe and never feeds the raw string to new Date(),
  * preventing date-shifting issues in different client locales.
  */
-export function formatCalendarDate(dateStr: string): string {
+export function formatCalendarDate(dateStr?: string | null): string {
   if (!dateStr) return "—";
   const parts = dateStr.split("-");
   if (parts.length !== 3) return dateStr;

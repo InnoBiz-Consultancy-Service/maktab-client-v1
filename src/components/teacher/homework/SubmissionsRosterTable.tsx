@@ -15,14 +15,15 @@ interface SubmissionsRosterTableProps {
   results: HomeworkSubmissionSummary["results"];
 }
 
-export function SubmissionsRosterTable({ homeworkId, homework, results }: SubmissionsRosterTableProps) {
+export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: SubmissionsRosterTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
 
-  const isCompletionOnly = homework.maxScore === null;
+  const isCompletionOnly = homework?.maxScore === null;
+  const safeResults = results || [];
 
   // Filter out students who don't have submissions (cannot be graded)
-  const gradableSubmissions = results.filter((r) => r.submissionId !== null);
+  const gradableSubmissions = safeResults.filter((r) => r?.submissionId !== null && r?.submissionId !== undefined);
 
   const handleSelectAll = () => {
     if (selectedIds.length === gradableSubmissions.length) {
@@ -124,11 +125,12 @@ export function SubmissionsRosterTable({ homeworkId, homework, results }: Submis
               </tr>
             </thead>
             <tbody className="divide-y divide-cream-100 text-sm text-ink">
-              {results.map((row) => {
-                const canGrade = row.submissionId !== null;
-                const isSelected = row.submissionId ? selectedIds.includes(row.submissionId) : false;
+              {safeResults.map((row) => {
+                const canGrade = (row?.submissionId !== null && row?.submissionId !== undefined) || row?.status === "SUBMITTED" || row?.status === "GRADED";
+                const activeSubmissionId = row?.submissionId || row?.assignmentId;
+                const isSelected = activeSubmissionId ? selectedIds.includes(activeSubmissionId) : false;
 
-                const formattedDate = row.submittedAt
+                const formattedDate = row?.submittedAt
                   ? new Date(row.submittedAt).toLocaleString("en-US", {
                       dateStyle: "medium",
                       timeStyle: "short",
@@ -137,7 +139,7 @@ export function SubmissionsRosterTable({ homeworkId, homework, results }: Submis
 
                 return (
                   <tr
-                    key={row.assignmentId}
+                    key={row?.assignmentId || row?.student?.id}
                     className={`hover:bg-cream-50/30 transition-all ${
                       isSelected ? "bg-gold-500/5 hover:bg-gold-500/10" : ""
                     }`}
@@ -162,20 +164,20 @@ export function SubmissionsRosterTable({ homeworkId, homework, results }: Submis
                       </td>
                     )}
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-night-900">{row.student.name}</div>
-                      <div className="text-xs text-ink-soft">{row.student.studentCode}</div>
+                      <div className="font-semibold text-night-900">{row?.student?.name || "Student"}</div>
+                      <div className="text-xs text-ink-soft">{row?.student?.studentCode || ""}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <StatusChip chip={row.chip} />
+                      <StatusChip chip={row?.chip} />
                     </td>
                     <td className="px-6 py-4 text-xs text-ink-soft">{formattedDate}</td>
                     {!isCompletionOnly && (
                       <td className="px-6 py-4 text-center font-display font-semibold">
-                        {row.status === "GRADED" ? (
+                        {row?.status === "GRADED" ? (
                           <span className="text-success">
-                            {row.score} / {homework.maxScore}
+                            {row?.score} / {homework?.maxScore}
                           </span>
-                        ) : row.status === "SUBMITTED" ? (
+                        ) : row?.status === "SUBMITTED" ? (
                           <span className="text-warn text-xs bg-warn/10 px-2 py-0.5 rounded">Awaiting Grade</span>
                         ) : (
                           <span className="text-ink-soft/40">—</span>
@@ -185,18 +187,18 @@ export function SubmissionsRosterTable({ homeworkId, homework, results }: Submis
                     <td className="px-6 py-4 text-right">
                       {canGrade ? (
                         <Link
-                          href={`/dashboard/teacher/homework/submissions/${row.submissionId}`}
+                          href={`/dashboard/teacher/homework/submissions/${activeSubmissionId}`}
                           className={
-                            row.status === "GRADED"
+                            row?.status === "GRADED"
                               ? "inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[38px] px-4 text-sm"
                               : "inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-gold-500 text-night-900 shadow-soft hover:shadow-[0_0_28px_rgba(245,184,51,0.4)] min-h-[38px] px-4 text-sm"
                           }
                         >
-                          {row.status === "GRADED" ? "Edit Grade" : "Grade"}
+                          {row?.status === "GRADED" ? "Edit Grade" : "Grade"}
                         </Link>
                       ) : (
                         <Button size="sm" variant="ghost" disabled className="opacity-40">
-                          Unavailable
+                          Not Submitted
                         </Button>
                       )}
                     </td>

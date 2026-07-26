@@ -2,8 +2,13 @@ import { getParentHomeworkData } from "@/actions/homework";
 import { ParentHomeworkView } from "@/components/parent/homework/ParentHomeworkView";
 import { Card } from "@/components/ui";
 
-export default async function ParentHomeworkPage() {
-  const result = await getParentHomeworkData();
+interface PageProps {
+  searchParams: Promise<{ studentId?: string }>;
+}
+
+export default async function ParentHomeworkPage({ searchParams }: PageProps) {
+  const { studentId } = await searchParams;
+  const result = await getParentHomeworkData({ studentId });
 
   if (!result.ok) {
     return (
@@ -15,5 +20,5 @@ export default async function ParentHomeworkPage() {
     );
   }
 
-  return <ParentHomeworkView data={result.data} />;
+  return <ParentHomeworkView data={result.data} initialChildId={studentId} />;
 }

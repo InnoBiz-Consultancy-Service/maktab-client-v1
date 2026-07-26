@@ -49,12 +49,18 @@ export default async function SubmissionsRosterPage({ params, searchParams }: Pa
     );
   }
 
-  const { homework, summary, results } = result.data;
+  const { homework, summary, results = [] } = result.data || {};
   const meta = (result as any).meta;
+  const safeResults = results || [];
 
-  // Percentage calculations
-  const submissionRate = summary.totalAssigned > 0 
-    ? Math.round((summary.submitted / summary.totalAssigned) * 100) 
+  // Percentage calculations with fallback computation from safeResults
+  const totalAssigned = (summary?.totalAssigned && summary.totalAssigned > 0) ? summary.totalAssigned : safeResults.length;
+  const submitted = summary?.submitted ?? safeResults.filter((r: any) => r.submissionId || r.status === "SUBMITTED" || r.status === "GRADED").length;
+  const graded = summary?.graded ?? safeResults.filter((r: any) => r.status === "GRADED").length;
+  const late = summary?.late ?? safeResults.filter((r: any) => r.chip === "SUBMITTED_LATE" || r.chip === "GRADED_LATE").length;
+  const notSubmitted = summary?.notSubmitted ?? (totalAssigned - submitted);
+  const submissionRate = totalAssigned > 0 
+    ? Math.round((submitted / totalAssigned) * 100) 
     : 0;
 
   return (
@@ -84,11 +90,11 @@ export default async function SubmissionsRosterPage({ params, searchParams }: Pa
             </span>
             <span className="text-xs font-semibold text-ink-soft flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
-              Due: {formatCalendarDate(homework.dueDate)}
+              Due: {homework?.dueDate ? formatCalendarDate(homework.dueDate) : "—"}
             </span>
           </div>
-          <h2 className="text-xl font-bold text-night-900">{homework.title}</h2>
-          <p className="text-sm text-ink-soft line-clamp-3 leading-relaxed">{homework.instruction}</p>
+          <h2 className="text-xl font-bold text-night-900">{homework?.title || "Homework"}</h2>
+          <p className="text-sm text-ink-soft line-clamp-3 leading-relaxed">{homework?.instruction || ""}</p>
         </Card>
 
         {/* Progress Chart */}
@@ -98,7 +104,7 @@ export default async function SubmissionsRosterPage({ params, searchParams }: Pa
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-extrabold text-quran">{submissionRate}%</span>
               <span className="text-xs text-ink-soft">
-                ({summary.submitted}/{summary.totalAssigned} submitted)
+                ({submitted}/{totalAssigned} submitted)
               </span>
             </div>
             {/* Progress Bar */}
@@ -112,15 +118,15 @@ export default async function SubmissionsRosterPage({ params, searchParams }: Pa
 
           <div className="grid grid-cols-3 gap-2 text-center text-xs border-t border-cream-100 pt-3 mt-4">
             <div>
-              <span className="block text-sm font-bold text-success">{summary.graded}</span>
+              <span className="block text-sm font-bold text-success">{graded}</span>
               <span className="text-[10px] text-ink-soft">Graded</span>
             </div>
             <div>
-              <span className="block text-sm font-bold text-warn">{summary.late}</span>
+              <span className="block text-sm font-bold text-warn">{late}</span>
               <span className="text-[10px] text-ink-soft">Late</span>
             </div>
             <div>
-              <span className="block text-sm font-bold text-ink-soft">{summary.notSubmitted}</span>
+              <span className="block text-sm font-bold text-ink-soft">{notSubmitted}</span>
               <span className="text-[10px] text-ink-soft">Pending</span>
             </div>
           </div>
@@ -177,7 +183,7 @@ export default async function SubmissionsRosterPage({ params, searchParams }: Pa
           <h3 className="font-bold text-night-900 font-display">Submissions Checklist</h3>
         </div>
 
-        {results.length === 0 ? (
+        {!(results && results.length > 0) ? (
           <Card className="flex flex-col items-center justify-center py-16 text-center shadow-soft border border-cream-200">
             <BookOpen className="h-12 w-12 text-ink-soft/40" />
             <h3 className="mt-4 text-lg font-bold text-night-900">

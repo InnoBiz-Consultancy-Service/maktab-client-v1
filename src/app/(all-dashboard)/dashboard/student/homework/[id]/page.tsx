@@ -21,7 +21,17 @@ export default async function StudentHomeworkDetailPage({ params }: PageProps) {
     );
   }
 
-  const { homework, canSubmit, submission, submitBlockedReason } = result.data;
+  const { homework, canSubmit = false, submission = null, submitBlockedReason = null } = result.data || {};
+
+  if (!homework) {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <Card className="py-10 text-center text-sm text-ink-soft">
+          Homework assignment details could not be found.
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <StudentSubmissionForm

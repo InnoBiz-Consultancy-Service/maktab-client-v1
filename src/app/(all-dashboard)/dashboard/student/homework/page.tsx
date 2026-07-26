@@ -56,7 +56,7 @@ export default async function StudentHomeworkListPage({ searchParams }: PageProp
     );
   }
 
-  const assignments = result.data;
+  const assignments = Array.isArray(result.data) ? result.data : [];
   const meta = (result as any).meta;
 
   return (
@@ -127,36 +127,41 @@ export default async function StudentHomeworkListPage({ searchParams }: PageProp
       ) : (
         <div className="grid gap-4 max-w-4xl">
           {assignments.map((asg) => {
-            const hw = asg.homework;
+            const hw = asg?.homework;
+            const batchName = hw?.batch?.name;
+            const href = hw?.id ? `/dashboard/student/homework/${hw.id}` : "#";
+
             return (
-              <Link key={asg.assignmentId} href={`/dashboard/student/homework/${hw.id}`} className="block group">
+              <Link key={asg?.assignmentId || hw?.id} href={href} className="block group">
                 <Card className="border border-cream-200 shadow-soft group-hover:border-gold-500/50 transition-all p-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-semibold text-quran bg-quran-soft px-2 py-0.5 rounded">
-                        {hw.batch.name}
-                      </span>
-                      <StatusChip chip={asg.chip} />
+                      {batchName && (
+                        <span className="text-xs font-semibold text-quran bg-quran-soft px-2 py-0.5 rounded">
+                          {batchName}
+                        </span>
+                      )}
+                      <StatusChip chip={asg?.chip} />
                     </div>
                     <h3 className="text-lg font-bold text-night-900 group-hover:text-gold-600 transition-colors">
-                      {hw.title}
+                      {hw?.title || "Homework"}
                     </h3>
                     <div className="flex flex-wrap gap-4 text-xs text-ink-soft">
                       <span className="flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" /> Due: {formatCalendarDate(hw.dueDate)}
+                        <Calendar className="h-3.5 w-3.5" /> Due: {hw?.dueDate ? formatCalendarDate(hw.dueDate) : "—"}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Award className="h-3.5 w-3.5" /> {hw.maxScore !== null ? `Score: ${hw.maxScore} max` : "Ungraded / Completion"}
+                        <Award className="h-3.5 w-3.5" /> {hw?.maxScore !== null && hw?.maxScore !== undefined ? `Score: ${hw.maxScore} max` : "Ungraded / Completion"}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4 self-end sm:self-center">
-                    {asg.status === "GRADED" && hw.maxScore !== null && (
+                    {asg?.status === "GRADED" && hw?.maxScore !== null && hw?.maxScore !== undefined && (
                       <div className="text-right">
                         <span className="text-xs text-ink-soft block">Grade</span>
                         <span className="text-base font-extrabold text-success">
-                          {asg.score} / {hw.maxScore}
+                          {asg?.score} / {hw.maxScore}
                         </span>
                       </div>
                     )}

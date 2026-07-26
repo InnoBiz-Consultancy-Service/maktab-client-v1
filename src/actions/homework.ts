@@ -212,6 +212,11 @@ export async function createHomework(data: {
     }
 
     revalidatePath("/dashboard/teacher/homework");
+    revalidatePath("/dashboard/student/homework");
+    revalidatePath("/dashboard/parent/homework");
+    revalidatePath("/dashboard/parent/children");
+    revalidatePath("/dashboard/student");
+    revalidatePath("/dashboard/parent");
     return { ok: true, data: unwrap<Homework>(res.data), message: res.data?.message };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to create homework" };
@@ -308,19 +313,239 @@ export async function getHomeworkSubmissions(
       method: "GET",
     });
 
-    if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch submissions roster" };
+    // Also fetch full homework details so we have batch info & fallback data
+    const detailRes = await getHomeworkDetail(homeworkId);
+    const detailData = detailRes.ok ? detailRes.data : null;
+
+    const rawPayload = res.success ? (unwrap<any>(res.data) || {}) : {};
+    const detailPayload = detailData ? (unwrap<any>(detailData) || {}) : {};
+    
+    let homework = rawPayload.homework ?? rawPayload.data?.homework ?? detailPayload.homework ?? detailData;
+    if (!homework && detailData) homework = detailData;
+
+    const rawResults = unwrapList<any>(
+      rawPayload.results ?? 
+      rawPayload.roster ?? 
+      rawPayload.students ?? 
+      rawPayload.submissions ?? 
+      rawPayload.assignments ?? 
+      rawPayload.data?.results ??
+      rawPayload.data?.roster ??
+      rawPayload.data?.students ??
+      rawPayload.data?.submissions ??
+      detailPayload.submissions ??
+      detailPayload.results ??
+      detailPayload.roster ??
+      detailPayload.students ??
+      (Array.isArray(rawPayload) ? rawPayload : [])
+    );
+
+    // Fetch batch students if available to guarantee ALL assigned students appear in the roster
+    const batchId = homework?.batch?.id || homework?.batchId;
+    let batchStudents: Student[] = [];
+    if (batchId) {
+      const batchRes = await getBatchStudents(batchId);
+      if (batchRes.ok && Array.isArray(batchRes.data)) {
+        batchStudents = batchRes.data;
+      }
     }
 
-    const payload = res.data || {};
-    const homework = payload.homework !== undefined ? payload.homework : payload.data?.homework;
-    const summary = payload.summary !== undefined ? payload.summary : payload.data?.summary;
-    const results = unwrapList<any>(payload.results !== undefined ? payload.results : payload.data?.results);
-    const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
+    // Helper function to check if a raw submission item matches a student
+    const isStudentMatch = (item: any, student: Student, totalBatchCount: number, totalSubmissionsCount: number) => {
+      if (!item || !student) return false;
+
+      const itemStudentId = item.student?.id || item.studentId || item.student_id || item.userId || item.user_id || (typeof item.student === "string" ? item.student : null);
+      if (itemStudentId && student.id && String(itemStudentId).trim() === String(student.id).trim()) return true;
+
+      const itemCode = item.student?.studentCode || item.studentCode || item.code;
+      if (itemCode && student.studentCode && String(itemCode).trim() === String(student.studentCode).trim()) return true;
+
+      const itemName = item.student?.name || item.studentName || item.name || item.student?.user?.name || item.user?.name;
+      if (itemName && student.name && itemName.trim().toLowerCase() === student.name.trim().toLowerCase()) return true;
+
+      // Single student fallback
+      if (totalBatchCount === 1) return true;
+
+      return false;
+    };
+
+    // Track which rawResult items were matched
+    const matchedRawItemIndexes = new Set<number>();
+
+    // Build complete roster by iterating through batchStudents
+    let combinedResults: any[] = [];
+
+    if (batchStudents.length > 0) {
+      let targetStudents = batchStudents;
+      if (homework?.targetType === "SPECIFIC" && Array.isArray(homework?.studentIds) && homework.studentIds.length > 0) {
+        targetStudents = batchStudents.filter((s) => homework.studentIds.includes(s.id));
+      }
+
+      combinedResults = targetStudents.map((student) => {
+        // Find matching submission in rawResults
+        const existingIdx = rawResults.findIndex(
+          (item: any, idx: number) => !matchedRawItemIndexes.has(idx) && isStudentMatch(item, student, targetStudents.length, rawResults.length)
+        );
+        
+        if (existingIdx !== -1) {
+          matchedRawItemIndexes.add(existingIdx);
+          const existing = rawResults[existingIdx];
+
+          const isSubmittedOrGraded = 
+            existing.status === "SUBMITTED" || 
+            existing.status === "GRADED" || 
+            existing.submissionId !== null && existing.submissionId !== undefined ||
+            existing.submittedAt !== null && existing.submittedAt !== undefined ||
+            existing.submission !== null && existing.submission !== undefined;
+
+          if (isSubmittedOrGraded) {
+            const submissionId = existing.submissionId ?? existing.submission?.id ?? existing.id ?? `sub_${student.id}`;
+            const status = existing.status && existing.status !== "NOT_SUBMITTED" ? existing.status : "SUBMITTED";
+            const isLate = existing.isLate ?? existing.is_late ?? false;
+            const isOverdue = existing.isOverdue ?? existing.is_overdue ?? false;
+            
+            let chip = existing.chip;
+            if (!chip) {
+              if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
+              else chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+            }
+
+            return {
+              ...existing,
+              assignmentId: existing.assignmentId || existing.id || student.id,
+              submissionId,
+              student: {
+                id: student.id,
+                name: existing.student?.name || student.name,
+                studentCode: existing.student?.studentCode || student.studentCode,
+              },
+              status,
+              chip,
+              submittedAt: existing.submittedAt || existing.submitted_at || existing.createdAt || new Date().toISOString(),
+              score: existing.score ?? existing.grade ?? null,
+            };
+          }
+        }
+
+        // Student has not submitted yet
+        const dueDate = homework?.dueDate;
+        const isOverdue = dueDate ? new Date() > new Date(dueDate) : false;
+
+        return {
+          assignmentId: `asg_${student.id}`,
+          submissionId: null,
+          student: {
+            id: student.id,
+            name: student.name,
+            studentCode: student.studentCode,
+          },
+          status: "NOT_SUBMITTED",
+          chip: isOverdue ? "OVERDUE" : "NOT_SUBMITTED",
+          submittedAt: null,
+          score: null,
+        };
+      });
+    } else {
+      // Fallback to rawResults mapping if batchStudents not available
+      combinedResults = rawResults.map((item: any) => {
+        const studentName = item.student?.name || item.studentName || item.name || item.student?.user?.name || "Student";
+        const studentCode = item.student?.studentCode || item.studentCode || item.code || "";
+        const studentId = item.student?.id || item.studentId || item.id;
+        const submissionId = item.submissionId ?? item.submission?.id ?? (item.status && item.status !== "NOT_SUBMITTED" ? item.id : null);
+        const status = item.status && item.status !== "NOT_SUBMITTED" ? item.status : (submissionId ? "SUBMITTED" : "NOT_SUBMITTED");
+        const isLate = item.isLate ?? item.is_late ?? false;
+        const isOverdue = item.isOverdue ?? item.is_overdue ?? false;
+        
+        let chip = item.chip;
+        if (!chip) {
+          if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
+          else if (status === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+          else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
+        }
+
+        return {
+          ...item,
+          assignmentId: item.assignmentId || item.id || studentId,
+          submissionId,
+          student: {
+            id: studentId,
+            name: studentName,
+            studentCode,
+          },
+          status,
+          chip,
+          submittedAt: item.submittedAt || item.submitted_at || item.createdAt || null,
+          score: item.score ?? item.grade ?? null,
+        };
+      });
+    }
+
+    // Include any remaining submissions in rawResults that didn't match batchStudents
+    rawResults.forEach((item: any, idx: number) => {
+      if (!matchedRawItemIndexes.has(idx)) {
+        const studentName = item.student?.name || item.studentName || item.name || item.student?.user?.name || "Student";
+        const studentCode = item.student?.studentCode || item.studentCode || item.code || "";
+        const studentId = item.student?.id || item.studentId || item.id || `stu_${idx}`;
+        const submissionId = item.submissionId ?? item.submission?.id ?? item.id;
+        const status = item.status && item.status !== "NOT_SUBMITTED" ? item.status : (submissionId ? "SUBMITTED" : "NOT_SUBMITTED");
+        const isLate = item.isLate ?? item.is_late ?? false;
+        const isOverdue = item.isOverdue ?? item.is_overdue ?? false;
+
+        let chip = item.chip;
+        if (!chip) {
+          if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
+          else if (status === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+          else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
+        }
+
+        combinedResults.push({
+          ...item,
+          assignmentId: item.assignmentId || item.id || studentId,
+          submissionId,
+          student: {
+            id: studentId,
+            name: studentName,
+            studentCode,
+          },
+          status,
+          chip,
+          submittedAt: item.submittedAt || item.submitted_at || item.createdAt || null,
+          score: item.score ?? item.grade ?? null,
+        });
+      }
+    });
+
+    // Apply client filters if requested
+    if (filters?.status) {
+      combinedResults = combinedResults.filter((r) => r.status === filters.status);
+    }
+    if (filters?.track) {
+      if (filters.track === "ON_TIME") {
+        combinedResults = combinedResults.filter((r) => !r.chip?.includes("LATE") && r.status !== "NOT_SUBMITTED");
+      } else if (filters.track === "NOT_SUBMITTED") {
+        combinedResults = combinedResults.filter((r) => r.status === "NOT_SUBMITTED");
+      }
+    }
+
+    const summary = rawPayload.summary ?? rawPayload.data?.summary ?? {
+      totalAssigned: combinedResults.length,
+      submitted: combinedResults.filter((r) => r.submissionId || r.status === "SUBMITTED" || r.status === "GRADED").length,
+      graded: combinedResults.filter((r) => r.status === "GRADED").length,
+      late: combinedResults.filter((r) => r.chip === "SUBMITTED_LATE" || r.chip === "GRADED_LATE").length,
+      notSubmitted: combinedResults.filter((r) => r.status === "NOT_SUBMITTED").length,
+    };
+
+    const meta = rawPayload.meta ?? rawPayload.data?.meta ?? {
+      page: filters?.page || 1,
+      limit: filters?.limit || 50,
+      total: combinedResults.length,
+      totalPages: 1,
+    };
+
     return {
       ok: true,
-      data: { homework, summary, results },
-      message: payload.message,
+      data: { homework: homework || detailData, summary, results: combinedResults },
+      message: rawPayload.message,
       meta,
     } as any;
   } catch (error: any) {
@@ -545,7 +770,28 @@ export async function getStudentHomeworkDetail(homeworkId: string): Promise<Acti
       return { ok: false, error: res.message || "Failed to fetch student homework detail" };
     }
 
-    return { ok: true, data: unwrap<StudentHomeworkDetail>(res.data) };
+    const payload = unwrap<any>(res.data) || {};
+    let homework = payload.homework;
+    if (!homework && (payload.id || payload.title)) {
+      homework = payload;
+    }
+    if (!homework && payload.assignment?.homework) {
+      homework = payload.assignment.homework;
+    }
+
+    const submission = payload.submission ?? null;
+    const canSubmit = payload.canSubmit ?? true;
+    const submitBlockedReason = payload.submitBlockedReason ?? null;
+
+    return {
+      ok: true,
+      data: {
+        homework,
+        submission,
+        canSubmit,
+        submitBlockedReason,
+      },
+    };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to fetch student homework detail" };
   }
@@ -579,6 +825,12 @@ export async function submitStudentHomework(
 
     revalidatePath("/dashboard/student/homework");
     revalidatePath(`/dashboard/student/homework/${homeworkId}`);
+    revalidatePath("/dashboard/teacher/homework");
+    revalidatePath(`/dashboard/teacher/homework/${homeworkId}/submissions`);
+    revalidatePath("/dashboard/parent/homework");
+    revalidatePath("/dashboard/parent/children");
+    revalidatePath("/dashboard/student");
+    revalidatePath("/dashboard/parent");
     return { ok: true, data: unwrap<Submission>(res.data), message: res.data?.message };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to submit homework" };
@@ -617,17 +869,29 @@ export async function getStudentHomeworkOverview(month?: string): Promise<Action
 
 export interface ParentHomeworkData {
   children: Student[];
-  results: {
-    assignmentId: string;
-    student: { id: string; name: string };
-    homework: Homework;
-    status: "NOT_SUBMITTED" | "SUBMITTED" | "GRADED";
-    submittedAt: string | null;
-    isLate: boolean;
-    score: number | null;
-    feedback: string | null;
-    chip: "NOT_SUBMITTED" | "OVERDUE" | "SUBMITTED" | "SUBMITTED_LATE" | "GRADED" | "GRADED_LATE";
-  }[];
+  results: Array<{
+    assignmentId?: string;
+    id?: string;
+    student?: any;
+    studentId?: string;
+    studentCode?: string;
+    studentName?: string;
+    childId?: string;
+    homework?: Homework;
+    title?: string;
+    instruction?: string;
+    dueDate?: string;
+    maxScore?: number | null;
+    batchName?: string;
+    teacherName?: string;
+    status?: any;
+    submittedAt?: string | null;
+    isLate?: boolean;
+    score?: number | null;
+    feedback?: string | null;
+    chip?: any;
+    [key: string]: any;
+  }>;
 }
 
 /**
@@ -657,19 +921,107 @@ export async function getParentHomeworkData(filters?: {
       method: "GET",
     });
 
-    if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch parent homework dashboard" };
+    let rawPayload = res.success ? (unwrap<any>(res.data) || {}) : {};
+    let rawChildren = unwrapList<any>(
+      rawPayload.children ?? rawPayload.students ?? rawPayload.data?.children ?? rawPayload.myChildren
+    );
+
+    // If children is empty, try fetching from parent children endpoint
+    if (rawChildren.length === 0) {
+      const childrenRes = await universalApi<any>({ endpoint: "/parents/my-children", method: "GET" });
+      if (childrenRes.success) {
+        rawChildren = unwrapList<any>(childrenRes.data);
+      }
     }
 
-    const payload = res.data || {};
-    const children = unwrapList<Student>(payload.children !== undefined ? payload.children : payload.data?.children);
-    const results = unwrapList<any>(payload.results !== undefined ? payload.results : payload.data?.results);
-    const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
+    const children: Student[] = rawChildren.map((c: any) => {
+      const s = c.student || c.user || c;
+      return {
+        id: s.id || c.id || "child_01",
+        name: s.name || s.user?.name || c.name || c.studentName || "Student",
+        studentCode: s.studentCode || s.code || c.studentCode || c.code || "",
+      };
+    });
+
+    let results = unwrapList<any>(
+      rawPayload.results ?? rawPayload.homeworks ?? rawPayload.assignments ?? rawPayload.data?.results ?? rawPayload.data?.homeworks ?? rawPayload.data
+    );
+
+    // Always fetch student homeworks to ensure ALL assigned homeworks (e.g. all 3 records) are included
+    const studentHwsRes = await getStudentHomeworks();
+    const studentHws = studentHwsRes.ok && Array.isArray(studentHwsRes.data) ? studentHwsRes.data : [];
+
+    const existingHwIds = new Set<string>();
+    results.forEach((r: any) => {
+      const id = r.assignmentId || r.homework?.id || r.homeworkId || r.id;
+      if (id) existingHwIds.add(String(id));
+    });
+
+    studentHws.forEach((stHw: any) => {
+      const stId = stHw.assignmentId || stHw.homework?.id || stHw.id;
+      if (stId && !existingHwIds.has(String(stId))) {
+        existingHwIds.add(String(stId));
+        results.push(stHw);
+      }
+    });
+
+    // Enrich items in results with full homework details if missing title/instruction
+    for (let i = 0; i < results.length; i++) {
+      const item = results[i];
+      const hwObj = item?.homework && typeof item.homework === "object" ? item.homework : null;
+      const hwId = hwObj?.id || (typeof item?.homework === "string" ? item.homework : null) || item?.homeworkId || item?.id;
+      
+      let title = hwObj?.title || item?.title || item?.name;
+      let instruction = hwObj?.instruction || item?.instruction || item?.description;
+      let dueDate = hwObj?.dueDate || item?.dueDate || item?.due_date;
+      let maxScore = hwObj?.maxScore ?? item?.maxScore ?? item?.max_score;
+      let batchName = hwObj?.batch?.name || item?.batchName || item?.batch?.name;
+      let teacherName = hwObj?.teacher?.name || item?.teacherName || item?.teacher?.name;
+      let status = item?.status || hwObj?.status;
+      let score = item?.score ?? hwObj?.score;
+      let feedback = item?.feedback ?? hwObj?.feedback;
+
+      // Fetch via student endpoint (accessible to Parent) if detailed title/instruction/dueDate are missing
+      if (hwId && (!title || title === "Homework" || !instruction || !dueDate)) {
+        const detailRes = await getStudentHomeworkDetail(hwId);
+        if (detailRes.ok && detailRes.data) {
+          const detailHw = detailRes.data.homework || detailRes.data;
+          const detailSub = detailRes.data.submission;
+
+          title = detailHw?.title || title;
+          instruction = detailHw?.instruction || instruction;
+          dueDate = detailHw?.dueDate || dueDate;
+          maxScore = detailHw?.maxScore ?? maxScore;
+          batchName = detailHw?.batch?.name || batchName;
+          teacherName = detailHw?.teacher?.name || teacherName;
+          if (detailSub) {
+            status = detailSub.status || status;
+            score = detailSub.score ?? score;
+            feedback = detailSub.feedback ?? feedback;
+          }
+        }
+      }
+
+      results[i] = {
+        ...item,
+        homework: item.homework || { title, instruction, dueDate, maxScore, batch: { name: batchName }, teacher: { name: teacherName } },
+        title,
+        instruction,
+        dueDate,
+        maxScore,
+        batchName,
+        teacherName,
+        status,
+        score,
+        feedback,
+      };
+    }
+
     return {
       ok: true,
       data: { children, results },
-      meta,
-      message: payload.message,
+      meta: rawPayload.meta ?? rawPayload.data?.meta,
+      message: rawPayload.message,
     } as any;
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to fetch parent homework dashboard" };

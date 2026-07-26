@@ -53,8 +53,8 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
       setLoadingStudents(false);
       if (res.ok) {
         setStudents(res.data);
-        // Automatically select all students initially
-        setSelectedStudentIds(res.data.map((s) => s.id));
+        // Initially leave all students unselected so teacher selects them manually
+        setSelectedStudentIds([]);
       } else {
         toast.error("Failed to load students for this batch");
       }
@@ -348,18 +348,20 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
                         onClick={() => !loading && handleStudentToggle(student.id)}
                         className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
                           isSelected
-                            ? "bg-gold-500/10 border-gold-500/30 text-night-900"
-                            : "bg-white border-cream-200 hover:bg-cream-50/50"
+                            ? "bg-gold-500/10 border-gold-500/40 text-night-900"
+                            : "bg-white border-cream-200 hover:bg-cream-50/50 hover:border-cream-300 text-night-900"
                         }`}
                       >
                         <div>
                           <p className="text-sm font-semibold">{student.name}</p>
                           <p className="text-xs text-ink-soft">{student.studentCode}</p>
                         </div>
-                        {isSelected && (
-                          <div className="rounded-full bg-gold-500 p-0.5 text-white">
+                        {isSelected ? (
+                          <div className="h-5 w-5 rounded-full bg-gold-500 text-white flex items-center justify-center p-0.5 shrink-0 shadow-sm">
                             <Check className="h-3.5 w-3.5 stroke-[3]" />
                           </div>
+                        ) : (
+                          <div className="h-5 w-5 rounded-full border-2 border-cream-300 bg-white shrink-0 transition-colors" />
                         )}
                       </div>
                     );

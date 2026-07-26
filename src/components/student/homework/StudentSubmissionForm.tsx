@@ -143,6 +143,11 @@ export function StudentSubmissionForm({
       return;
     }
 
+    if (!homework?.id) {
+      toast.error("Invalid homework assignment");
+      return;
+    }
+
     setLoading(true);
     const result = await submitStudentHomework(homework.id, {
       note: note.trim() || null,
@@ -169,7 +174,7 @@ export function StudentSubmissionForm({
   }
 
   // Formatting date helper
-  const formattedDueDate = formatCalendarDate(homework.dueDate);
+  const formattedDueDate = formatCalendarDate(homework?.dueDate);
 
   return (
     <div className="space-y-6">
@@ -193,43 +198,49 @@ export function StudentSubmissionForm({
         <div className="lg:col-span-2 space-y-6">
           <Card className="p-6 border border-cream-200 shadow-soft space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cream-100 pb-3">
-              <span className="text-xs font-semibold text-quran bg-quran-soft px-2.5 py-1 rounded">
-                {homework.batch.name}
-              </span>
+              {homework?.batch?.name && (
+                <span className="text-xs font-semibold text-quran bg-quran-soft px-2.5 py-1 rounded">
+                  {homework.batch.name}
+                </span>
+              )}
               <span className="text-xs text-ink-soft flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" /> Due Date: {formattedDueDate}
+                <Calendar className="h-3.5 w-3.5" /> Due Date: {homework?.dueDate ? formatCalendarDate(homework.dueDate) : "—"}
               </span>
             </div>
 
-            <h2 className="text-xl font-bold text-night-900">{homework.title}</h2>
+            <h2 className="text-xl font-bold text-night-900">{homework?.title || "Homework Details"}</h2>
             
             {/* Clamped show-more instructions */}
             <div className="space-y-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-ink-soft">Instructions</h4>
               <div className="text-sm text-ink bg-cream-50 p-4 rounded-lg border border-cream-200/50 whitespace-pre-wrap leading-relaxed">
-                {homework.instruction}
+                {homework?.instruction || "No instructions provided."}
               </div>
             </div>
 
             {/* Lesson details if linked */}
-            {homework.lesson && (
+            {homework?.lesson && (
               <div className="bg-arabic-soft/20 border border-arabic/10 rounded-lg p-4 space-y-3">
                 <h4 className="text-xs font-bold text-arabic uppercase tracking-wider">Linked Lesson Reference</h4>
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-arabic" />
-                    <span className="text-sm font-semibold text-night-900">{homework.lesson.title}</span>
+                    <span className="text-sm font-semibold text-night-900">{homework.lesson.title || "Lesson"}</span>
                   </div>
-                  <a
-                    href={`https://www.youtube.com/watch?v=${homework.lesson.youtubeVideoId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-arabic hover:underline"
-                  >
-                    View video lesson <Play className="h-3 w-3 fill-arabic" />
-                  </a>
+                  {homework.lesson.youtubeVideoId && (
+                    <a
+                      href={`https://www.youtube.com/watch?v=${homework.lesson.youtubeVideoId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-arabic hover:underline"
+                    >
+                      View video lesson <Play className="h-3 w-3 fill-arabic" />
+                    </a>
+                  )}
                 </div>
-                <YouTubeEmbed url={`https://www.youtube.com/watch?v=${homework.lesson.youtubeVideoId}`} className="max-w-md mx-auto" />
+                {homework.lesson.youtubeVideoId && (
+                  <YouTubeEmbed url={`https://www.youtube.com/watch?v=${homework.lesson.youtubeVideoId}`} className="max-w-md mx-auto" />
+                )}
               </div>
             )}
           </Card>
@@ -485,7 +496,7 @@ export function StudentSubmissionForm({
               <div className="space-y-5">
                 <div className="bg-night-800 p-4 rounded-lg border border-night-700 text-center space-y-1">
                   <span className="text-xs text-cream-100/60 uppercase tracking-wider block">Graded Result</span>
-                  {homework.maxScore !== null ? (
+                  {homework?.maxScore !== null && homework?.maxScore !== undefined ? (
                     <div className="flex items-baseline justify-center gap-1.5">
                       <span className="text-4xl font-extrabold text-success">{submission.score}</span>
                       <span className="text-sm text-cream-100/50">/ {homework.maxScore}</span>

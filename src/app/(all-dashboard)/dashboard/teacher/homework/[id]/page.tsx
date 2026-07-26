@@ -30,7 +30,7 @@ export default async function EditHomeworkPage({ params }: PageProps) {
   const lessons = lessonsRes.ok ? lessonsRes.data : [];
   
   // Count how many students have actually submitted
-  const submissionCount = submissionsRes.ok 
+  const submissionCount = submissionsRes.ok && submissionsRes.data?.results
     ? submissionsRes.data.results.filter(r => r.status !== "NOT_SUBMITTED").length 
     : 0;
 

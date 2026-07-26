@@ -121,7 +121,7 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
         </Card>
       ) : (
         <div className="relative border-l border-cream-200 ml-4 pl-6 space-y-8">
-          {historyData.days.map((day) => (
+          {(historyData.days || []).map((day) => (
             <div key={day.date} className="relative">
               {/* Timeline dot */}
               <div className="absolute -left-[31px] top-1.5 bg-gold-500 w-4.5 h-4.5 rounded-full border-4 border-white shadow-sm" />
@@ -138,26 +138,28 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
 
               {/* Day's Homeworks list */}
               <div className="grid gap-4 sm:grid-cols-2">
-                {day.homeworks.map((hw) => (
+                {(day.homeworks || []).map((hw) => (
                   <Card key={hw.id} className="border border-cream-200 shadow-soft p-4 flex flex-col justify-between hover:border-gold-500/50 transition-all">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-quran bg-quran-soft px-2 py-0.5 rounded uppercase tracking-wider">
-                          {hw.batch.name}
-                        </span>
+                        {hw.batch?.name && (
+                          <span className="text-[10px] font-bold text-quran bg-quran-soft px-2 py-0.5 rounded uppercase tracking-wider">
+                            {hw.batch.name}
+                          </span>
+                        )}
                       </div>
-                      <h4 className="text-base font-bold text-night-900 line-clamp-1">{hw.title}</h4>
+                      <h4 className="text-base font-bold text-night-900 line-clamp-1">{hw.title || "Homework"}</h4>
                     </div>
 
                     <div className="mt-4 pt-3 border-t border-cream-100 flex items-center justify-between text-xs text-ink-soft">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5" />
-                          {hw.totalAssigned}
+                          {hw.totalAssigned ?? 0}
                         </span>
                         <span className="flex items-center gap-1 text-success">
                           <ClipboardCheck className="h-3.5 w-3.5" />
-                          {hw.totalSubmitted}
+                          {hw.totalSubmitted ?? 0}
                         </span>
                       </div>
                       <Link

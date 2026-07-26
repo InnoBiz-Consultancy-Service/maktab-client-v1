@@ -18,17 +18,17 @@ export function GradingForm({ submission }: GradingFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const hw = submission.homework;
-  const isCompletionOnly = hw.maxScore === null;
+  const hw = submission?.homework;
+  const isCompletionOnly = hw?.maxScore === null;
 
   // Grade state
   const [score, setScore] = useState<string>(
-    submission.score !== null ? submission.score.toString() : ""
+    submission?.score !== null && submission?.score !== undefined ? submission.score.toString() : ""
   );
   const [isCompleted, setIsCompleted] = useState<boolean>(
-    submission.score === 1 // Complete is stored as 1, Incomplete as 0
+    submission?.score === 1 // Complete is stored as 1, Incomplete as 0
   );
-  const [feedback, setFeedback] = useState<string>(submission.feedback || "");
+  const [feedback, setFeedback] = useState<string>(submission?.feedback || "");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,14 +39,14 @@ export function GradingForm({ submission }: GradingFormProps) {
     let parsedScore: number | null = null;
     if (!isCompletionOnly) {
       parsedScore = Number(score);
-      if (score === "" || isNaN(parsedScore) || parsedScore < 0 || parsedScore > (hw.maxScore || 0)) {
-        setError(`Score must be a number between 0 and ${hw.maxScore}`);
+      if (score === "" || isNaN(parsedScore) || parsedScore < 0 || parsedScore > (hw?.maxScore || 0)) {
+        setError(`Score must be a number between 0 and ${hw?.maxScore || 0}`);
         return;
       }
     }
 
     setLoading(true);
-    const result = await gradeSubmission(submission.id, {
+    const result = await gradeSubmission(submission?.id, {
       score: isCompletionOnly ? null : parsedScore,
       feedback: feedback.trim() || null,
       isCompleted: isCompletionOnly ? isCompleted : undefined,
@@ -55,24 +55,26 @@ export function GradingForm({ submission }: GradingFormProps) {
 
     if (result.ok) {
       toast.success("Submission graded successfully!");
-      router.push(`/dashboard/teacher/homework/${hw.id}/submissions`);
+      router.push(`/dashboard/teacher/homework/${hw?.id}/submissions`);
       router.refresh();
     } else {
       toast.error(result.error);
     }
   };
 
-  const formattedSubmitted = new Date(submission.submittedAt).toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  const formattedSubmitted = submission?.submittedAt
+    ? new Date(submission.submittedAt).toLocaleString("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : "—";
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
-          href={`/dashboard/teacher/homework/${hw.id}/submissions`}
+          href={`/dashboard/teacher/homework/${hw?.id}/submissions`}
           className="mb-3 inline-flex items-center gap-1 text-sm text-ink-soft transition-colors hover:text-night-900"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -81,7 +83,7 @@ export function GradingForm({ submission }: GradingFormProps) {
         <div>
           <h1 className="text-2xl font-bold text-night-900">Grade Submission</h1>
           <p className="text-sm text-ink-soft">
-            Reviewing work from <strong className="text-night-900">{submission.student.name}</strong> ({submission.student.studentCode})
+            Reviewing work from <strong className="text-night-900">{submission?.student?.name || "Student"}</strong> ({submission?.student?.studentCode || ""})
           </p>
         </div>
       </div>
@@ -96,12 +98,12 @@ export function GradingForm({ submission }: GradingFormProps) {
                 Prompt
               </span>
               <span className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" /> Due: {hw.dueDate}
+                <Calendar className="h-3.5 w-3.5" /> Due: {formatCalendarDate(hw?.dueDate)}
               </span>
             </div>
-            <h2 className="text-lg font-bold text-night-900">{hw.title}</h2>
+            <h2 className="text-lg font-bold text-night-900">{hw?.title || "Homework Details"}</h2>
             <div className="text-sm text-ink bg-cream-50/50 p-4 rounded-lg border border-cream-200/50 whitespace-pre-wrap">
-              {hw.instruction}
+              {hw?.instruction || ""}
             </div>
           </Card>
 
