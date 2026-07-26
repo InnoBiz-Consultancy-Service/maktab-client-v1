@@ -1,13 +1,15 @@
 export interface QuizOption {
-  id: string;
+  id?: string;
   text: string;
+  isCorrect: boolean;
 }
 
 export interface QuizQuestion {
-  id: string;
+  id?: string;
   text: string;
   marks: number;
   options: QuizOption[];
+
 }
 
 export interface Quiz {

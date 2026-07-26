@@ -114,13 +114,13 @@ const teacherNav: RoleNav = {
     },
     {
       href: "/dashboard/teacher/lessons",
-      label: "Add lesson",
+      label: "Lessons",
       icon: "attendance",
       mobile: true,
     },
     {
-      href: "/dashboard/teacher/quizzes",
-      label: "Add quiz",
+      href: "/dashboard/teacher/create-lesson",
+      label: "Add lesson",
       icon: "attendance",
       mobile: true,
     },
@@ -182,6 +182,12 @@ const studentNav: RoleNav = {
       href: "/dashboard/student/learn",
       label: "Learn",
       icon: "learn",
+      mobile: true,
+    },
+    {
+      href: "/dashboard/student/lessons",
+      label: "Lessons",
+      icon: "progress",
       mobile: true,
     },
     {

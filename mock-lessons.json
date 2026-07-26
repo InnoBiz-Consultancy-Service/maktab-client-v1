@@ -1,13 +1,28 @@
-const mockQuiz = {
-  "success": true,
-  "data": {
-    "quizId": "quiz1...",
-    "lessonId": "lesson1...",
-    "title": "Surah Al-Fatiha Quiz",
-    "passMark": 6,
-    "totalMarks": 10,
-    "timeLimit": 10,
-    "questions": [
+{
+  "lessons": [
+    {
+      "id": "lesson1...",
+      "title": "Surah Al-Fatiha Tafsir - Part 1",
+      "description": "Watch the full video before taking the quiz",
+      "videoId": "dQw4w9WgXcQ",
+      "date": "2026-07-21",
+      "hasQuiz": true,
+      "attempted": false,
+      "createdAt": "2026-07-21T10:00:00.000Z"
+    },
+    {
+      "id": "lesson2...",
+      "title": "Surah Al-Baqarah - Part 1",
+      "description": "Watch the full video before taking the quiz",
+      "videoId": null,
+      "date": "2026-07-20",
+      "hasQuiz": false,
+      "attempted": false,
+      "createdAt": "2026-07-20T09:00:00.000Z"
+    }
+  ],
+
+    "quizzes": [
       {
         "id": "q1...",
         "text": "How many verses (ayat) does Surah Al-Fatiha contain?",
@@ -31,8 +46,4 @@ const mockQuiz = {
         ]
       }
     ]
-  }
 }
-
-
-export default mockQuiz;
