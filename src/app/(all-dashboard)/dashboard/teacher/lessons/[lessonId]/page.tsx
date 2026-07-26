@@ -32,7 +32,7 @@ const page = async ({ params }: PageProps) => {
         {lessons.map((lesson) => (
           <LessonCard
             key={lesson.id}
-            lesson={lesson}
+            lesson={lesson as any}
             role="teacher"
           />
         ))}

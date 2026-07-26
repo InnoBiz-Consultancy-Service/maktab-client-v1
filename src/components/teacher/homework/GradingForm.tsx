@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { YouTubeEmbed } from "@/components/shared/homework/YouTubeEmbed";
 import { ArrowLeft, ExternalLink, FileText, Image as ImageIcon, Link as LinkIcon, AlertCircle, Calendar, CheckSquare } from "lucide-react";
 import Link from "next/link";
+import { formatCalendarDate } from "@/lib/utils/date";
 
 interface GradingFormProps {
   submission: SubmissionDetails;

@@ -16,7 +16,7 @@ const AllLessons = ({ lessons }: { lessons: Lesson[] }) => {
       <div className="lg:col-span-2">
         <h2 className="mb-4 text-2xl font-bold"> {selectedLesson?.title}</h2>
 
-        <VideoPlayer videoId={selectedLesson?.videoId} />
+        <VideoPlayer videoId={selectedLesson?.videoId ?? null} />
 
         <p className="mt-4 text-gray-600">{selectedLesson?.description}</p>
       </div>

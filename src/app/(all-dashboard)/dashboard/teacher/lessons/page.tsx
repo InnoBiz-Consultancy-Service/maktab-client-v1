@@ -22,7 +22,7 @@ const LessonsPage = async () => {
           <span className="hidden sm:inline">Add lesson</span>
         </Link>
       </div>
-      <AllLessons lessons={lessons}></AllLessons>
+      <AllLessons lessons={lessons as any}></AllLessons>
     </div>
   );
 };

@@ -70,7 +70,7 @@ const CreateLesson = ({ batch, lesson, mode, quiz }: Props) => {
     };
 
     if (mode === "create") {
-      await createLessonAction(payload);
+      await createLessonAction(payload as any);
     } else {
       // await updateLessonAction(lesson!.id, formData);
     }
@@ -106,7 +106,7 @@ const CreateLesson = ({ batch, lesson, mode, quiz }: Props) => {
         },
       };
 
-      await createLessonAction(payload);
+      await createLessonAction(payload as any);
 
       console.log(payload);
 
