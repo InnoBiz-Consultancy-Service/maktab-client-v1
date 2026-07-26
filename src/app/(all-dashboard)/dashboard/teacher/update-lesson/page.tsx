@@ -1,11 +1,13 @@
-import { getMyBatchesAction } from "@/actions/teacher/lesson/getMyBatch.action";
+import { getBatchesAction } from "@/actions/institute/batch/get-batches";
 import CreateLesson from "@/components/teacher/lesson/CreateLesson";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-const LessonsPage = async () => {
-  const result = await getMyBatchesAction();
- 
+const UpdateLessonPage = async () => {
+  const res = await getBatchesAction();
+
+  console.log("res", res);
+
   return (
     <div className="mx-auto w-full max-w-2xl">
       <Link
@@ -15,9 +17,9 @@ const LessonsPage = async () => {
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Back to dashboard
       </Link>
-      <CreateLesson batch={result.ok ? result.data : []} mode="create"></CreateLesson>
+      <CreateLesson batch={res.ok ? res.data : []} mode="edit"></CreateLesson>
     </div>
   );
 };
 
-export default LessonsPage;
+export default UpdateLessonPage;

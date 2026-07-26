@@ -112,6 +112,12 @@ const teacherNav: RoleNav = {
       mobile: true,
     },
     {
+      href: "/dashboard/teacher/lessons",
+      label: "Lessons",
+      icon: "attendance",
+      mobile: true,
+    },
+    {
       href: "/dashboard/teacher/create-lesson",
       label: "Add lesson",
       icon: "attendance",

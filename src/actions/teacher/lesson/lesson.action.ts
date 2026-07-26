@@ -8,9 +8,9 @@ import { createLessonSchema } from "@/lib/utils/schema/lessonSchema";
 export interface CreateLessonState {
   success: boolean;
   formError?: string;
-  fieldErrors?: Partial<Record<string, string>>;
+  fieldErrors?: Record<string, string>;
   createdLesson?: Lesson;
-  values?: Record<string, string | boolean>;
+  values?: Partial<CreateLessonPayload>;
 }
 
 function unwrap<T>(raw: unknown): T {
@@ -33,7 +33,17 @@ type CreateLessonPayload = {
   description: string;
   videoUrl: string;
   date: string;
-  isPublished: boolean;
+  status: "PUBLISHED" | "DRAFT";
+  quiz: {
+    passMark: number;
+    questions: {
+      text: string;
+      options: {
+        text: string;
+        isCorrect: boolean;
+      }[];
+    }[];
+  };
 };
 
 export async function createLessonAction(
@@ -61,7 +71,7 @@ export async function createLessonAction(
   }
 
   const result = await universalApi<unknown>({
-    endpoint: "/api/v1/lessons",
+    endpoint: "/lessons",
     method: "POST",
     data: parsed.data,
     requireAuth: true,
@@ -84,32 +94,3 @@ export async function createLessonAction(
     createdLesson,
   };
 }
-
-
-// export async function updateLessonAction({
-//   lessonId,
-//   data,
-// }: UpdateLessonPayload): Promise<UpdateLessonState> {
-//   const result = await universalApi<unknown>({
-//     endpoint: `/api/v1/lessons/${lessonId}`,
-//     method: "PATCH",
-//     data,
-//     requireAuth: true,
-//   });
-
-//   if (!result.success) {
-//     return {
-//       success: false,
-//       formError: result.message ?? "Could not update lesson.",
-//     };
-//   }
-
-//   const updatedLesson = unwrap<Lesson>(result.data);
-
-//   revalidatePath("/dashboard/teacher/lessons");
-
-//   return {
-//     success: true,
-//     updatedLesson,
-//   };
-// }
