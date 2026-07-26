@@ -351,20 +351,29 @@ export async function getHomeworkSubmissions(
     }
 
     // Helper function to check if a raw submission item matches a student
-    const isStudentMatch = (item: any, student: Student, totalBatchCount: number, totalSubmissionsCount: number) => {
+    const isStudentMatch = (item: any, student: Student, totalBatchCount: number, totalSubmissionsCount: number, studentIndex: number) => {
       if (!item || !student) return false;
 
+      // 1. Direct ID matching (student.id, student.userId, student.user_id, user.id, etc.)
       const itemStudentId = item.student?.id || item.studentId || item.student_id || item.userId || item.user_id || (typeof item.student === "string" ? item.student : null);
+      const studentUserId = (student as any).userId || (student as any).user_id || (student as any).user?.id;
       if (itemStudentId && student.id && String(itemStudentId).trim() === String(student.id).trim()) return true;
+      if (itemStudentId && studentUserId && String(itemStudentId).trim() === String(studentUserId).trim()) return true;
 
+      // 2. Student code matching
       const itemCode = item.student?.studentCode || item.studentCode || item.code;
       if (itemCode && student.studentCode && String(itemCode).trim() === String(student.studentCode).trim()) return true;
 
-      const itemName = item.student?.name || item.studentName || item.name || item.student?.user?.name || item.user?.name;
-      if (itemName && student.name && itemName.trim().toLowerCase() === student.name.trim().toLowerCase()) return true;
+      // 3. Name matching (exact or substring)
+      const itemName = (item.student?.name || item.studentName || item.name || item.student?.user?.name || item.user?.name || "").trim().toLowerCase();
+      const sName = (student.name || (student as any).user?.name || "").trim().toLowerCase();
+      if (itemName && sName && (itemName === sName || itemName.includes(sName) || sName.includes(itemName))) return true;
 
-      // Single student fallback
-      if (totalBatchCount === 1) return true;
+      // 4. Index-based match fallback if submission count equals batch student count or if single student
+      if (totalBatchCount === 1 || (totalSubmissionsCount === totalBatchCount && totalSubmissionsCount > 0)) return true;
+
+      // 5. Fallback: if rawResults has only 1 submission item and it hasn't been matched yet
+      if (totalSubmissionsCount === 1) return true;
 
       return false;
     };
@@ -381,26 +390,32 @@ export async function getHomeworkSubmissions(
         targetStudents = batchStudents.filter((s) => homework.studentIds.includes(s.id));
       }
 
-      combinedResults = targetStudents.map((student) => {
+      combinedResults = targetStudents.map((student, studentIndex) => {
         // Find matching submission in rawResults
         const existingIdx = rawResults.findIndex(
-          (item: any, idx: number) => !matchedRawItemIndexes.has(idx) && isStudentMatch(item, student, targetStudents.length, rawResults.length)
+          (item: any, idx: number) => !matchedRawItemIndexes.has(idx) && isStudentMatch(item, student, targetStudents.length, rawResults.length, studentIndex)
         );
         
         if (existingIdx !== -1) {
           matchedRawItemIndexes.add(existingIdx);
           const existing = rawResults[existingIdx];
 
+          const existingStatus = String(existing.status || "").toUpperCase();
           const isSubmittedOrGraded = 
-            existing.status === "SUBMITTED" || 
-            existing.status === "GRADED" || 
-            existing.submissionId !== null && existing.submissionId !== undefined ||
-            existing.submittedAt !== null && existing.submittedAt !== undefined ||
-            existing.submission !== null && existing.submission !== undefined;
+            existingStatus === "SUBMITTED" || 
+            existingStatus === "GRADED" || 
+            existingStatus === "PENDING" || 
+            existingStatus === "PENDING_GRADE" ||
+            Boolean(existing.submissionId) ||
+            Boolean(existing.submission?.id) ||
+            Boolean(existing.submittedAt || existing.submitted_at || existing.createdAt) ||
+            Boolean(existing.note) ||
+            (Array.isArray(existing.attachments) && existing.attachments.length > 0) ||
+            (existing.score !== null && existing.score !== undefined);
 
           if (isSubmittedOrGraded) {
             const submissionId = existing.submissionId ?? existing.submission?.id ?? existing.id ?? `sub_${student.id}`;
-            const status = existing.status && existing.status !== "NOT_SUBMITTED" ? existing.status : "SUBMITTED";
+            const status = existingStatus && existingStatus !== "NOT_SUBMITTED" ? existingStatus : "SUBMITTED";
             const isLate = existing.isLate ?? existing.is_late ?? false;
             const isOverdue = existing.isOverdue ?? existing.is_overdue ?? false;
             
@@ -818,6 +833,37 @@ export async function submitStudentHomework(
       method: "POST",
       data: payload,
     });
+
+    // Also update mock submission store for local testing fallback
+    try {
+      const { initialMockSubmissions } = require("@/data/mock-homework");
+      if (initialMockSubmissions) {
+        if (!initialMockSubmissions[homeworkId]) {
+          initialMockSubmissions[homeworkId] = [];
+        }
+        const newSub: Submission = {
+          id: `sub_${Date.now()}`,
+          note: payload.note,
+          submittedAt: new Date().toISOString(),
+          isLate: false,
+          status: "SUBMITTED",
+          score: null,
+          feedback: null,
+          gradedAt: null,
+          attachments: payload.attachments.map((att, i) => ({
+            id: `att_${Date.now()}_${i}`,
+            type: att.type,
+            url: att.url,
+            youtubeVideoId: att.type === "YOUTUBE" ? att.url : null,
+            fileName: att.fileName,
+            order: i + 1,
+          })),
+        };
+        initialMockSubmissions[homeworkId].push(newSub);
+      }
+    } catch (e) {
+      // Ignore if mock file not used
+    }
 
     if (!res.success) {
       return { ok: false, error: res.message || "Failed to submit homework" };
