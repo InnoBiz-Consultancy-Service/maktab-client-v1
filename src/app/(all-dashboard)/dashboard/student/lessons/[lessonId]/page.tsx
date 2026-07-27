@@ -1,67 +1,50 @@
-import LessonCard from "@/components/student/lessons/LessonCard";
-import { Button } from "@/components/ui";
-import VideoPlayer from "@/components/ui/VideoPlayer";
-import { Lesson } from "@/types/teacher/lesson/page";
-import { cookies } from "next/headers";
 import Link from "next/link";
+import { ArrowLeft, Lock } from "lucide-react";
+import { StudentLessonView } from "@/components/student/lessons/details/StudentLessonView";
+import { getStudentLessonAction } from "@/actions/student/lesson/get-lessons";
 
 interface PageProps {
-  params: {
-    lessonId: string;
-  };
+  params: Promise<{ lessonId: string }>;
 }
 
-const lessonDetailsPage = async ({ params }: PageProps) => {
+export default async function StudentLessonDetailPage({ params }: PageProps) {
   const { lessonId } = await params;
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
-
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/lessons/student/${lessonId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
-  const result = await res.json();
-  const lesson = result?.data;
-  console.log("lesson", lesson);
-
-  const lessonRes = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/lessons/student`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
-
-  const lessonResult = await lessonRes.json();
-
-  const lessons = lessonResult?.data?.lessons;
+  const res = await getStudentLessonAction(lessonId);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      {/* Left */}
-      <div className="lg:col-span-2">
-        <h2 className="mb-4 text-2xl font-bold">{lesson?.title}</h2>
-        <VideoPlayer videoId={lesson?.videoId} />
-        <p className="mt-4 text-gray-600">{lesson?.description}</p>
+    <div className="mx-auto w-full max-w-3xl">
+      <Link
+        href="/dashboard/student/lessons"
+        className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-ink-soft transition-colors hover:text-night-900"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden />
+        Back to lessons
+      </Link>
 
-        <Link href={`/dashboard/student/quiz/q1...`}>
-          <Button className="mt-5">Quiz</Button>
-        </Link>
-      </div>
-
-      {/* Right */}
-      <div className="space-y-3 rounded border p-3">
-        {lessons?.map((lesson: Lesson) => (
-          <LessonCard key={lesson.id} lesson={lesson} role="student" />
-        ))}
-      </div>
+      {!res.ok ? (
+        <div className="flex flex-col items-center rounded-lg border border-cream-200 bg-cream-50 px-6 py-16 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-cream-200 text-ink-soft">
+            <Lock className="h-7 w-7" aria-hidden />
+          </div>
+          <h1 className="mb-1 font-display text-lg font-bold text-night-900">
+            This lesson is locked
+          </h1>
+          <p className="mb-5 max-w-sm text-sm text-ink-soft">{res.error}</p>
+          <Link
+            href="/dashboard/student/lessons"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-gold-500 px-6 font-display text-sm font-semibold text-night-900 shadow-soft transition-transform hover:scale-[1.02] active:scale-95"
+          >
+            Back to my lessons
+          </Link>
+        </div>
+      ) : (
+        <>
+          <h1 className="mb-4 font-display text-2xl font-bold text-night-900">
+            {res.data.title}
+          </h1>
+          <StudentLessonView lesson={res.data} />
+        </>
+      )}
     </div>
   );
-};
-
-export default lessonDetailsPage;
+}
