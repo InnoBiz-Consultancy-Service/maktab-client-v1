@@ -47,6 +47,14 @@ export function SearchPicker({
   // Debounced search — runs 300ms after the user stops typing.
   useEffect(() => {
     if (selected) return; // don't search while something is chosen
+
+    if (!term.trim()) {
+      setResults([]);
+      setSearched(false);
+      if (timer.current) clearTimeout(timer.current);
+      return;
+    }
+
     if (timer.current) clearTimeout(timer.current);
 
     timer.current = setTimeout(() => {

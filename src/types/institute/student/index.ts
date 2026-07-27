@@ -38,6 +38,11 @@ export interface CreatedStudent {
   name: string;
   class: string;
   dob: string;
+  joinDate?: string;
+  address?: string;
+  medicalConditions?: string;
+  medications?: string;
+  additionalNotes?: string;
   gender: Gender;
   allergies: string | null;
   photoConsent: boolean;

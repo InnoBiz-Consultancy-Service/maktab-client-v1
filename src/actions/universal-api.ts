@@ -15,6 +15,7 @@ export interface ApiResult<T = unknown> {
   message?: string;
   unauthorized?: boolean;
   retryAfter?: number;
+  errorSource?: { path: string; message: string }[];
 }
 
 export async function universalApi<T = unknown>({
@@ -73,6 +74,7 @@ export async function universalApi<T = unknown>({
       return {
         success: false,
         message: errorData.message || `Error: ${response.statusText}`,
+        errorSource: errorData.errorSource,
       };
     }
 

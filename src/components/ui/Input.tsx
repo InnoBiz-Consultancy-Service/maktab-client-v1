@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils/cn";
-import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
+import { forwardRef, type InputHTMLAttributes, type ReactNode, useId } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   error?: string;
   /** Optional leading icon (e.g. a lucide icon element). */
   icon?: ReactNode;
@@ -12,13 +12,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { label, error, icon, className, id, ...props },
   ref,
 ) {
-  const inputId = id ?? props.name ?? label.toLowerCase().replace(/\s+/g, "-");
+  const generatedId = useId();
+  const inputId = id ?? props.name ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={inputId} className="text-sm font-medium text-night-900">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={inputId} className="text-sm font-medium text-night-900">
+          {label}
+        </label>
+      )}
       <div className="relative">
         {icon && (
           <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft">

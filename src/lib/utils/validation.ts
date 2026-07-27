@@ -40,6 +40,27 @@ export const registerTeacherSchema = z.object({
     .string()
     .min(2, "Education must be at least 2 characters")
     .max(150, "Education is too long"),
+  jobTitle: z
+    .string()
+    .trim()
+    .min(2, "Job title is required")
+    .max(100, "Job title must not exceed 100 characters"),
+
+  startDate: z
+    .string()
+    .min(2, "Start date is required")
+    .refine(
+      (value) => !isNaN(Date.parse(value)),
+      "Please select a valid start date"
+    )
+    .transform((value) => new Date(value)),
+
+  notes: z
+    .string()
+    .trim()
+    .max(500, "Notes must not exceed 500 characters")
+    .optional()
+    .or(z.literal("")),
   phone: z
     .string()
     .min(6, "Enter a valid phone number")
@@ -72,6 +93,31 @@ const studentBase = z.object({
     .max(100, "Name is too long"),
   class: z.string().min(1, "Enter a class").max(50, "Class is too long"),
   dob: z.coerce.date({ message: "Enter a valid date of birth" }),
+  joinDate: z.coerce.date({
+    message: "Enter a valid join date",
+  }),
+  address: z
+    .string()
+    .min(1, "Enter an address")
+    .max(500, "Address must not exceed 500 characters"),
+
+  medicalConditions: z
+    .string()
+    .max(500, "Medical conditions must not exceed 500 characters")
+    .optional()
+    .or(z.literal("")),
+
+  medications: z
+    .string()
+    .max(500, "Medications must not exceed 500 characters")
+    .optional()
+    .or(z.literal("")),
+
+  additionalNotes: z
+    .string()
+    .max(1000, "Additional notes must not exceed 1000 characters")
+    .optional()
+    .or(z.literal("")),
   gender: z.enum(["MALE", "FEMALE"], { message: "Select a gender" }),
   allergies: z.string().max(255, "Too long").optional().or(z.literal("")),
   photoConsent: z.boolean(),

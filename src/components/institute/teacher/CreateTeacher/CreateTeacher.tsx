@@ -14,6 +14,8 @@ import {
   EyeOff,
   Loader2,
   CheckCircle2,
+  Calendar1,
+  Captions,
 } from "lucide-react";
 import { Input, Card } from "@/components/ui";
 import {
@@ -21,6 +23,8 @@ import {
   CreateTeacherState,
 } from "@/actions/institute/teacher/create-teacher";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Batch } from "../../../../types/institute/batch/index";
 
 const initialState: CreateTeacherState = { success: false };
 
@@ -43,10 +47,37 @@ function SubmitButton() {
   );
 }
 
-export function CreateTeacherForm() {
+export function CreateTeacherForm({ batch }: { batch: Batch[] }) {
   const [state, formAction] = useActionState(createTeacherAction, initialState);
   const [showPassword, setShowPassword] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // console.log("batch", batch);
+  const [selectedClasses, setSelectedClasses] = useState<
+    { id: string; name: string }[]
+  >([]);
+
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+
+    if (!value) return;
+
+    const selected = batch.find((item) => String(item.id) === value);
+
+    if (!selected) return;
+
+    setSelectedClasses((prev) => {
+      if (prev.some((item) => item.id === selected.id)) return prev;
+      return [...prev, selected];
+    });
+
+    // select reset
+    e.target.value = "";
+  };
+
+  const removeClass = (id: string) => {
+    setSelectedClasses((prev) => prev.filter((item) => item.id !== id));
+  };
 
   useEffect(() => {
     if (state.success && state.createdTeacher) {
@@ -135,40 +166,111 @@ export function CreateTeacherForm() {
             icon={<Phone className="h-[18px] w-[18px]" aria-hidden />}
           />
         </div>
-
-        <div className="relative">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="relative">
+            <Input
+              label="Password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              defaultValue={v.password}
+              error={err.password}
+              placeholder="At least 6 characters"
+              autoComplete="new-password"
+              icon={<Lock className="h-[18px] w-[18px]" aria-hidden />}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              className="absolute right-3 top-[38px] text-ink-soft transition-colors hover:text-night-900"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-[18px] w-[18px]" aria-hidden />
+              ) : (
+                <Eye className="h-[18px] w-[18px]" aria-hidden />
+              )}
+            </button>
+          </div>
           <Input
-            label="Password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            defaultValue={v.password}
-            error={err.password}
-            placeholder="At least 6 characters"
-            autoComplete="new-password"
-            icon={<Lock className="h-[18px] w-[18px]" aria-hidden />}
+            label="Education"
+            name="education"
+            defaultValue={v.education}
+            error={err.education}
+            placeholder="e.g. BA in Islamic Studies, Hifz"
+            icon={<GraduationCap className="h-[18px] w-[18px]" aria-hidden />}
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-3 top-[38px] text-ink-soft transition-colors hover:text-night-900"
-            aria-label={showPassword ? "Hide password" : "Show password"}
-          >
-            {showPassword ? (
-              <EyeOff className="h-[18px] w-[18px]" aria-hidden />
-            ) : (
-              <Eye className="h-[18px] w-[18px]" aria-hidden />
-            )}
-          </button>
         </div>
 
-        <Input
-          label="Education"
-          name="education"
-          defaultValue={v.education}
-          error={err.education}
-          placeholder="e.g. BA in Islamic Studies, Hifz"
-          icon={<GraduationCap className="h-[18px] w-[18px]" aria-hidden />}
-        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Input
+            label="Job title"
+            name="jobTitle"
+            defaultValue={v.jobTitle}
+            error={err.jobTitle}
+            placeholder="e.g. Quran Teacher, Admin"
+            icon={<Captions className="h-[18px] w-[18px]" aria-hidden />}
+          />
+
+          <Input
+            label="Start date"
+            name="startDate"
+            type="date"
+            defaultValue={v.startDate}
+            error={err.startDate}
+            icon={<Calendar1 className="h-[18px] w-[18px]" aria-hidden />}
+          />
+        </div>
+
+        <div>
+          {/* Selected Tags */}
+          <div
+            className={`${selectedClasses.length > 0 && "mb-2"}  flex flex-wrap gap-2`}
+          >
+            {selectedClasses.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-2 rounded bg-blue-100 px-3 py-1 text-sm"
+              >
+                <span>{item.name}</span>
+
+                <button
+                  type="button"
+                  onClick={() => removeClass(item.id)}
+                  className="font-bold text-red-500 text-lg"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <Select
+            label="Classes"
+            name="batchId"
+            defaultValue=""
+            onChange={handleSelect}
+          >
+            <option value="">Select Classes</option>
+
+            {batch.map((item) => (
+              <option
+                key={item.id}
+                value={item.id}
+                disabled={selectedClasses.some(
+                  (selected) => selected.id === item.id,
+                )}
+              >
+                {item.name}
+              </option>
+            ))}
+          </Select>
+          <input
+            type="hidden"
+            name="assignedClasses"
+            value={JSON.stringify(selectedClasses.map((item) => item.id))}
+          />
+        </div>
+
         <Input
           label="Address"
           name="address"
@@ -177,6 +279,13 @@ export function CreateTeacherForm() {
           placeholder="Street, city, postcode"
           autoComplete="off"
           icon={<MapPin className="h-[18px] w-[18px]" aria-hidden />}
+        />
+        <Textarea
+          label="Notes"
+          name="notes"
+          defaultValue={v.notes}
+          error={err.notes}
+          placeholder="Additional notes about the teacher..."
         />
 
         <div className="mt-2 flex flex-col gap-3 sm:flex-row-reverse sm:items-center">

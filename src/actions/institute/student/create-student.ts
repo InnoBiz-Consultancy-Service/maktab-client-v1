@@ -24,6 +24,11 @@ export interface CreateStudentPayload {
   name: string;
   class: string;
   dob: string;
+  joinDate: string;
+  address?: string;
+  medicalConditions?: string;
+  medications?: string;
+  additionalNotes?: string;
   gender: string;
   allergies?: string;
   photoConsent: boolean;
@@ -66,6 +71,11 @@ export async function createStudentAction(
     name: parsed.data.name,
     class: parsed.data.class,
     dob: parsed.data.dob.toISOString(),
+    joinDate: parsed.data.joinDate,
+    address: parsed.data.address,
+    medicalConditions: parsed.data.medicalConditions,
+    medications: parsed.data.medications,
+    additionalNotes: parsed.data.additionalNotes,
     gender: parsed.data.gender,
     photoConsent: parsed.data.photoConsent,
     teacherId: parsed.data.teacherId,

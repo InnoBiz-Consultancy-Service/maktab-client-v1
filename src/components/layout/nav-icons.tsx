@@ -33,4 +33,5 @@ export const navIcons: Record<NavIconName, LucideIcon> = {
   learn: BookOpen,
   progress: Trophy,
   batches: Layers,
+  homework: BookOpen,
 };

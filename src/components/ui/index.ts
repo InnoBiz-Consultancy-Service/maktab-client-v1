@@ -5,3 +5,5 @@ export { DarkInput } from "./DarkInput";
 export { Spinner } from "./Spinner";
 export { Skeleton } from "./Skeleton";
 export { Select } from "./Select";
+export { Textarea } from "./Textarea";
+
