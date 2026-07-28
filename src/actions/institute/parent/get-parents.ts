@@ -2,7 +2,7 @@
 
 import { universalApi } from "@/actions/universal-api";
 import { unwrapList } from "@/lib/utils/unwrap";
-import { ParentSearchResult } from "@/types/institute/parents";
+import { type ParentSearchResult } from "@/types/institute/parents";
 import type { ActionResult } from "@/types/shared";
 
 export async function searchParentsAction(

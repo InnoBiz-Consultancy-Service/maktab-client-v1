@@ -1,6 +1,13 @@
 import { getTeacherHomeworkHistory, getBatches } from "@/actions/homework";
 import { Card, Button } from "@/components/ui";
-import { ArrowLeft, Calendar, BookOpen, Users, ClipboardCheck, ArrowRight } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  BookOpen,
+  Users,
+  ClipboardCheck,
+  ArrowRight,
+} from "lucide-react";
 import Link from "next/link";
 import { formatCalendarDate } from "@/lib/utils/date";
 
@@ -27,9 +34,9 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
     page,
     limit: 10,
   });
-  
+
   const batchesResult = await getBatches();
-  
+
   const historyData = historyResult.ok ? historyResult.data : null;
   const batchesList = batchesResult.ok ? batchesResult.data : [];
   const meta = historyResult.ok ? (historyResult as any).meta : undefined;
@@ -46,21 +53,27 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
           <span>Back to Homeworks</span>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-night-900 font-display">Timeline & History</h1>
-          <p className="text-sm text-ink-soft">Review date-wise history and submission patterns across batches.</p>
+          <h1 className="font-display text-2xl font-bold text-night-900">
+            Timeline & History
+          </h1>
+          <p className="text-sm text-ink-soft">
+            Review date-wise history and submission patterns across batches.
+          </p>
         </div>
       </div>
 
       {/* Filters section */}
       <Card className="p-4 shadow-soft">
-        <form method="GET" className="grid gap-4 sm:grid-cols-4 items-end">
+        <form method="GET" className="grid items-end gap-4 sm:grid-cols-4">
           {/* Batch filter */}
           <div>
-            <label className="block text-xs font-bold text-night-900 uppercase tracking-wider mb-2">Batch</label>
+            <label className="mb-2 block text-xs font-bold tracking-wider text-night-900 uppercase">
+              Batch
+            </label>
             <select
               name="batchId"
               defaultValue={batchId}
-              className="w-full rounded-full border border-cream-200 bg-cream-50 px-4 py-2.5 text-sm text-ink outline-none transition-all focus:border-gold-500/50 focus:bg-white"
+              className="w-full rounded-full border border-cream-200 bg-cream-50 px-4 py-2.5 text-sm text-ink transition-all outline-none focus:border-gold-500/50 focus:bg-white"
             >
               <option value="">All Batches</option>
               {batchesList.map((b) => (
@@ -73,35 +86,44 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
 
           {/* From Date */}
           <div>
-            <label className="block text-xs font-bold text-night-900 uppercase tracking-wider mb-2">From Date</label>
+            <label className="mb-2 block text-xs font-bold tracking-wider text-night-900 uppercase">
+              From Date
+            </label>
             <input
               type="date"
               name="from"
               defaultValue={from}
-              className="w-full rounded-full border border-cream-200 bg-cream-50 px-4 py-2 text-sm text-ink outline-none transition-all focus:border-gold-500/50 focus:bg-white"
+              className="w-full rounded-full border border-cream-200 bg-cream-50 px-4 py-2 text-sm text-ink transition-all outline-none focus:border-gold-500/50 focus:bg-white"
             />
           </div>
 
           {/* To Date */}
           <div>
-            <label className="block text-xs font-bold text-night-900 uppercase tracking-wider mb-2">To Date</label>
+            <label className="mb-2 block text-xs font-bold tracking-wider text-night-900 uppercase">
+              To Date
+            </label>
             <input
               type="date"
               name="to"
               defaultValue={to}
-              className="w-full rounded-full border border-cream-200 bg-cream-50 px-4 py-2 text-sm text-ink outline-none transition-all focus:border-gold-500/50 focus:bg-white"
+              className="w-full rounded-full border border-cream-200 bg-cream-50 px-4 py-2 text-sm text-ink transition-all outline-none focus:border-gold-500/50 focus:bg-white"
             />
           </div>
 
           {/* Filter Actions */}
           <div className="flex gap-2">
-            <Button variant="night" type="submit" size="sm" className="px-6 flex-1">
+            <Button
+              variant="night"
+              type="submit"
+              size="sm"
+              className="flex-1 px-6"
+            >
               Apply Filter
             </Button>
             {(batchId || from || to) && (
               <Link
                 href="/dashboard/teacher/homework/history"
-                className="inline-flex items-center justify-center font-display font-semibold rounded-full border border-cream-200 bg-white text-night-900 text-xs px-4 py-2 hover:bg-cream-50 transition-all shrink-0"
+                className="inline-flex shrink-0 items-center justify-center rounded-full border border-cream-200 bg-white px-4 py-2 font-display text-xs font-semibold text-night-900 transition-all hover:bg-cream-50"
               >
                 Clear
               </Link>
@@ -114,44 +136,53 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
       {!historyData || historyData.days.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-16 text-center shadow-soft">
           <BookOpen className="h-12 w-12 text-ink-soft/40" />
-          <h3 className="mt-4 text-lg font-bold text-night-900 font-display">No history found</h3>
+          <h3 className="mt-4 font-display text-lg font-bold text-night-900">
+            No history found
+          </h3>
           <p className="mt-1 text-sm text-ink-soft">
-            There are no recorded homework events matching your filters in this range.
+            There are no recorded homework events matching your filters in this
+            range.
           </p>
         </Card>
       ) : (
-        <div className="relative border-l border-cream-200 ml-4 pl-6 space-y-8">
+        <div className="relative ml-4 space-y-8 border-l border-cream-200 pl-6">
           {(historyData.days || []).map((day) => (
             <div key={day.date} className="relative">
               {/* Timeline dot */}
-              <div className="absolute -left-[31px] top-1.5 bg-gold-500 w-4.5 h-4.5 rounded-full border-4 border-white shadow-sm" />
+              <div className="absolute top-1.5 -left-[31px] h-4.5 w-4.5 rounded-full border-4 border-white bg-gold-500 shadow-sm" />
 
               {/* Day Header */}
-              <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-                <h3 className="text-lg font-bold text-night-900 font-display">
+              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="font-display text-lg font-bold text-night-900">
                   {formatCalendarDate(day.date)}
                 </h3>
-                <span className="text-xs font-semibold text-ink-soft bg-cream-50 border border-cream-200 px-2.5 py-1 rounded">
-                  {day.homeworkCount} Homework{day.homeworkCount > 1 ? "s" : ""} • Average Rate: {day.submissionRate}%
+                <span className="rounded border border-cream-200 bg-cream-50 px-2.5 py-1 text-xs font-semibold text-ink-soft">
+                  {day.homeworkCount} Homework{day.homeworkCount > 1 ? "s" : ""}{" "}
+                  • Average Rate: {day.submissionRate}%
                 </span>
               </div>
 
               {/* Day's Homeworks list */}
               <div className="grid gap-4 sm:grid-cols-2">
                 {(day.homeworks || []).map((hw) => (
-                  <Card key={hw.id} className="border border-cream-200 shadow-soft p-4 flex flex-col justify-between hover:border-gold-500/50 transition-all">
+                  <Card
+                    key={hw.id}
+                    className="flex flex-col justify-between border border-cream-200 p-4 shadow-soft transition-all hover:border-gold-500/50"
+                  >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         {hw.batch?.name && (
-                          <span className="text-[10px] font-bold text-quran bg-quran-soft px-2 py-0.5 rounded uppercase tracking-wider">
+                          <span className="rounded bg-quran-soft px-2 py-0.5 text-[10px] font-bold tracking-wider text-quran uppercase">
                             {hw.batch.name}
                           </span>
                         )}
                       </div>
-                      <h4 className="text-base font-bold text-night-900 line-clamp-1">{hw.title || "Homework"}</h4>
+                      <h4 className="line-clamp-1 text-base font-bold text-night-900">
+                        {hw.title || "Homework"}
+                      </h4>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-cream-100 flex items-center justify-between text-xs text-ink-soft">
+                    <div className="mt-4 flex items-center justify-between border-t border-cream-100 pt-3 text-xs text-ink-soft">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5" />
@@ -164,7 +195,7 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
                       </div>
                       <Link
                         href={`/dashboard/teacher/homework/${hw.id}/submissions`}
-                        className="inline-flex items-center gap-1 font-bold text-gold-600 hover:text-gold-500 transition-colors uppercase tracking-wider text-[10px]"
+                        className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-gold-600 uppercase transition-colors hover:text-gold-500"
                       >
                         <span>View Roster</span>
                         <ArrowRight className="h-3 w-3" />
@@ -180,9 +211,11 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
 
       {/* Pagination Controls */}
       {meta && meta.totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-cream-200 pt-4 mt-6">
+        <div className="mt-6 flex items-center justify-between border-t border-cream-200 pt-4">
           <p className="text-xs text-ink-soft">
-            Showing Page <strong className="text-night-900">{meta.page}</strong> of <strong className="text-night-900">{meta.totalPages}</strong> ({meta.total} total items)
+            Showing Page <strong className="text-night-900">{meta.page}</strong>{" "}
+            of <strong className="text-night-900">{meta.totalPages}</strong> (
+            {meta.total} total items)
           </p>
           <div className="flex gap-2">
             <Link
@@ -190,7 +223,7 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
                 pathname: "/dashboard/teacher/homework/history",
                 query: { ...params, page: Math.max(1, meta.page - 1) },
               }}
-              className={`inline-flex items-center justify-center font-display font-semibold rounded-full border border-cream-200 bg-white text-night-900 text-xs px-4 py-2 hover:bg-cream-50 transition-all ${
+              className={`inline-flex items-center justify-center rounded-full border border-cream-200 bg-white px-4 py-2 font-display text-xs font-semibold text-night-900 transition-all hover:bg-cream-50 ${
                 meta.page <= 1 ? "pointer-events-none opacity-40" : ""
               }`}
             >
@@ -199,10 +232,15 @@ export default async function HomeworkHistoryPage({ searchParams }: PageProps) {
             <Link
               href={{
                 pathname: "/dashboard/teacher/homework/history",
-                query: { ...params, page: Math.min(meta.totalPages, meta.page + 1) },
+                query: {
+                  ...params,
+                  page: Math.min(meta.totalPages, meta.page + 1),
+                },
               }}
-              className={`inline-flex items-center justify-center font-display font-semibold rounded-full border border-cream-200 bg-white text-night-900 text-xs px-4 py-2 hover:bg-cream-50 transition-all ${
-                meta.page >= meta.totalPages ? "pointer-events-none opacity-40" : ""
+              className={`inline-flex items-center justify-center rounded-full border border-cream-200 bg-white px-4 py-2 font-display text-xs font-semibold text-night-900 transition-all hover:bg-cream-50 ${
+                meta.page >= meta.totalPages
+                  ? "pointer-events-none opacity-40"
+                  : ""
               }`}
             >
               Next

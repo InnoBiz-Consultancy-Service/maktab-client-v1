@@ -15,7 +15,7 @@ import {
   type LucideIcon,
   Layers,
 } from "lucide-react";
-import { NavIconName } from "./nav-item";
+import { type NavIconName } from "./nav-item";
 
 export const navIcons: Record<NavIconName, LucideIcon> = {
   home: LayoutDashboard,

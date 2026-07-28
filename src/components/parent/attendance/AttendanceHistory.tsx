@@ -53,7 +53,7 @@ export function AttendanceHistory({
   return (
     <div>
       {/* Filter pills */}
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+      <div className="mb-4 flex scrollbar-none gap-2 overflow-x-auto pb-1">
         {filters.map(({ key, label }) => (
           <button
             key={key}

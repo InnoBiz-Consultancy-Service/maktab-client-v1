@@ -36,7 +36,12 @@ describe("getStudentSummaryAction", () => {
 
   it("unwraps the summary on success", async () => {
     const summary = {
-      student: { id: "s1", name: "Abdullah", studentCode: "104829", class: "Nursery" },
+      student: {
+        id: "s1",
+        name: "Abdullah",
+        studentCode: "104829",
+        class: "Nursery",
+      },
       range: { from: "2026-07-01", to: "2026-07-18" },
       totalClassDays: 15,
       present: 12,

@@ -19,11 +19,13 @@ export default async function StudentPage() {
     );
   }
 
-  const homeworkOverview = homeworkOverviewRes.ok ? homeworkOverviewRes.data : undefined;
+  const homeworkOverview = homeworkOverviewRes.ok
+    ? homeworkOverviewRes.data
+    : undefined;
 
   return (
-    <StudentDashboard 
-      overview={overviewRes.data} 
+    <StudentDashboard
+      overview={overviewRes.data}
       homeworkOverview={homeworkOverview}
     />
   );

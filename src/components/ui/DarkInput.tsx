@@ -14,7 +14,9 @@ export const DarkInput = forwardRef<HTMLInputElement, DarkInputProps>(
   function DarkInput({ label, error, className, id, ...props }, ref) {
     const generatedId = useId();
     const inputId =
-      id ?? props.name ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
+      id ??
+      props.name ??
+      (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
 
     const inputElement = (
       <input
@@ -22,7 +24,7 @@ export const DarkInput = forwardRef<HTMLInputElement, DarkInputProps>(
         id={inputId}
         className={cn(
           "mt-1.5 min-h-12 w-full rounded-(--radius-md) border-2 bg-night-800 px-4 py-3",
-          "text-cream-50 placeholder:text-cream-100/40 outline-none transition-colors",
+          "text-cream-50 transition-colors outline-none placeholder:text-cream-100/40",
           "focus:border-gold-400 focus-visible:outline-none",
           error ? "border-error" : "border-night-600",
           className,

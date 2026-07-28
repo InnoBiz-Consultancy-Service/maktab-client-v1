@@ -3,7 +3,10 @@ import { getLeaderboardAction } from "@/actions/dashboard/leaderboard";
 import { getInstituteDashboardBatchesAction } from "@/actions/dashboard/institute-dashboard";
 import { getTeacherDashboardStudentsAction } from "@/actions/dashboard/teacher-dashboard";
 import { getParentChildrenDashboardAction } from "@/actions/dashboard/parent-dashboard";
-import { getStudentHomeworks, getStudentHomeworkOverview } from "@/actions/homework";
+import {
+  getStudentHomeworks,
+  getStudentHomeworkOverview,
+} from "@/actions/homework";
 import { universalApi } from "@/actions/universal-api";
 import { LeaderboardView } from "@/components/dashboard/leaderboard/LeaderboardView";
 
@@ -24,7 +27,10 @@ export default async function LeaderboardPage({
   const isRestrictedRole = userRole === "STUDENT" || userRole === "PARENT";
   const scope: "batch" | "institute" = isRestrictedRole
     ? "batch"
-    : params.scope || (userRole === "INSTITUTE" || userRole === "ADMIN" ? "institute" : "batch");
+    : params.scope ||
+      (userRole === "INSTITUTE" || userRole === "ADMIN"
+        ? "institute"
+        : "batch");
   const period = params.period || "alltime";
 
   // Fetch batches list based on role
@@ -36,13 +42,18 @@ export default async function LeaderboardPage({
       batches = batchRes.data.map((b) => ({ id: b.id, name: b.name }));
     }
   } else if (userRole === "TEACHER") {
-    const teacherStudentsRes = await getTeacherDashboardStudentsAction({ limit: 100 });
+    const teacherStudentsRes = await getTeacherDashboardStudentsAction({
+      limit: 100,
+    });
     if (teacherStudentsRes.ok && teacherStudentsRes.data?.result) {
       const batchMap = new Map<string, string>();
       teacherStudentsRes.data.result.forEach((s) => {
         s.batches?.forEach((b) => batchMap.set(b.id, b.name));
       });
-      batches = Array.from(batchMap.entries()).map(([id, name]) => ({ id, name }));
+      batches = Array.from(batchMap.entries()).map(([id, name]) => ({
+        id,
+        name,
+      }));
     }
   } else if (userRole === "PARENT") {
     const childrenRes = await getParentChildrenDashboardAction();
@@ -53,7 +64,10 @@ export default async function LeaderboardPage({
           batchMap.set(c.batch.id, c.batch.name);
         }
       });
-      batches = Array.from(batchMap.entries()).map(([id, name]) => ({ id, name }));
+      batches = Array.from(batchMap.entries()).map(([id, name]) => ({
+        id,
+        name,
+      }));
     }
   } else if (userRole === "STUDENT") {
     // 1. Try student homeworks list
@@ -61,11 +75,23 @@ export default async function LeaderboardPage({
     if (studentHwListRes.ok && Array.isArray(studentHwListRes.data)) {
       const batchMap = new Map<string, string>();
       studentHwListRes.data.forEach((item: any) => {
-        const bId = item.batchId || item.batch?.id || item.homework?.batchId || item.homework?.batch?.id;
-        const bName = item.batchName || item.batch?.name || item.homework?.batchName || item.homework?.batch?.name || "My Batch";
+        const bId =
+          item.batchId ||
+          item.batch?.id ||
+          item.homework?.batchId ||
+          item.homework?.batch?.id;
+        const bName =
+          item.batchName ||
+          item.batch?.name ||
+          item.homework?.batchName ||
+          item.homework?.batch?.name ||
+          "My Batch";
         if (bId) batchMap.set(bId, bName);
       });
-      batches = Array.from(batchMap.entries()).map(([id, name]) => ({ id, name }));
+      batches = Array.from(batchMap.entries()).map(([id, name]) => ({
+        id,
+        name,
+      }));
     }
 
     // 2. Fallback to student overview if no batch found yet
@@ -82,11 +108,16 @@ export default async function LeaderboardPage({
     // 3. Fallback to direct API call if still empty
     if (batches.length === 0) {
       try {
-        const apiRes = await universalApi<any>({ endpoint: "/students/me", method: "GET" });
+        const apiRes = await universalApi<any>({
+          endpoint: "/students/me",
+          method: "GET",
+        });
         if (apiRes.success && apiRes.data) {
           const profile = apiRes.data.data || apiRes.data;
-          const bId = profile.batchId || profile.batch?.id || profile.batches?.[0]?.id;
-          const bName = profile.batch?.name || profile.batches?.[0]?.name || "My Batch";
+          const bId =
+            profile.batchId || profile.batch?.id || profile.batches?.[0]?.id;
+          const bName =
+            profile.batch?.name || profile.batches?.[0]?.name || "My Batch";
           if (bId) batches = [{ id: bId, name: bName }];
         }
       } catch (e) {}
@@ -101,7 +132,9 @@ export default async function LeaderboardPage({
     const initialRes = await getLeaderboardAction({
       scope,
       period,
-      ...(scope === "batch" && initialBatchId ? { batchId: initialBatchId } : {}),
+      ...(scope === "batch" && initialBatchId
+        ? { batchId: initialBatchId }
+        : {}),
     });
     if (initialRes.ok) {
       initialData = initialRes.data;

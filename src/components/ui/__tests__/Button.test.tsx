@@ -31,7 +31,11 @@ describe("Button", () => {
   it("does not fire onClick when disabled", async () => {
     const user = userEvent.setup();
     const onClick = jest.fn();
-    render(<Button disabled onClick={onClick}>Tap</Button>);
+    render(
+      <Button disabled onClick={onClick}>
+        Tap
+      </Button>,
+    );
     await user.click(screen.getByRole("button"));
     expect(onClick).not.toHaveBeenCalled();
   });

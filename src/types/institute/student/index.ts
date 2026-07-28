@@ -1,4 +1,4 @@
-import { Gender } from "@/types/shared";
+import { type Gender } from "@/types/shared";
 
 export interface StudentSearchResult {
   id: string;

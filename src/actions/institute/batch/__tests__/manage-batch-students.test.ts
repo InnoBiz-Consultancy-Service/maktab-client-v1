@@ -37,7 +37,10 @@ describe("addBatchStudentsAction", () => {
   });
 
   it("maps a failed call to an ActionResult error", async () => {
-    mockedApi.mockResolvedValue({ success: false, message: "Already in batch" });
+    mockedApi.mockResolvedValue({
+      success: false,
+      message: "Already in batch",
+    });
     const result = await addBatchStudentsAction("b1", ["s1"]);
     expect(result).toEqual({ ok: false, error: "Already in batch" });
   });

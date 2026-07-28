@@ -117,7 +117,7 @@ export function TeacherLessonList({ initial, batches }: Props) {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1 || pending}
-            className="inline-flex min-h-10 items-center gap-1 rounded-full border border-cream-200 px-4 text-sm font-semibold text-night-900 transition-colors hover:bg-cream-100 disabled:opacity-40 disabled:pointer-events-none"
+            className="inline-flex min-h-10 items-center gap-1 rounded-full border border-cream-200 px-4 text-sm font-semibold text-night-900 transition-colors hover:bg-cream-100 disabled:pointer-events-none disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
             Prev
@@ -128,7 +128,7 @@ export function TeacherLessonList({ initial, batches }: Props) {
           <button
             onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
             disabled={page >= meta.totalPages || pending}
-            className="inline-flex min-h-10 items-center gap-1 rounded-full border border-cream-200 px-4 text-sm font-semibold text-night-900 transition-colors hover:bg-cream-100 disabled:opacity-40 disabled:pointer-events-none"
+            className="inline-flex min-h-10 items-center gap-1 rounded-full border border-cream-200 px-4 text-sm font-semibold text-night-900 transition-colors hover:bg-cream-100 disabled:pointer-events-none disabled:opacity-40"
           >
             Next
             <ChevronRight className="h-4 w-4" aria-hidden />

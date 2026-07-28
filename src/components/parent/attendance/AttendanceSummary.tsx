@@ -5,7 +5,7 @@ import { getStudentSummaryAction } from "@/actions/attendance/get-student-summar
 import { Skeleton } from "@/components/ui";
 import type { StudentSummary } from "@/types/attendance";
 import {
-  DatePreset,
+  type DatePreset,
   DateRangeFilter,
   presetToParams,
 } from "@/components/shared/attendance/DateRangeFilter";

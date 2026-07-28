@@ -1,4 +1,3 @@
-
 export type AttendanceDayType = "CLASS" | "OFF_DAY";
 export type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE";
 

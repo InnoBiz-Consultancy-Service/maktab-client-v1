@@ -22,9 +22,12 @@ export default async function ParentChildrenDashboardPage() {
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-night-900">My Children Dashboard</h1>
+        <h1 className="text-2xl font-bold text-night-900">
+          My Children Dashboard
+        </h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Overview of all your enrolled children, progress, points, and standings.
+          Overview of all your enrolled children, progress, points, and
+          standings.
         </p>
       </header>
 
@@ -42,8 +45,8 @@ export default async function ParentChildrenDashboardPage() {
             };
 
             return (
-              <Card key={child.id} className="p-6 space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-cream-200 pb-4">
+              <Card key={child.id} className="space-y-5 p-6">
+                <div className="flex flex-col justify-between gap-4 border-b border-cream-200 pb-4 sm:flex-row sm:items-center">
                   <div className="flex items-center gap-4">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-duas-soft font-display text-xl font-bold text-duas">
                       {child.name.charAt(0).toUpperCase()}
@@ -57,8 +60,9 @@ export default async function ParentChildrenDashboardPage() {
                           {child.studentCode}
                         </span>
                       </div>
-                      <p className="text-xs text-ink-soft mt-0.5">
-                        {child.class} • Batch: {child.batch?.name || "Unassigned"}
+                      <p className="mt-0.5 text-xs text-ink-soft">
+                        {child.class} • Batch:{" "}
+                        {child.batch?.name || "Unassigned"}
                       </p>
                     </div>
                   </div>
@@ -68,7 +72,9 @@ export default async function ParentChildrenDashboardPage() {
                     <div className="flex items-center gap-2 rounded-xl bg-gold-500/10 px-4 py-2">
                       <Trophy className="h-5 w-5 text-gold-600" />
                       <div>
-                        <p className="text-[10px] font-medium text-ink-soft">Rank #{child.rank?.rank ?? "-"}</p>
+                        <p className="text-[10px] font-medium text-ink-soft">
+                          Rank #{child.rank?.rank ?? "-"}
+                        </p>
                         <p className="font-display text-sm font-bold text-night-900">
                           {child.points} pts
                         </p>
@@ -77,14 +83,17 @@ export default async function ParentChildrenDashboardPage() {
 
                     <Link
                       href={`/dashboard/parent/children/${child.id}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-gold-500 px-4 py-2 text-xs font-bold text-night-900 hover:scale-105 transition-transform"
+                      className="inline-flex items-center gap-1 rounded-full bg-gold-500 px-4 py-2 text-xs font-bold text-night-900 transition-transform hover:scale-105"
                     >
                       Full Details <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>
 
-                <ProgressGauges progress={progressRates} title={`${child.name}'s Progress`} />
+                <ProgressGauges
+                  progress={progressRates}
+                  title={`${child.name}'s Progress`}
+                />
               </Card>
             );
           })}

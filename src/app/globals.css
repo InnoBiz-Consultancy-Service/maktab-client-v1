@@ -69,7 +69,12 @@ body {
 }
 
 /* Headings default to the display face */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: 700;
 }
@@ -84,19 +89,37 @@ h1, h2, h3, h4, h5, h6 {
 /* Motion primitives — all gated behind prefers-reduced-motion */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
   }
   @keyframes twinkle {
-    0%, 100% { opacity: 0.35; }
-    50% { opacity: 1; }
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
   }
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
   }
-  .animate-float { animation: float 6s ease-in-out infinite; }
-  .animate-twinkle { animation: twinkle 3s ease-in-out infinite; }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  .animate-twinkle {
+    animation: twinkle 3s ease-in-out infinite;
+  }
   .animate-shimmer {
     background: linear-gradient(
       90deg,
@@ -112,16 +135,34 @@ h1, h2, h3, h4, h5, h6 {
 /* ---- Night-sky auth screen animations (from the student/parent portals) ---- */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes lantern-glow {
-    0%, 100% { filter: drop-shadow(0 0 12px rgba(245, 184, 51, 0.5)); }
-    50% { filter: drop-shadow(0 0 28px rgba(245, 184, 51, 0.85)); }
+    0%,
+    100% {
+      filter: drop-shadow(0 0 12px rgba(245, 184, 51, 0.5));
+    }
+    50% {
+      filter: drop-shadow(0 0 28px rgba(245, 184, 51, 0.85));
+    }
   }
   @keyframes shake-x {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-8px); }
-    40%, 80% { transform: translateX(8px); }
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-8px);
+    }
+    40%,
+    80% {
+      transform: translateX(8px);
+    }
   }
-  .animate-glow { animation: lantern-glow 3s ease-in-out infinite; }
-  .animate-shake { animation: shake-x 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+  .animate-glow {
+    animation: lantern-glow 3s ease-in-out infinite;
+  }
+  .animate-shake {
+    animation: shake-x 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
 }
 
 /* Visible keyboard focus everywhere */

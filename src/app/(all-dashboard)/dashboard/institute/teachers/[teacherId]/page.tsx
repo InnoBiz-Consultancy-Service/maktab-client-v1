@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowLeft, GraduationCap, Phone, Layers, BookOpen } from "lucide-react";
+import {
+  ArrowLeft,
+  GraduationCap,
+  Phone,
+  Layers,
+  BookOpen,
+} from "lucide-react";
 import { Card } from "@/components/ui";
 import { getInstituteTeacherDetailAction } from "@/actions/dashboard/institute-dashboard";
 import { ProgressGauges } from "@/components/dashboard/shared/ProgressGauges";
@@ -45,14 +51,16 @@ export default async function TeacherDetailPage({
             {teacher.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-night-900">{teacher.name}</h1>
+            <h1 className="text-2xl font-bold text-night-900">
+              {teacher.name}
+            </h1>
             <p className="text-sm text-ink-soft">
               {teacher.jobTitle || "Teacher"} • Phone: {teacher.phone || "N/A"}
             </p>
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-4 border-t border-cream-200 pt-4 sm:grid-cols-3 text-sm">
+        <div className="mt-6 grid grid-cols-1 gap-4 border-t border-cream-200 pt-4 text-sm sm:grid-cols-3">
           <div>
             <span className="text-xs text-ink-soft">Total Students</span>
             <p className="font-bold text-night-900">{teacher.totalStudents}</p>
@@ -65,7 +73,9 @@ export default async function TeacherDetailPage({
           </div>
           <div>
             <span className="text-xs text-ink-soft">Start Date</span>
-            <p className="font-bold text-night-900">{teacher.startDate || "N/A"}</p>
+            <p className="font-bold text-night-900">
+              {teacher.startDate || "N/A"}
+            </p>
           </div>
         </div>
       </Card>
@@ -84,7 +94,7 @@ export default async function TeacherDetailPage({
           <h2 className="mb-4 font-display text-lg font-bold text-night-900">
             Teacher Activity Overview
           </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 text-sm">
+          <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
             <div className="rounded-xl border border-cream-200 bg-cream-50 p-3">
               <span className="text-xs text-ink-soft">Homeworks Published</span>
               <p className="text-xl font-bold text-night-900">

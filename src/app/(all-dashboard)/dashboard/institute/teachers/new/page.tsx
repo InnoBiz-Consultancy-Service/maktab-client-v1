@@ -3,12 +3,12 @@ import { ArrowLeft } from "lucide-react";
 import { requireSession } from "@/lib/utils/session";
 import { CreateTeacherForm } from "@/components/institute/teacher/CreateTeacher/CreateTeacher";
 import { getBatchesAction } from "@/actions/institute/batch/get-batches";
-import { Batch } from '../../../../../../types/institute/batch/index';
+import { Batch } from "../../../../../../types/institute/batch/index";
 
 export default async function NewTeacherPage() {
   await requireSession(["INSTITUTE"]);
   const res = await getBatchesAction();
-  
+
   return (
     <div className="mx-auto w-full max-w-2xl">
       <Link

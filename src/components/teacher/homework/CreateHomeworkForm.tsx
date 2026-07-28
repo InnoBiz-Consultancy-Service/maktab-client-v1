@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Batch, Lesson, Student } from "@/types/shared/homework";
+import { type Batch, type Lesson, type Student } from "@/types/shared/homework";
 import { Button, Card, Input, Textarea, Select } from "@/components/ui";
 import { createHomework, getBatchStudents } from "@/actions/homework";
 import { toast } from "sonner";
@@ -16,7 +16,11 @@ interface CreateHomeworkFormProps {
   students?: Student[];
 }
 
-export function CreateHomeworkForm({ batches, lessons, students: initialStudents = [] }: CreateHomeworkFormProps) {
+export function CreateHomeworkForm({
+  batches,
+  lessons,
+  students: initialStudents = [],
+}: CreateHomeworkFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
@@ -27,10 +31,14 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
   const [instruction, setInstruction] = useState("");
   const [batchId, setBatchId] = useState("");
   const [lessonId, setLessonId] = useState("");
-  const [assignedDate, setAssignedDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [assignedDate, setAssignedDate] = useState(
+    () => new Date().toISOString().split("T")[0],
+  );
   const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED">("PUBLISHED");
-  const [gradingType, setGradingType] = useState<"graded" | "completion">("graded");
+  const [gradingType, setGradingType] = useState<"graded" | "completion">(
+    "graded",
+  );
   const [maxScore, setMaxScore] = useState<string>("10");
   const [allowLateSubmission, setAllowLateSubmission] = useState(true);
   const [targetType, setTargetType] = useState<"BATCH" | "SPECIFIC">("BATCH");
@@ -65,7 +73,9 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
 
   const handleStudentToggle = (studentId: string) => {
     setSelectedStudentIds((prev) =>
-      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
+      prev.includes(studentId)
+        ? prev.filter((id) => id !== studentId)
+        : [...prev, studentId],
     );
   };
 
@@ -73,10 +83,13 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) newErrors.title = "Title cannot be empty";
-    else if (title.length > 200) newErrors.title = "Title cannot exceed 200 characters";
+    else if (title.length > 200)
+      newErrors.title = "Title cannot exceed 200 characters";
 
-    if (!instruction.trim()) newErrors.instruction = "Instructions cannot be empty";
-    else if (instruction.length > 5000) newErrors.instruction = "Instructions cannot exceed 5000 characters";
+    if (!instruction.trim())
+      newErrors.instruction = "Instructions cannot be empty";
+    else if (instruction.length > 5000)
+      newErrors.instruction = "Instructions cannot exceed 5000 characters";
 
     if (!batchId) newErrors.batchId = "Please select a batch";
 
@@ -133,7 +146,10 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
       router.push("/dashboard/teacher/homework");
       router.refresh();
     } else {
-      if ((result as any).errorSource && (result as any).errorSource.length > 0) {
+      if (
+        (result as any).errorSource &&
+        (result as any).errorSource.length > 0
+      ) {
         const fieldErrors: Record<string, string> = {};
         (result as any).errorSource.forEach((err: any) => {
           fieldErrors[err.path] = err.message;
@@ -147,7 +163,7 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
+    <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/teacher/homework"
@@ -157,20 +173,26 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
           <span>Back</span>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-night-900">Create New Homework</h1>
-          <p className="text-sm text-ink-soft">Publish a new assignment for your students.</p>
+          <h1 className="text-2xl font-bold text-night-900">
+            Create New Homework
+          </h1>
+          <p className="text-sm text-ink-soft">
+            Publish a new assignment for your students.
+          </p>
         </div>
       </div>
 
-      <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-        <div className="flex items-center gap-2 text-quran font-bold text-sm bg-quran-soft/30 px-3 py-1.5 rounded-md w-fit">
+      <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
+        <div className="flex w-fit items-center gap-2 rounded-md bg-quran-soft/30 px-3 py-1.5 text-sm font-bold text-quran">
           <Sparkles className="h-4 w-4" />
           <span>Basic Details</span>
         </div>
 
         {/* Title */}
         <div className="space-y-1">
-          <label className="text-sm font-semibold text-night-900">Homework Title *</label>
+          <label className="text-sm font-semibold text-night-900">
+            Homework Title *
+          </label>
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -191,14 +213,22 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
             disabled={loading}
             error={errors.instruction}
           />
-          <p className="text-right text-xs text-ink-soft/60">{instruction.length}/5000 chars</p>
+          <p className="text-right text-xs text-ink-soft/60">
+            {instruction.length}/5000 chars
+          </p>
         </div>
 
         {/* Batch and Lesson */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Batch *</label>
-            <Select value={batchId} onChange={(e) => setBatchId(e.target.value)} disabled={loading}>
+            <label className="text-sm font-semibold text-night-900">
+              Batch *
+            </label>
+            <Select
+              value={batchId}
+              onChange={(e) => setBatchId(e.target.value)}
+              disabled={loading}
+            >
               <option value="">Select a batch</option>
               {batches.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -206,12 +236,20 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
                 </option>
               ))}
             </Select>
-            {errors.batchId && <p className="text-xs text-error">{errors.batchId}</p>}
+            {errors.batchId && (
+              <p className="text-xs text-error">{errors.batchId}</p>
+            )}
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Link Lesson (Optional)</label>
-            <Select value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={loading}>
+            <label className="text-sm font-semibold text-night-900">
+              Link Lesson (Optional)
+            </label>
+            <Select
+              value={lessonId}
+              onChange={(e) => setLessonId(e.target.value)}
+              disabled={loading}
+            >
               <option value="">None</option>
               {lessons.map((l) => (
                 <option key={l.id} value={l.id}>
@@ -225,8 +263,8 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
 
       {batchId && (
         <>
-          <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-            <div className="flex items-center gap-2 text-studies font-bold text-sm bg-studies-soft/30 px-3 py-1.5 rounded-md w-fit">
+          <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
+            <div className="flex w-fit items-center gap-2 rounded-md bg-studies-soft/30 px-3 py-1.5 text-sm font-bold text-studies">
               <Sparkles className="h-4 w-4" />
               <span>Grading & Timeline</span>
             </div>
@@ -234,7 +272,9 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
             {/* Dates */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-sm font-semibold text-night-900">Start Date</label>
+                <label className="text-sm font-semibold text-night-900">
+                  Start Date
+                </label>
                 <Input
                   type="date"
                   value={assignedDate}
@@ -244,21 +284,27 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-semibold text-night-900">Due Date *</label>
+                <label className="text-sm font-semibold text-night-900">
+                  Due Date *
+                </label>
                 <Input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                   disabled={loading}
                 />
-                {errors.dueDate && <p className="text-xs text-error">{errors.dueDate}</p>}
+                {errors.dueDate && (
+                  <p className="text-xs text-error">{errors.dueDate}</p>
+                )}
               </div>
             </div>
 
             {/* Grading settings */}
-            <div className="grid gap-4 sm:grid-cols-2 items-end">
+            <div className="grid items-end gap-4 sm:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-sm font-semibold text-night-900">Grading Option</label>
+                <label className="text-sm font-semibold text-night-900">
+                  Grading Option
+                </label>
                 <Select
                   value={gradingType}
                   onChange={(e) => setGradingType(e.target.value as any)}
@@ -271,7 +317,9 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
 
               {gradingType === "graded" && (
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-night-900">Maximum Score</label>
+                  <label className="text-sm font-semibold text-night-900">
+                    Maximum Score
+                  </label>
                   <Input
                     type="number"
                     min="1"
@@ -279,40 +327,48 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
                     onChange={(e) => setMaxScore(e.target.value)}
                     disabled={loading}
                   />
-                  {errors.maxScore && <p className="text-xs text-error">{errors.maxScore}</p>}
+                  {errors.maxScore && (
+                    <p className="text-xs text-error">{errors.maxScore}</p>
+                  )}
                 </div>
               )}
             </div>
 
             {/* Allow late submission */}
-            <div className="flex items-center gap-3 bg-cream-50/50 p-3 rounded-lg border border-cream-200/50">
+            <div className="flex items-center gap-3 rounded-lg border border-cream-200/50 bg-cream-50/50 p-3">
               <input
                 type="checkbox"
                 id="allowLate"
                 checked={allowLateSubmission}
                 onChange={(e) => setAllowLateSubmission(e.target.checked)}
-                className="h-4.5 w-4.5 rounded border-cream-300 text-gold-500 accent-gold-500"
+                className="border-cream-300 h-4.5 w-4.5 rounded text-gold-500 accent-gold-500"
                 disabled={loading}
               />
-              <label htmlFor="allowLate" className="text-sm font-medium text-night-900 select-none">
+              <label
+                htmlFor="allowLate"
+                className="text-sm font-medium text-night-900 select-none"
+              >
                 Allow Late Submissions
                 <span className="block text-xs font-normal text-ink-soft">
-                  When checked, students can submit homework after the due date, marked as "Submitted late".
+                  When checked, students can submit homework after the due date,
+                  marked as "Submitted late".
                 </span>
               </label>
             </div>
           </Card>
 
-          <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-            <div className="flex items-center gap-2 text-arabic font-bold text-sm bg-arabic-soft/30 px-3 py-1.5 rounded-md w-fit">
+          <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
+            <div className="flex w-fit items-center gap-2 rounded-md bg-arabic-soft/30 px-3 py-1.5 text-sm font-bold text-arabic">
               <Sparkles className="h-4 w-4" />
               <span>Audience & Publishing</span>
             </div>
 
             {/* Student list */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-4 mb-1">
-                <label className="text-sm font-semibold text-night-900">Assign to Students *</label>
+              <div className="mb-1 flex items-center justify-between gap-4">
+                <label className="text-sm font-semibold text-night-900">
+                  Assign to Students *
+                </label>
                 {students.length > 0 && (
                   <button
                     type="button"
@@ -323,20 +379,22 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
                         setSelectedStudentIds(students.map((s) => s.id));
                       }
                     }}
-                    className="text-xs font-semibold text-gold-600 hover:text-gold-700 transition-colors"
+                    className="hover:text-gold-700 text-xs font-semibold text-gold-600 transition-colors"
                   >
-                    {selectedStudentIds.length === students.length ? "Deselect All" : "Select All"}
+                    {selectedStudentIds.length === students.length
+                      ? "Deselect All"
+                      : "Select All"}
                   </button>
                 )}
               </div>
-              <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20 min-h-[100px] items-center justify-center">
+              <div className="grid max-h-60 min-h-[100px] items-center justify-center gap-2 overflow-y-auto rounded-lg border border-cream-200 bg-cream-50/20 p-3 sm:grid-cols-2">
                 {loadingStudents ? (
                   <div className="col-span-2 flex flex-col items-center justify-center gap-2 py-4">
-                    <Loader2 className="h-5 w-5 text-gold-500 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin text-gold-500" />
                     <p className="text-xs text-ink-soft">Loading students...</p>
                   </div>
                 ) : students.length === 0 ? (
-                  <div className="col-span-2 text-center text-xs text-ink-soft py-4">
+                  <div className="col-span-2 py-4 text-center text-xs text-ink-soft">
                     No students found in this batch
                   </div>
                 ) : (
@@ -345,23 +403,29 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
                     return (
                       <div
                         key={student.id}
-                        onClick={() => !loading && handleStudentToggle(student.id)}
-                        className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
+                        onClick={() =>
+                          !loading && handleStudentToggle(student.id)
+                        }
+                        className={`flex cursor-pointer items-center justify-between rounded-md border p-2.5 transition-all select-none ${
                           isSelected
-                            ? "bg-gold-500/10 border-gold-500/40 text-night-900"
-                            : "bg-white border-cream-200 hover:bg-cream-50/50 hover:border-cream-300 text-night-900"
+                            ? "border-gold-500/40 bg-gold-500/10 text-night-900"
+                            : "hover:border-cream-300 border-cream-200 bg-white text-night-900 hover:bg-cream-50/50"
                         }`}
                       >
                         <div>
-                          <p className="text-sm font-semibold">{student.name}</p>
-                          <p className="text-xs text-ink-soft">{student.studentCode}</p>
+                          <p className="text-sm font-semibold">
+                            {student.name}
+                          </p>
+                          <p className="text-xs text-ink-soft">
+                            {student.studentCode}
+                          </p>
                         </div>
                         {isSelected ? (
-                          <div className="h-5 w-5 rounded-full bg-gold-500 text-white flex items-center justify-center p-0.5 shrink-0 shadow-sm">
+                          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold-500 p-0.5 text-white shadow-sm">
                             <Check className="h-3.5 w-3.5 stroke-[3]" />
                           </div>
                         ) : (
-                          <div className="h-5 w-5 rounded-full border-2 border-cream-300 bg-white shrink-0 transition-colors" />
+                          <div className="border-cream-300 h-5 w-5 shrink-0 rounded-full border-2 bg-white transition-colors" />
                         )}
                       </div>
                     );
@@ -369,24 +433,34 @@ export function CreateHomeworkForm({ batches, lessons, students: initialStudents
                 )}
               </div>
               {(errors.students || errors.studentIds) && (
-                <p className="text-xs text-error">{errors.students || errors.studentIds}</p>
+                <p className="text-xs text-error">
+                  {errors.students || errors.studentIds}
+                </p>
               )}
             </div>
 
             {/* Publish status */}
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-night-900">Status</label>
-              <Select value={status} onChange={(e) => setStatus(e.target.value as any)} disabled={loading}>
-                <option value="PUBLISHED">Published (Visible to students immediately)</option>
+              <label className="text-sm font-semibold text-night-900">
+                Status
+              </label>
+              <Select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as any)}
+                disabled={loading}
+              >
+                <option value="PUBLISHED">
+                  Published (Visible to students immediately)
+                </option>
                 <option value="DRAFT">Draft (Only visible to you)</option>
               </Select>
             </div>
           </Card>
 
-          <div className="flex items-center gap-3 justify-end pt-4">
+          <div className="flex items-center justify-end gap-3 pt-4">
             <Link
               href="/dashboard/teacher/homework"
-              className="inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[44px] px-6 text-[15px]"
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-cream-200 bg-transparent px-6 font-display text-[15px] font-semibold text-night-900 transition-all duration-150 hover:scale-[1.02] hover:bg-cream-50 active:scale-95"
             >
               Cancel
             </Link>

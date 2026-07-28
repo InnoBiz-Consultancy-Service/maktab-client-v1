@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ArrowLeft, User, Phone, BookOpen, Calendar, Award } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Phone,
+  BookOpen,
+  Calendar,
+  Award,
+} from "lucide-react";
 import { Card } from "@/components/ui";
 import { getInstituteStudentDetailAction } from "@/actions/dashboard/institute-dashboard";
 import { ProgressGauges } from "@/components/dashboard/shared/ProgressGauges";
@@ -55,7 +62,9 @@ export default async function InstituteStudentDetailPage({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-night-900">{profile.name}</h1>
+                <h1 className="text-2xl font-bold text-night-900">
+                  {profile.name}
+                </h1>
                 <span className="rounded-full bg-cream-100 px-2.5 py-0.5 text-xs font-semibold text-night-900">
                   {profile.studentCode}
                 </span>
@@ -67,7 +76,9 @@ export default async function InstituteStudentDetailPage({
           </div>
 
           <div className="flex flex-col gap-1 rounded-xl bg-gold-500/10 p-3 text-right">
-            <span className="text-xs font-medium text-ink-soft">Total Points</span>
+            <span className="text-xs font-medium text-ink-soft">
+              Total Points
+            </span>
             <span className="font-display text-2xl font-bold text-night-900">
               {points} pts
             </span>
@@ -99,7 +110,10 @@ export default async function InstituteStudentDetailPage({
       </Card>
 
       {/* Progress Gauges */}
-      <ProgressGauges progress={progressRates} title="Student Progress Breakdown" />
+      <ProgressGauges
+        progress={progressRates}
+        title="Student Progress Breakdown"
+      />
 
       {/* Points Breakdown */}
       <PointsBreakdownCard points={points} breakdown={pointsBreakdown} />
@@ -111,15 +125,21 @@ export default async function InstituteStudentDetailPage({
           <p className="mt-1 text-xl font-bold text-night-900">
             {progress?.lesson?.completed ?? 0} / {progress?.lesson?.total ?? 0}
           </p>
-          <span className="text-xs text-gold-600">Completed Rate: {progress?.lesson?.rate ?? 0}%</span>
+          <span className="text-xs text-gold-600">
+            Completed Rate: {progress?.lesson?.rate ?? 0}%
+          </span>
         </Card>
 
         <Card className="p-4">
           <span className="text-xs font-medium text-ink-soft">Homework</span>
           <p className="mt-1 text-xl font-bold text-night-900">
-            {progress?.homework?.submitted ?? 0} / {progress?.homework?.total ?? 0}
+            {progress?.homework?.submitted ?? 0} /{" "}
+            {progress?.homework?.total ?? 0}
           </p>
-          <span className="text-xs text-arabic">On-Time: {progress?.homework?.onTime ?? 0} | Avg: {progress?.homework?.avgScore ?? 0}</span>
+          <span className="text-xs text-arabic">
+            On-Time: {progress?.homework?.onTime ?? 0} | Avg:{" "}
+            {progress?.homework?.avgScore ?? 0}
+          </span>
         </Card>
 
         <Card className="p-4">
@@ -127,7 +147,10 @@ export default async function InstituteStudentDetailPage({
           <p className="mt-1 text-xl font-bold text-night-900">
             {progress?.attendance?.present ?? 0} Present
           </p>
-          <span className="text-xs text-quran">Late: {progress?.attendance?.late ?? 0} | Absent: {progress?.attendance?.absent ?? 0}</span>
+          <span className="text-xs text-quran">
+            Late: {progress?.attendance?.late ?? 0} | Absent:{" "}
+            {progress?.attendance?.absent ?? 0}
+          </span>
         </Card>
       </div>
     </div>

@@ -33,14 +33,12 @@ function unwrap<T>(raw: unknown): T {
   return raw as T;
 }
 
-
-
 export async function createTeacherAction(
   _prev: CreateTeacherState,
   formData: FormData,
 ): Promise<CreateTeacherState> {
   const assignedClasses = JSON.parse(
-    String(formData.get("assignedClasses") ?? "[]")
+    String(formData.get("assignedClasses") ?? "[]"),
   );
   const values = {
     name: String(formData.get("name") ?? "").trim(),
@@ -73,7 +71,7 @@ export async function createTeacherAction(
     };
   }
 
-  console.log("parsed.data", parsed.data)
+  console.log("parsed.data", parsed.data);
 
   // instituteId is NOT sent — backend derives it from the logged-in token.
   const result = await universalApi<unknown>({
@@ -87,12 +85,16 @@ export async function createTeacherAction(
     const msg = result.message ?? "Could not create the teacher.";
     const lower = msg.toLowerCase();
     const fieldErrors: Record<string, string> = {};
-    if (lower.includes("email")) fieldErrors.email = "This email is already in use.";
-    if (lower.includes("phone")) fieldErrors.phone = "This phone number is already in use.";
+    if (lower.includes("email"))
+      fieldErrors.email = "This email is already in use.";
+    if (lower.includes("phone"))
+      fieldErrors.phone = "This phone number is already in use.";
 
     return {
       success: false,
-      formError: Object.keys(fieldErrors).length ? "Please fix the highlighted fields." : msg,
+      formError: Object.keys(fieldErrors).length
+        ? "Please fix the highlighted fields."
+        : msg,
       fieldErrors: Object.keys(fieldErrors).length ? fieldErrors : undefined,
       values,
     };

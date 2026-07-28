@@ -1,4 +1,4 @@
-import { Gender } from "@/types/shared";
+import { type Gender } from "@/types/shared";
 
 export interface TeacherSearchResult {
   id: string;
@@ -10,4 +10,3 @@ export interface TeacherSearchResult {
   createdAt: string;
   user: { email: string | null } | null;
 }
-

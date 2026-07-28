@@ -34,7 +34,12 @@ describe("loginAction", () => {
       data: {
         accessToken: "at",
         refreshToken: "rt",
-        user: { id: "u1", email: "parent@test.com", phone: null, role: "PARENT" },
+        user: {
+          id: "u1",
+          email: "parent@test.com",
+          phone: null,
+          role: "PARENT",
+        },
       },
     });
 
@@ -63,7 +68,12 @@ describe("loginAction", () => {
         data: {
           accessToken: "at",
           refreshToken: "rt",
-          user: { id: "u2", email: "inst@test.com", phone: null, role: "INSTITUTE" },
+          user: {
+            id: "u2",
+            email: "inst@test.com",
+            phone: null,
+            role: "INSTITUTE",
+          },
         },
       }); // institute
 
@@ -190,7 +200,10 @@ describe("registerParentAction", () => {
   };
 
   it("rejects invalid input before calling the API", async () => {
-    const result = await registerParentAction({ ...validPayload, email: "bad" });
+    const result = await registerParentAction({
+      ...validPayload,
+      email: "bad",
+    });
     expect(result.ok).toBe(false);
     expect(mockedApi).not.toHaveBeenCalled();
   });

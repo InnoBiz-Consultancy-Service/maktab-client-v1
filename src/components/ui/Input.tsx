@@ -1,5 +1,10 @@
 import { cn } from "@/lib/utils/cn";
-import { forwardRef, type InputHTMLAttributes, type ReactNode, useId } from "react";
+import {
+  forwardRef,
+  type InputHTMLAttributes,
+  type ReactNode,
+  useId,
+} from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -13,7 +18,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   ref,
 ) {
   const generatedId = useId();
-  const inputId = id ?? props.name ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
+  const inputId =
+    id ??
+    props.name ??
+    (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -24,7 +32,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       )}
       <div className="relative">
         {icon && (
-          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft">
+          <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-ink-soft">
             {icon}
           </span>
         )}
@@ -33,7 +41,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           id={inputId}
           className={cn(
             "min-h-[44px] w-full rounded-sm border bg-cream-50 px-4 py-2.5 text-[15px] text-night-900",
-            "placeholder:text-ink-soft/60 outline-none transition-colors",
+            "transition-colors outline-none placeholder:text-ink-soft/60",
             "focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-gold-500",
             icon ? "pl-11" : "",
             error

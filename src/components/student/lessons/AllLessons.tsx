@@ -1,6 +1,6 @@
 "use client";
 
-import { Lesson } from "@/types/teacher/lesson/page";
+import { type Lesson } from "@/types/teacher/lesson/page";
 import LessonCard from "./LessonCard";
 import { useState } from "react";
 import VideoPlayer from "@/components/ui/VideoPlayer";
@@ -23,12 +23,8 @@ const AllLessons = ({ lessons }: { lessons: Lesson[] }) => {
 
       {/* Right */}
       <div className="space-y-3 rounded border p-3">
-        {lessons.map ((lesson) => (
-          <LessonCard
-            key={lesson.id}
-            lesson={lesson}
-            role="student"
-          />
+        {lessons.map((lesson) => (
+          <LessonCard key={lesson.id} lesson={lesson} role="student" />
         ))}
       </div>
     </div>

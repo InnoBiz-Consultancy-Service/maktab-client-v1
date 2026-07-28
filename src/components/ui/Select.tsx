@@ -1,5 +1,10 @@
 import { cn } from "@/lib/utils/cn";
-import { forwardRef, type SelectHTMLAttributes, type ReactNode, useId } from "react";
+import {
+  forwardRef,
+  type SelectHTMLAttributes,
+  type ReactNode,
+  useId,
+} from "react";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -11,7 +16,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   function Select({ label, error, className, id, children, ...props }, ref) {
     const generatedId = useId();
     const selectId =
-      id ?? props.name ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
+      id ??
+      props.name ??
+      (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
 
     return (
       <div className="flex flex-col gap-1.5">
@@ -28,7 +35,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           id={selectId}
           className={cn(
             "min-h-11 w-full rounded-sm border bg-cream-50 px-4 py-2.5 text-[15px] text-night-900",
-            "outline-none transition-colors",
+            "transition-colors outline-none",
             "focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-gold-500",
             error
               ? "border-error focus-visible:outline-error"

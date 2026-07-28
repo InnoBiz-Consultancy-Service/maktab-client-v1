@@ -1,5 +1,5 @@
 import { Session } from "@/types/auth";
-import { Lesson } from "@/types/teacher/lesson/page";
+import { type Lesson } from "@/types/teacher/lesson/page";
 import { SquarePen } from "lucide-react";
 import Link from "next/link";
 

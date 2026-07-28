@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { HomeworkSubmissionSummary } from "@/types/shared/homework";
+import { type HomeworkSubmissionSummary } from "@/types/shared/homework";
 import { Button, Card } from "@/components/ui";
 import { StatusChip } from "@/components/shared/homework/StatusChip";
 import { bulkGradeSubmissions } from "@/actions/homework";
@@ -15,7 +15,11 @@ interface SubmissionsRosterTableProps {
   results: HomeworkSubmissionSummary["results"];
 }
 
-export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: SubmissionsRosterTableProps) {
+export function SubmissionsRosterTable({
+  homeworkId,
+  homework,
+  results = [],
+}: SubmissionsRosterTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
 
@@ -23,7 +27,9 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
   const safeResults = results || [];
 
   // Filter out students who don't have submissions (cannot be graded)
-  const gradableSubmissions = safeResults.filter((r) => r?.submissionId !== null && r?.submissionId !== undefined);
+  const gradableSubmissions = safeResults.filter(
+    (r) => r?.submissionId !== null && r?.submissionId !== undefined,
+  );
 
   const handleSelectAll = () => {
     if (selectedIds.length === gradableSubmissions.length) {
@@ -35,7 +41,9 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
 
   const handleSelectRow = (submissionId: string) => {
     setSelectedIds((prev) =>
-      prev.includes(submissionId) ? prev.filter((id) => id !== submissionId) : [...prev, submissionId]
+      prev.includes(submissionId)
+        ? prev.filter((id) => id !== submissionId)
+        : [...prev, submissionId],
     );
   };
 
@@ -63,11 +71,13 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
     <div className="space-y-4">
       {/* Bulk Action Bar (Visible only for completion-only and when selections exist) */}
       {isCompletionOnly && gradableSubmissions.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-cream-50/50 p-4 rounded-lg border border-cream-200">
-          <div className="flex items-center gap-2 text-sm text-night-900 font-medium">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-cream-200 bg-cream-50/50 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-night-900">
             <span>
-              Selected <strong className="text-gold-600">{selectedIds.length}</strong> of{" "}
-              <strong>{gradableSubmissions.length}</strong> gradable submission(s)
+              Selected{" "}
+              <strong className="text-gold-600">{selectedIds.length}</strong> of{" "}
+              <strong>{gradableSubmissions.length}</strong> gradable
+              submission(s)
             </span>
           </div>
 
@@ -79,7 +89,11 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
               onClick={() => handleBulkGrade(true)}
               className="flex items-center gap-1.5"
             >
-              {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+              {isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Check className="h-3.5 w-3.5" />
+              )}
               <span>Mark as Completed</span>
             </Button>
             <Button
@@ -87,7 +101,7 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
               variant="ghost"
               disabled={selectedIds.length === 0 || isPending}
               onClick={() => handleBulkGrade(false)}
-              className="flex items-center gap-1.5 border-cream-300 hover:border-gold-500 hover:text-gold-600"
+              className="border-cream-300 flex items-center gap-1.5 hover:border-gold-500 hover:text-gold-600"
             >
               <span>Mark as Incomplete</span>
             </Button>
@@ -96,20 +110,21 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
       )}
 
       {/* Roster Table */}
-      <Card className="border border-cream-200 shadow-soft overflow-hidden p-0">
+      <Card className="overflow-hidden border border-cream-200 p-0 shadow-soft">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-cream-100 bg-cream-50/50 text-xs font-bold text-ink-soft uppercase tracking-wider">
+              <tr className="border-b border-cream-100 bg-cream-50/50 text-xs font-bold tracking-wider text-ink-soft uppercase">
                 {isCompletionOnly && (
-                  <th className="px-6 py-3.5 w-12">
+                  <th className="w-12 px-6 py-3.5">
                     <button
                       type="button"
                       onClick={handleSelectAll}
                       disabled={gradableSubmissions.length === 0}
-                      className="text-ink-soft hover:text-gold-500 transition-colors disabled:opacity-40"
+                      className="text-ink-soft transition-colors hover:text-gold-500 disabled:opacity-40"
                     >
-                      {selectedIds.length === gradableSubmissions.length && gradableSubmissions.length > 0 ? (
+                      {selectedIds.length === gradableSubmissions.length &&
+                      gradableSubmissions.length > 0 ? (
                         <CheckSquare className="h-5 w-5 text-gold-500" />
                       ) : (
                         <Square className="h-5 w-5" />
@@ -120,15 +135,24 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
                 <th className="px-6 py-3.5">Student</th>
                 <th className="px-6 py-3.5">Status</th>
                 <th className="px-6 py-3.5">Submitted At</th>
-                {!isCompletionOnly && <th className="px-6 py-3.5 text-center">Score</th>}
+                {!isCompletionOnly && (
+                  <th className="px-6 py-3.5 text-center">Score</th>
+                )}
                 <th className="px-6 py-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-cream-100 text-sm text-ink">
               {safeResults.map((row) => {
-                const canGrade = (row?.submissionId !== null && row?.submissionId !== undefined) || row?.status === "SUBMITTED" || row?.status === "GRADED";
-                const activeSubmissionId = row?.submissionId || row?.assignmentId;
-                const isSelected = activeSubmissionId ? selectedIds.includes(activeSubmissionId) : false;
+                const canGrade =
+                  (row?.submissionId !== null &&
+                    row?.submissionId !== undefined) ||
+                  row?.status === "SUBMITTED" ||
+                  row?.status === "GRADED";
+                const activeSubmissionId =
+                  row?.submissionId || row?.assignmentId;
+                const isSelected = activeSubmissionId
+                  ? selectedIds.includes(activeSubmissionId)
+                  : false;
 
                 const formattedDate = row?.submittedAt
                   ? new Date(row.submittedAt).toLocaleString("en-US", {
@@ -140,7 +164,7 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
                 return (
                   <tr
                     key={row?.assignmentId || row?.student?.id}
-                    className={`hover:bg-cream-50/30 transition-all ${
+                    className={`transition-all hover:bg-cream-50/30 ${
                       isSelected ? "bg-gold-500/5 hover:bg-gold-500/10" : ""
                     }`}
                   >
@@ -150,7 +174,7 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
                           <button
                             type="button"
                             onClick={() => handleSelectRow(row.submissionId!)}
-                            className="text-ink-soft hover:text-gold-500 transition-colors"
+                            className="text-ink-soft transition-colors hover:text-gold-500"
                           >
                             {isSelected ? (
                               <CheckSquare className="h-5 w-5 text-gold-500" />
@@ -159,18 +183,24 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
                             )}
                           </button>
                         ) : (
-                          <Square className="h-5 w-5 opacity-20 pointer-events-none" />
+                          <Square className="pointer-events-none h-5 w-5 opacity-20" />
                         )}
                       </td>
                     )}
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-night-900">{row?.student?.name || "Student"}</div>
-                      <div className="text-xs text-ink-soft">{row?.student?.studentCode || ""}</div>
+                      <div className="font-semibold text-night-900">
+                        {row?.student?.name || "Student"}
+                      </div>
+                      <div className="text-xs text-ink-soft">
+                        {row?.student?.studentCode || ""}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <StatusChip chip={row?.chip} />
                     </td>
-                    <td className="px-6 py-4 text-xs text-ink-soft">{formattedDate}</td>
+                    <td className="px-6 py-4 text-xs text-ink-soft">
+                      {formattedDate}
+                    </td>
                     {!isCompletionOnly && (
                       <td className="px-6 py-4 text-center font-display font-semibold">
                         {row?.status === "GRADED" ? (
@@ -178,7 +208,9 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
                             {row?.score} / {homework?.maxScore}
                           </span>
                         ) : row?.status === "SUBMITTED" ? (
-                          <span className="text-warn text-xs bg-warn/10 px-2 py-0.5 rounded">Awaiting Grade</span>
+                          <span className="rounded bg-warn/10 px-2 py-0.5 text-xs text-warn">
+                            Awaiting Grade
+                          </span>
                         ) : (
                           <span className="text-ink-soft/40">—</span>
                         )}
@@ -190,14 +222,19 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
                           href={`/dashboard/teacher/homework/${homeworkId}/submissions/${activeSubmissionId}/grade`}
                           className={
                             row?.status === "GRADED"
-                              ? "inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[38px] px-4 text-sm"
-                              : "inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-gold-500 text-night-900 shadow-soft hover:shadow-[0_0_28px_rgba(245,184,51,0.4)] min-h-[38px] px-4 text-sm"
+                              ? "inline-flex min-h-[38px] items-center justify-center gap-2 rounded-full border border-cream-200 bg-transparent px-4 font-display text-sm font-semibold text-night-900 transition-all duration-150 hover:scale-[1.02] hover:bg-cream-50 active:scale-95"
+                              : "inline-flex min-h-[38px] items-center justify-center gap-2 rounded-full bg-gold-500 px-4 font-display text-sm font-semibold text-night-900 shadow-soft transition-all duration-150 hover:scale-[1.02] hover:shadow-[0_0_28px_rgba(245,184,51,0.4)] active:scale-95"
                           }
                         >
                           {row?.status === "GRADED" ? "Edit Grade" : "Grade"}
                         </Link>
                       ) : (
-                        <Button size="sm" variant="ghost" disabled className="opacity-40">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled
+                          className="opacity-40"
+                        >
                           Not Submitted
                         </Button>
                       )}

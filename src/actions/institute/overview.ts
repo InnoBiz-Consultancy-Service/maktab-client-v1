@@ -1,6 +1,6 @@
 "use server";
 
-import { TeacherSearchResult } from "@/types/institute/teachers";
+import { type TeacherSearchResult } from "@/types/institute/teachers";
 import type { ActionResult } from "@/types/shared";
 import { searchTeachersAction } from "./teacher/get-teacher";
 import { searchParentsAction } from "./parent/get-parents";

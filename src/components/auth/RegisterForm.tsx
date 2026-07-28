@@ -15,7 +15,12 @@ const fields: Array<{
 }> = [
   { key: "name", label: "Full name", autoComplete: "name" },
   { key: "email", label: "Email", type: "email", autoComplete: "email" },
-  { key: "password", label: "Password", type: "password", autoComplete: "new-password" },
+  {
+    key: "password",
+    label: "Password",
+    type: "password",
+    autoComplete: "new-password",
+  },
   { key: "phone", label: "Phone", autoComplete: "tel" },
   { key: "profession", label: "Profession" },
   { key: "address", label: "Address", autoComplete: "street-address" },
@@ -23,8 +28,13 @@ const fields: Array<{
 ];
 
 const empty: RegisterParentInput = {
-  name: "", email: "", password: "", phone: "",
-  profession: "", address: "", emergencyContact: "",
+  name: "",
+  email: "",
+  password: "",
+  phone: "",
+  profession: "",
+  address: "",
+  emergencyContact: "",
 };
 
 export function RegisterForm() {

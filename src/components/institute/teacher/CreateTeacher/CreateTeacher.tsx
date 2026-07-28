@@ -20,11 +20,11 @@ import {
 import { Input, Card } from "@/components/ui";
 import {
   createTeacherAction,
-  CreateTeacherState,
+  type CreateTeacherState,
 } from "@/actions/institute/teacher/create-teacher";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { Batch } from "../../../../types/institute/batch/index";
+import { type Batch } from "../../../../types/institute/batch/index";
 
 const initialState: CreateTeacherState = { success: false };
 
@@ -181,7 +181,7 @@ export function CreateTeacherForm({ batch }: { batch: Batch[] }) {
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-[38px] text-ink-soft transition-colors hover:text-night-900"
+              className="absolute top-[38px] right-3 text-ink-soft transition-colors hover:text-night-900"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -224,7 +224,7 @@ export function CreateTeacherForm({ batch }: { batch: Batch[] }) {
         <div>
           {/* Selected Tags */}
           <div
-            className={`${selectedClasses.length > 0 && "mb-2"}  flex flex-wrap gap-2`}
+            className={`${selectedClasses.length > 0 && "mb-2"} flex flex-wrap gap-2`}
           >
             {selectedClasses.map((item) => (
               <div
@@ -236,7 +236,7 @@ export function CreateTeacherForm({ batch }: { batch: Batch[] }) {
                 <button
                   type="button"
                   onClick={() => removeClass(item.id)}
-                  className="font-bold text-red-500 text-lg"
+                  className="text-lg font-bold text-red-500"
                 >
                   ×
                 </button>

@@ -23,7 +23,7 @@ export default async function SettingsPage() {
             <p className="truncate font-semibold text-night-900">
               {session?.label ?? "Your institute"}
             </p>
-            <p className="text-sm capitalize text-ink-soft">
+            <p className="text-sm text-ink-soft capitalize">
               {session?.role.toLowerCase() ?? "institute"} account
             </p>
           </div>

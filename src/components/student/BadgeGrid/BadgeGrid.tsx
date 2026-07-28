@@ -53,7 +53,7 @@ export function BadgeGrid({ badges }: { badges: Badge[] }) {
             </div>
             <p
               className={cn(
-                "mt-2 text-xs font-semibold leading-tight",
+                "mt-2 text-xs leading-tight font-semibold",
                 b.earned ? "text-night-900" : "text-ink-soft/60",
               )}
             >

@@ -37,7 +37,10 @@ describe("addBatchTeachersAction", () => {
   });
 
   it("maps a failed call to an ActionResult error", async () => {
-    mockedApi.mockResolvedValue({ success: false, message: "Already assigned" });
+    mockedApi.mockResolvedValue({
+      success: false,
+      message: "Already assigned",
+    });
     const result = await addBatchTeachersAction("b1", ["t1"]);
     expect(result).toEqual({ ok: false, error: "Already assigned" });
   });

@@ -7,7 +7,7 @@ import { SignOutButton } from "@/components/layout/SignOutButton";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { cn } from "@/lib/utils/cn";
 import type { Session } from "@/types/auth";
-import { NavItem } from "./nav-item";
+import { type NavItem } from "./nav-item";
 import { navIcons } from "./nav-icons";
 
 /** Is this nav item the current page? Exact for the index, prefix otherwise. */
@@ -37,7 +37,7 @@ export function Sidebar({
         </div>
         <NotificationBell
           role={session.role}
-          className="text-cream-100/70 hover:text-cream-50 hover:bg-night-800"
+          className="text-cream-100/70 hover:bg-night-800 hover:text-cream-50"
         />
       </div>
 

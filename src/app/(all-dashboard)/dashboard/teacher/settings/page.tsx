@@ -21,7 +21,7 @@ export default async function TeacherSettingsPage() {
             <p className="truncate font-semibold text-night-900">
               {session?.label ?? "Teacher"}
             </p>
-            <p className="text-sm capitalize text-ink-soft">
+            <p className="text-sm text-ink-soft capitalize">
               {session?.role.toLowerCase() ?? "teacher"} account
             </p>
           </div>

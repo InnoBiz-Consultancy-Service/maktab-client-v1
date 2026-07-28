@@ -66,11 +66,29 @@ describe("getInstituteOverviewAction", () => {
       ok: true,
       data: [
         parent("p1", "Rahim", [
-          { id: "c1", name: "Abdullah", class: "Nursery", studentCode: "104829", isActive: true },
+          {
+            id: "c1",
+            name: "Abdullah",
+            class: "Nursery",
+            studentCode: "104829",
+            isActive: true,
+          },
         ]),
         parent("p2", "Karim", [
-          { id: "c2", name: "Yusuf", class: "Class 1", studentCode: "104830", isActive: true },
-          { id: "c3", name: "Zainab", class: "Class 2", studentCode: "104831", isActive: false },
+          {
+            id: "c2",
+            name: "Yusuf",
+            class: "Class 1",
+            studentCode: "104830",
+            isActive: true,
+          },
+          {
+            id: "c3",
+            name: "Zainab",
+            class: "Class 2",
+            studentCode: "104831",
+            isActive: false,
+          },
         ]),
       ],
     });
@@ -79,11 +97,36 @@ describe("getInstituteOverviewAction", () => {
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.data.counts).toEqual({ teachers: 0, students: 3, parents: 2 });
+    expect(result.data.counts).toEqual({
+      teachers: 0,
+      students: 3,
+      parents: 2,
+    });
     expect(result.data.recentStudents).toEqual([
-      { id: "c1", name: "Abdullah", class: "Nursery", studentCode: "104829", isActive: true, parentName: "Rahim" },
-      { id: "c2", name: "Yusuf", class: "Class 1", studentCode: "104830", isActive: true, parentName: "Karim" },
-      { id: "c3", name: "Zainab", class: "Class 2", studentCode: "104831", isActive: false, parentName: "Karim" },
+      {
+        id: "c1",
+        name: "Abdullah",
+        class: "Nursery",
+        studentCode: "104829",
+        isActive: true,
+        parentName: "Rahim",
+      },
+      {
+        id: "c2",
+        name: "Yusuf",
+        class: "Class 1",
+        studentCode: "104830",
+        isActive: true,
+        parentName: "Karim",
+      },
+      {
+        id: "c3",
+        name: "Zainab",
+        class: "Class 2",
+        studentCode: "104831",
+        isActive: false,
+        parentName: "Karim",
+      },
     ]);
   });
 

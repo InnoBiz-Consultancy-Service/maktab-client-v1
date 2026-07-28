@@ -69,14 +69,14 @@ export function BatchCard({
             <button
               type="button"
               onClick={() => onStart(batch.batch.id)}
-              className="inline-flex min-h-[42px] flex-1 items-center justify-center gap-1.5 rounded-full bg-gold-500 text-sm font-semibold text-night-900 shadow-soft transition-all active:scale-95 hover:scale-[1.02]"
+              className="inline-flex min-h-[42px] flex-1 items-center justify-center gap-1.5 rounded-full bg-gold-500 text-sm font-semibold text-night-900 shadow-soft transition-all hover:scale-[1.02] active:scale-95"
             >
               Start class
             </button>
             <button
               type="button"
               onClick={() => onOffDay(batch.batch.id)}
-              className="inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-full border border-cream-200 bg-cream-50 px-4 text-sm font-semibold text-ink-soft transition-all active:scale-95 hover:bg-cream-100"
+              className="inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-full border border-cream-200 bg-cream-50 px-4 text-sm font-semibold text-ink-soft transition-all hover:bg-cream-100 active:scale-95"
             >
               Off day
             </button>
@@ -114,7 +114,7 @@ export function BatchCard({
               <button
                 type="button"
                 onClick={() => batch.dayId && onContinue(batch.dayId)}
-                className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-full bg-gold-500 text-sm font-semibold text-night-900 shadow-soft transition-all active:scale-95 hover:scale-[1.02]"
+                className="inline-flex min-h-[42px] w-full items-center justify-center gap-1.5 rounded-full bg-gold-500 text-sm font-semibold text-night-900 shadow-soft transition-all hover:scale-[1.02] active:scale-95"
               >
                 Continue
               </button>
@@ -127,7 +127,7 @@ export function BatchCard({
                 <button
                   type="button"
                   onClick={() => batch.dayId && onView(batch.dayId)}
-                  className="inline-flex min-h-[38px] items-center justify-center rounded-full border border-cream-200 bg-cream-50 px-4 text-sm font-semibold text-ink-soft transition-all active:scale-95 hover:bg-cream-100"
+                  className="inline-flex min-h-[38px] items-center justify-center rounded-full border border-cream-200 bg-cream-50 px-4 text-sm font-semibold text-ink-soft transition-all hover:bg-cream-100 active:scale-95"
                 >
                   View
                 </button>
@@ -145,7 +145,7 @@ export function BatchCard({
               <button
                 type="button"
                 onClick={() => batch.dayId && onView(batch.dayId)}
-                className="inline-flex min-h-[38px] items-center justify-center rounded-full border border-cream-200 bg-cream-50 px-4 text-sm font-semibold text-ink-soft transition-all active:scale-95 hover:bg-cream-100"
+                className="inline-flex min-h-[38px] items-center justify-center rounded-full border border-cream-200 bg-cream-50 px-4 text-sm font-semibold text-ink-soft transition-all hover:bg-cream-100 active:scale-95"
               >
                 Edit
               </button>

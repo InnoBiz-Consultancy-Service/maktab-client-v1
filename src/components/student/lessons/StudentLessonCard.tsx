@@ -30,7 +30,7 @@ function StatusNode({ state }: { state: "done" | "available" | "locked" }) {
       )}
       {state === "locked" && <Lock className="h-5 w-5" aria-hidden />}
       {state === "done" && (
-        <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold-500 text-night-900">
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold-500 text-night-900">
           <Star className="h-3 w-3 fill-current" aria-hidden />
         </span>
       )}

@@ -29,7 +29,11 @@ export const metadata: Metadata = {
   description:
     "A warm, calm place to learn — Quran, Arabic, studies and duas under a lantern-lit night sky.",
   applicationName: "Maktab",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Maktab" },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Maktab",
+  },
 };
 
 export const viewport: Viewport = {
@@ -44,7 +48,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${fredoka.variable} ${jakarta.variable} ${amiri.variable}`}>
+      <body
+        className={`${fredoka.variable} ${jakarta.variable} ${amiri.variable}`}
+      >
         {children}
         <Toaster
           position="top-center"

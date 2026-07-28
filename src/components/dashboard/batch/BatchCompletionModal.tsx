@@ -55,23 +55,21 @@ export function BatchCompletionModal({
         </h2>
 
         <p className="mt-2 text-sm text-ink-soft">
-          Are you sure you want to mark <strong className="text-night-900">{batchName}</strong> as completed?
+          Are you sure you want to mark{" "}
+          <strong className="text-night-900">{batchName}</strong> as completed?
         </p>
 
-        <div className="my-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-800 border border-amber-200 flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-600" />
+        <div className="my-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
           <div>
-            <strong>Important:</strong> Completing a batch is standard, manual, and one-way.
-            The current all-time standings will be frozen into a permanent final leaderboard snapshot.
+            <strong>Important:</strong> Completing a batch is standard, manual,
+            and one-way. The current all-time standings will be frozen into a
+            permanent final leaderboard snapshot.
           </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
-          <Button
-            variant="ghost"
-            onClick={onClose}
-            disabled={loading}
-          >
+          <Button variant="ghost" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
           <Button

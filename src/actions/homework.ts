@@ -1,24 +1,24 @@
 "use server";
 
 import { universalApi } from "@/actions/universal-api";
-import { ActionResult } from "@/types/shared";
+import { type ActionResult } from "@/types/shared";
 import { revalidatePath } from "next/cache";
 import {
-  Homework,
-  Submission,
-  Batch,
-  Lesson,
-  Student,
-  TeacherHomeworkListItem,
-  TeacherHomeworkDetail,
-  StudentHomeworkListItem,
-  StudentHomeworkDetail,
-  HomeworkSubmissionSummary,
-  SubmissionDetails,
-  HistoryResponse,
-  TeacherOverviewResponse,
-  StudentOverviewResponse,
-  ParentOverviewResponse,
+  type Homework,
+  type Submission,
+  type Batch,
+  type Lesson,
+  type Student,
+  type TeacherHomeworkListItem,
+  type TeacherHomeworkDetail,
+  type StudentHomeworkListItem,
+  type StudentHomeworkDetail,
+  type HomeworkSubmissionSummary,
+  type SubmissionDetails,
+  type HistoryResponse,
+  type TeacherOverviewResponse,
+  type StudentOverviewResponse,
+  type ParentOverviewResponse,
 } from "@/types/shared/homework";
 
 // Helper to unwrap nested data property
@@ -45,7 +45,13 @@ function unwrapList<T>(raw: any): T[] {
       }
     }
     // If payload itself is a single item object (e.g. single submission or record), wrap in an array
-    if (payload.id || payload.submissionId || payload.studentId || payload.status || payload.submittedAt) {
+    if (
+      payload.id ||
+      payload.submissionId ||
+      payload.studentId ||
+      payload.status ||
+      payload.submittedAt
+    ) {
       return [payload as T];
     }
   }
@@ -82,7 +88,10 @@ export async function getTeacherHomeworks(filters?: {
     const res = await universalApi<any>({ endpoint, method: "GET" });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch teacher homeworks" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch teacher homeworks",
+      };
     }
 
     const payload = res.data || {};
@@ -94,7 +103,10 @@ export async function getTeacherHomeworks(filters?: {
       meta,
     } as any;
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch teacher homeworks" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch teacher homeworks",
+    };
   }
 }
 
@@ -102,7 +114,9 @@ export async function getTeacherHomeworks(filters?: {
  * GET /homeworks/teacher/:id
  * Retrieves details for a specific homework assignment created by the teacher.
  */
-export async function getHomeworkDetail(id: string): Promise<ActionResult<TeacherHomeworkDetail>> {
+export async function getHomeworkDetail(
+  id: string,
+): Promise<ActionResult<TeacherHomeworkDetail>> {
   try {
     const res = await universalApi<any>({
       endpoint: `/homeworks/teacher/${id}`,
@@ -110,12 +124,22 @@ export async function getHomeworkDetail(id: string): Promise<ActionResult<Teache
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch homework details" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch homework details",
+      };
     }
 
-    return { ok: true, data: unwrap<TeacherHomeworkDetail>(res.data), message: res.data?.message };
+    return {
+      ok: true,
+      data: unwrap<TeacherHomeworkDetail>(res.data),
+      message: res.data?.message,
+    };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch homework details" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch homework details",
+    };
   }
 }
 
@@ -165,7 +189,10 @@ export async function getLessons(): Promise<ActionResult<Lesson[]>> {
  * GET /homeworks/teacher/batches/:batchId/students
  * Retrieves the students enrolled in a specific batch for the teacher.
  */
-export async function getBatchStudents(batchId: string, search?: string): Promise<ActionResult<Student[]>> {
+export async function getBatchStudents(
+  batchId: string,
+  search?: string,
+): Promise<ActionResult<Student[]>> {
   try {
     const query = new URLSearchParams();
     if (search) query.set("search", search);
@@ -174,12 +201,18 @@ export async function getBatchStudents(batchId: string, search?: string): Promis
 
     const res = await universalApi<any>({ endpoint, method: "GET" });
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch batch students" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch batch students",
+      };
     }
 
     return { ok: true, data: unwrapList<Student>(res.data) };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch batch students" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch batch students",
+    };
   }
 }
 
@@ -221,7 +254,11 @@ export async function createHomework(data: {
     revalidatePath("/dashboard/parent/children");
     revalidatePath("/dashboard/student");
     revalidatePath("/dashboard/parent");
-    return { ok: true, data: unwrap<Homework>(res.data), message: res.data?.message };
+    return {
+      ok: true,
+      data: unwrap<Homework>(res.data),
+      message: res.data?.message,
+    };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to create homework" };
   }
@@ -245,7 +282,7 @@ export async function updateHomework(
     batchId?: string;
     targetType?: "BATCH" | "SPECIFIC";
     studentIds?: string[] | null;
-  }
+  },
 ): Promise<ActionResult<Homework>> {
   try {
     // Send only defined fields that the backend expects
@@ -266,7 +303,11 @@ export async function updateHomework(
     revalidatePath("/dashboard/teacher/homework");
     revalidatePath(`/dashboard/teacher/homework/${id}`);
     revalidatePath(`/dashboard/teacher/homework/${id}/submissions`);
-    return { ok: true, data: unwrap<Homework>(res.data), message: res.data?.message };
+    return {
+      ok: true,
+      data: unwrap<Homework>(res.data),
+      message: res.data?.message,
+    };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to update homework" };
   }
@@ -276,7 +317,9 @@ export async function updateHomework(
  * DELETE /homeworks/teacher/:id
  * Deletes a homework assignment and its associated submissions.
  */
-export async function deleteHomework(id: string): Promise<ActionResult<{ id: string; deletedSubmissions: number }>> {
+export async function deleteHomework(
+  id: string,
+): Promise<ActionResult<{ id: string; deletedSubmissions: number }>> {
   try {
     const res = await universalApi<any>({
       endpoint: `/homeworks/teacher/${id}`,
@@ -288,7 +331,11 @@ export async function deleteHomework(id: string): Promise<ActionResult<{ id: str
     }
 
     revalidatePath("/dashboard/teacher/homework");
-    return { ok: true, data: unwrap<any>(res.data), message: res.data?.message };
+    return {
+      ok: true,
+      data: unwrap<any>(res.data),
+      message: res.data?.message,
+    };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to delete homework" };
   }
@@ -300,7 +347,7 @@ export async function deleteHomework(id: string): Promise<ActionResult<{ id: str
  */
 export async function getHomeworkSubmissions(
   homeworkId: string,
-  filters?: { status?: string; track?: string; page?: number; limit?: number }
+  filters?: { status?: string; track?: string; page?: number; limit?: number },
 ): Promise<ActionResult<HomeworkSubmissionSummary>> {
   try {
     const query = new URLSearchParams();
@@ -321,12 +368,13 @@ export async function getHomeworkSubmissions(
     const detailRes = await getHomeworkDetail(homeworkId);
     const detailData = detailRes.ok ? detailRes.data : null;
 
-    const rawPayload = res.success ? (unwrap<any>(res.data) || {}) : {};
-    const detailPayload = detailData ? (unwrap<any>(detailData) || {}) : {};
+    const rawPayload = res.success ? unwrap<any>(res.data) || {} : {};
+    const detailPayload = detailData ? unwrap<any>(detailData) || {} : {};
 
     // The API wraps its response under a "homeworks" key:
     // { data: { homeworks: { homework, summary, results }, meta } }
-    const homeworksPayload = rawPayload.homeworks ?? rawPayload.data?.homeworks ?? {};
+    const homeworksPayload =
+      rawPayload.homeworks ?? rawPayload.data?.homeworks ?? {};
 
     let homework =
       homeworksPayload.homework ??
@@ -341,27 +389,30 @@ export async function getHomeworkSubmissions(
       ? homeworksPayload.results
       : unwrapList<any>(
           rawPayload.results ??
-          rawPayload.roster ??
-          rawPayload.students ??
-          rawPayload.submissions ??
-          rawPayload.assignments ??
-          rawPayload.data?.results ??
-          rawPayload.data?.roster ??
-          rawPayload.data?.students ??
-          rawPayload.data?.submissions ??
-          detailPayload.submissions ??
-          detailPayload.results ??
-          detailPayload.roster ??
-          detailPayload.students ??
-          (Array.isArray(rawPayload) ? rawPayload : [])
+            rawPayload.roster ??
+            rawPayload.students ??
+            rawPayload.submissions ??
+            rawPayload.assignments ??
+            rawPayload.data?.results ??
+            rawPayload.data?.roster ??
+            rawPayload.data?.students ??
+            rawPayload.data?.submissions ??
+            detailPayload.submissions ??
+            detailPayload.results ??
+            detailPayload.roster ??
+            detailPayload.students ??
+            (Array.isArray(rawPayload) ? rawPayload : []),
         );
 
     // Whether the API returned a complete, authoritative roster (vs needing local fallback logic)
     const apiReturnedFullRoster = Array.isArray(homeworksPayload.results);
 
     // Pull the summary from the API if available
-    const apiSummary = homeworksPayload.summary ?? rawPayload.summary ?? rawPayload.data?.summary ?? null;
-
+    const apiSummary =
+      homeworksPayload.summary ??
+      rawPayload.summary ??
+      rawPayload.data?.summary ??
+      null;
 
     // Only merge local mock submissions when the API did NOT return a full roster.
     // When the API returns homeworksPayload.results, it is the authoritative complete list —
@@ -374,7 +425,10 @@ export async function getHomeworkSubmissions(
           mockSubs.forEach((mockSub: any) => {
             const mockSubId = mockSub.id;
             const exists = rawResults.some(
-              (r: any) => r.id === mockSubId || r.submissionId === mockSubId || (r.studentId && r.studentId === mockSub.studentId)
+              (r: any) =>
+                r.id === mockSubId ||
+                r.submissionId === mockSubId ||
+                (r.studentId && r.studentId === mockSub.studentId),
             );
             if (!exists) {
               rawResults.push(mockSub);
@@ -383,7 +437,6 @@ export async function getHomeworkSubmissions(
         }
       } catch (e) {}
     }
-
 
     // Fetch batch students if available to guarantee ALL assigned students appear in the roster
     const batchId = homework?.batch?.id || homework?.batchId;
@@ -400,30 +453,72 @@ export async function getHomeworkSubmissions(
       if (!item || !student) return false;
 
       // Collect all possible IDs from the submission item's student reference
-      const itemStudentId = item.student?.id || item.studentId || item.student_id || item.userId || item.user_id || (typeof item.student === "string" ? item.student : null);
+      const itemStudentId =
+        item.student?.id ||
+        item.studentId ||
+        item.student_id ||
+        item.userId ||
+        item.user_id ||
+        (typeof item.student === "string" ? item.student : null);
       // Also pick up any secondary ID field that some backends swap (e.g. item.student.userId)
-      const itemStudentUserId = item.student?.userId || item.student?.user_id || item.student?.user?.id;
+      const itemStudentUserId =
+        item.student?.userId || item.student?.user_id || item.student?.user?.id;
 
       // Collect all possible IDs from the batch-student record
-      const studentUserId = (student as any).userId || (student as any).user_id || (student as any).user?.id;
+      const studentUserId =
+        (student as any).userId ||
+        (student as any).user_id ||
+        (student as any).user?.id;
 
       // 1. Direct ID matching — try every combination so we handle userId/studentId swaps
       if (itemStudentId) {
-        if (student.id && String(itemStudentId).trim() === String(student.id).trim()) return true;
-        if (studentUserId && String(itemStudentId).trim() === String(studentUserId).trim()) return true;
+        if (
+          student.id &&
+          String(itemStudentId).trim() === String(student.id).trim()
+        )
+          return true;
+        if (
+          studentUserId &&
+          String(itemStudentId).trim() === String(studentUserId).trim()
+        )
+          return true;
       }
       if (itemStudentUserId) {
-        if (student.id && String(itemStudentUserId).trim() === String(student.id).trim()) return true;
-        if (studentUserId && String(itemStudentUserId).trim() === String(studentUserId).trim()) return true;
+        if (
+          student.id &&
+          String(itemStudentUserId).trim() === String(student.id).trim()
+        )
+          return true;
+        if (
+          studentUserId &&
+          String(itemStudentUserId).trim() === String(studentUserId).trim()
+        )
+          return true;
       }
 
       // 2. Student code matching
-      const itemCode = item.student?.studentCode || item.studentCode || item.code;
-      if (itemCode && student.studentCode && String(itemCode).trim() === String(student.studentCode).trim()) return true;
+      const itemCode =
+        item.student?.studentCode || item.studentCode || item.code;
+      if (
+        itemCode &&
+        student.studentCode &&
+        String(itemCode).trim() === String(student.studentCode).trim()
+      )
+        return true;
 
       // 3. Name matching (exact only — substring matching is too risky and can produce false positives)
-      const itemName = (item.student?.name || item.studentName || item.student?.user?.name || item.user?.name || "").trim().toLowerCase();
-      const sName = (student.name || (student as any).user?.name || "").trim().toLowerCase();
+      const itemName = (
+        item.student?.name ||
+        item.studentName ||
+        item.student?.user?.name ||
+        item.user?.name ||
+        ""
+      )
+        .trim()
+        .toLowerCase();
+      const sName = (student.name || (student as any).user?.name || "")
+        .trim()
+        .toLowerCase();
       if (itemName && sName && itemName === sName) return true;
 
       // 4. Last-resort fallback ONLY when the item carries no identifying information at all
@@ -449,12 +544,17 @@ export async function getHomeworkSubmissions(
         const existingStatus = String(item.status || "").toUpperCase();
         const isLate = item.isLate ?? item.is_late ?? false;
         const dueDate = homework?.dueDate;
-        const isOverdue = item.isOverdue ?? item.is_overdue ?? (dueDate ? new Date() > new Date(dueDate) : false);
+        const isOverdue =
+          item.isOverdue ??
+          item.is_overdue ??
+          (dueDate ? new Date() > new Date(dueDate) : false);
 
         let chip = item.chip;
         if (!chip) {
-          if (existingStatus === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
-          else if (existingStatus === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+          if (existingStatus === "GRADED")
+            chip = isLate ? "GRADED_LATE" : "GRADED";
+          else if (existingStatus === "SUBMITTED")
+            chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
           else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
         }
 
@@ -475,39 +575,59 @@ export async function getHomeworkSubmissions(
       });
     } else if (batchStudents.length > 0) {
       let targetStudents = batchStudents;
-      if (homework?.targetType === "SPECIFIC" && Array.isArray(homework?.studentIds) && homework.studentIds.length > 0) {
-        targetStudents = batchStudents.filter((s) => homework.studentIds.includes(s.id));
+      if (
+        homework?.targetType === "SPECIFIC" &&
+        Array.isArray(homework?.studentIds) &&
+        homework.studentIds.length > 0
+      ) {
+        targetStudents = batchStudents.filter((s) =>
+          homework.studentIds.includes(s.id),
+        );
       }
 
       combinedResults = targetStudents.map((student) => {
         // Find matching submission in rawResults
         const existingIdx = rawResults.findIndex(
-          (item: any, idx: number) => !matchedRawItemIndexes.has(idx) && isStudentMatch(item, student)
+          (item: any, idx: number) =>
+            !matchedRawItemIndexes.has(idx) && isStudentMatch(item, student),
         );
-        
+
         if (existingIdx !== -1) {
           matchedRawItemIndexes.add(existingIdx);
           const existing = rawResults[existingIdx];
 
           const existingStatus = String(existing.status || "").toUpperCase();
-          const isSubmittedOrGraded = 
-            existingStatus === "SUBMITTED" || 
-            existingStatus === "GRADED" || 
-            existingStatus === "PENDING" || 
+          const isSubmittedOrGraded =
+            existingStatus === "SUBMITTED" ||
+            existingStatus === "GRADED" ||
+            existingStatus === "PENDING" ||
             existingStatus === "PENDING_GRADE" ||
             Boolean(existing.submissionId) ||
             Boolean(existing.submission?.id) ||
-            Boolean(existing.submittedAt || existing.submitted_at || existing.createdAt) ||
+            Boolean(
+              existing.submittedAt ||
+              existing.submitted_at ||
+              existing.createdAt,
+            ) ||
             Boolean(existing.note) ||
-            (Array.isArray(existing.attachments) && existing.attachments.length > 0) ||
+            (Array.isArray(existing.attachments) &&
+              existing.attachments.length > 0) ||
             (existing.score !== null && existing.score !== undefined);
 
           if (isSubmittedOrGraded) {
-            const submissionId = existing.submissionId ?? existing.submission?.id ?? existing.id ?? `sub_${student.id}`;
-            const status = existingStatus && existingStatus !== "NOT_SUBMITTED" ? existingStatus : "SUBMITTED";
+            const submissionId =
+              existing.submissionId ??
+              existing.submission?.id ??
+              existing.id ??
+              `sub_${student.id}`;
+            const status =
+              existingStatus && existingStatus !== "NOT_SUBMITTED"
+                ? existingStatus
+                : "SUBMITTED";
             const isLate = existing.isLate ?? existing.is_late ?? false;
-            const isOverdue = existing.isOverdue ?? existing.is_overdue ?? false;
-            
+            const isOverdue =
+              existing.isOverdue ?? existing.is_overdue ?? false;
+
             let chip = existing.chip;
             if (!chip) {
               if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
@@ -521,11 +641,16 @@ export async function getHomeworkSubmissions(
               student: {
                 id: student.id,
                 name: existing.student?.name || student.name,
-                studentCode: existing.student?.studentCode || student.studentCode,
+                studentCode:
+                  existing.student?.studentCode || student.studentCode,
               },
               status,
               chip,
-              submittedAt: existing.submittedAt || existing.submitted_at || existing.createdAt || new Date().toISOString(),
+              submittedAt:
+                existing.submittedAt ||
+                existing.submitted_at ||
+                existing.createdAt ||
+                new Date().toISOString(),
               score: existing.score ?? existing.grade ?? null,
             };
           }
@@ -552,18 +677,33 @@ export async function getHomeworkSubmissions(
     } else {
       // Fallback to rawResults mapping if batchStudents not available
       combinedResults = rawResults.map((item: any) => {
-        const studentName = item.student?.name || item.studentName || item.name || item.student?.user?.name || "Student";
-        const studentCode = item.student?.studentCode || item.studentCode || item.code || "";
+        const studentName =
+          item.student?.name ||
+          item.studentName ||
+          item.name ||
+          item.student?.user?.name ||
+          "Student";
+        const studentCode =
+          item.student?.studentCode || item.studentCode || item.code || "";
         const studentId = item.student?.id || item.studentId || item.id;
-        const submissionId = item.submissionId ?? item.submission?.id ?? (item.status && item.status !== "NOT_SUBMITTED" ? item.id : null);
-        const status = item.status && item.status !== "NOT_SUBMITTED" ? item.status : (submissionId ? "SUBMITTED" : "NOT_SUBMITTED");
+        const submissionId =
+          item.submissionId ??
+          item.submission?.id ??
+          (item.status && item.status !== "NOT_SUBMITTED" ? item.id : null);
+        const status =
+          item.status && item.status !== "NOT_SUBMITTED"
+            ? item.status
+            : submissionId
+              ? "SUBMITTED"
+              : "NOT_SUBMITTED";
         const isLate = item.isLate ?? item.is_late ?? false;
         const isOverdue = item.isOverdue ?? item.is_overdue ?? false;
-        
+
         let chip = item.chip;
         if (!chip) {
           if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
-          else if (status === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+          else if (status === "SUBMITTED")
+            chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
           else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
         }
 
@@ -578,7 +718,8 @@ export async function getHomeworkSubmissions(
           },
           status,
           chip,
-          submittedAt: item.submittedAt || item.submitted_at || item.createdAt || null,
+          submittedAt:
+            item.submittedAt || item.submitted_at || item.createdAt || null,
           score: item.score ?? item.grade ?? null,
         };
       });
@@ -589,18 +730,32 @@ export async function getHomeworkSubmissions(
     if (!apiReturnedFullRoster) {
       rawResults.forEach((item: any, idx: number) => {
         if (!matchedRawItemIndexes.has(idx)) {
-          const studentName = item.student?.name || item.studentName || item.name || item.student?.user?.name || "Student";
-          const studentCode = item.student?.studentCode || item.studentCode || item.code || "";
-          const studentId = item.student?.id || item.studentId || item.id || `stu_${idx}`;
-          const submissionId = item.submissionId ?? item.submission?.id ?? item.id;
-          const status = item.status && item.status !== "NOT_SUBMITTED" ? item.status : (submissionId ? "SUBMITTED" : "NOT_SUBMITTED");
+          const studentName =
+            item.student?.name ||
+            item.studentName ||
+            item.name ||
+            item.student?.user?.name ||
+            "Student";
+          const studentCode =
+            item.student?.studentCode || item.studentCode || item.code || "";
+          const studentId =
+            item.student?.id || item.studentId || item.id || `stu_${idx}`;
+          const submissionId =
+            item.submissionId ?? item.submission?.id ?? item.id;
+          const status =
+            item.status && item.status !== "NOT_SUBMITTED"
+              ? item.status
+              : submissionId
+                ? "SUBMITTED"
+                : "NOT_SUBMITTED";
           const isLate = item.isLate ?? item.is_late ?? false;
           const isOverdue = item.isOverdue ?? item.is_overdue ?? false;
 
           let chip = item.chip;
           if (!chip) {
             if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
-            else if (status === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+            else if (status === "SUBMITTED")
+              chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
             else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
           }
 
@@ -615,7 +770,8 @@ export async function getHomeworkSubmissions(
             },
             status,
             chip,
-            submittedAt: item.submittedAt || item.submitted_at || item.createdAt || null,
+            submittedAt:
+              item.submittedAt || item.submitted_at || item.createdAt || null,
             score: item.score ?? item.grade ?? null,
           });
         }
@@ -624,39 +780,59 @@ export async function getHomeworkSubmissions(
 
     // Apply client filters if requested
     if (filters?.status) {
-      combinedResults = combinedResults.filter((r) => r.status === filters.status);
+      combinedResults = combinedResults.filter(
+        (r) => r.status === filters.status,
+      );
     }
     if (filters?.track) {
       if (filters.track === "ON_TIME") {
-        combinedResults = combinedResults.filter((r) => !r.chip?.includes("LATE") && r.status !== "NOT_SUBMITTED");
+        combinedResults = combinedResults.filter(
+          (r) => !r.chip?.includes("LATE") && r.status !== "NOT_SUBMITTED",
+        );
       } else if (filters.track === "NOT_SUBMITTED") {
-        combinedResults = combinedResults.filter((r) => r.status === "NOT_SUBMITTED");
+        combinedResults = combinedResults.filter(
+          (r) => r.status === "NOT_SUBMITTED",
+        );
       }
     }
 
     const summary = apiSummary ?? {
       totalAssigned: combinedResults.length,
-      submitted: combinedResults.filter((r) => r.submissionId || r.status === "SUBMITTED" || r.status === "GRADED").length,
+      submitted: combinedResults.filter(
+        (r) =>
+          r.submissionId || r.status === "SUBMITTED" || r.status === "GRADED",
+      ).length,
       graded: combinedResults.filter((r) => r.status === "GRADED").length,
-      late: combinedResults.filter((r) => r.chip === "SUBMITTED_LATE" || r.chip === "GRADED_LATE").length,
-      notSubmitted: combinedResults.filter((r) => r.status === "NOT_SUBMITTED").length,
+      late: combinedResults.filter(
+        (r) => r.chip === "SUBMITTED_LATE" || r.chip === "GRADED_LATE",
+      ).length,
+      notSubmitted: combinedResults.filter((r) => r.status === "NOT_SUBMITTED")
+        .length,
     };
 
-    const meta = rawPayload.meta ?? rawPayload.data?.meta ?? {
-      page: filters?.page || 1,
-      limit: filters?.limit || 50,
-      total: combinedResults.length,
-      totalPages: 1,
-    };
+    const meta = rawPayload.meta ??
+      rawPayload.data?.meta ?? {
+        page: filters?.page || 1,
+        limit: filters?.limit || 50,
+        total: combinedResults.length,
+        totalPages: 1,
+      };
 
     return {
       ok: true,
-      data: { homework: homework || detailData, summary, results: combinedResults },
+      data: {
+        homework: homework || detailData,
+        summary,
+        results: combinedResults,
+      },
       message: rawPayload.message,
       meta,
     } as any;
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch submissions roster" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch submissions roster",
+    };
   }
 }
 
@@ -664,13 +840,18 @@ export async function getHomeworkSubmissions(
  * GET /homeworks/teacher/:homeworkId/submissions/:submissionId
  * Retrieves detailed submission data (student answer, files, note) for grading.
  */
-export async function getSubmissionDetails(submissionId: string, homeworkId?: string): Promise<ActionResult<SubmissionDetails>> {
+export async function getSubmissionDetails(
+  submissionId: string,
+  homeworkId?: string,
+): Promise<ActionResult<SubmissionDetails>> {
   try {
     const candidateEndpoints: string[] = [
       `/homeworks/teacher/submissions/${submissionId}`,
     ];
     if (homeworkId) {
-      candidateEndpoints.push(`/homeworks/teacher/${homeworkId}/submissions/${submissionId}`);
+      candidateEndpoints.push(
+        `/homeworks/teacher/${homeworkId}/submissions/${submissionId}`,
+      );
     }
     candidateEndpoints.push(`/homeworks/submissions/${submissionId}`);
     candidateEndpoints.push(`/homeworks/teacher/submission/${submissionId}`);
@@ -683,7 +864,9 @@ export async function getSubmissionDetails(submissionId: string, homeworkId?: st
         endpoint: ep,
         method: "GET",
       });
-      console.log(`[DEBUG getSubmissionDetails] tried "${ep}": success=${response.success}`);
+      console.log(
+        `[DEBUG getSubmissionDetails] tried "${ep}": success=${response.success}`,
+      );
       if (response.success && response.data) {
         res = response;
         successfulEndpoint = ep;
@@ -694,24 +877,18 @@ export async function getSubmissionDetails(submissionId: string, homeworkId?: st
     if (res && res.success) {
       const outerData = res.data?.data ?? res.data ?? {};
 
-      let sub: any =
-        outerData.submission ??
-        outerData.data?.submission ??
-        null;
+      let sub: any = outerData.submission ?? outerData.data?.submission ?? null;
 
       let hw: any =
-        outerData.homework ??
-        outerData.data?.homework ??
-        sub?.homework ??
-        null;
+        outerData.homework ?? outerData.data?.homework ?? sub?.homework ?? null;
 
       let student: any =
-        outerData.student ??
-        outerData.data?.student ??
-        sub?.student ??
-        null;
+        outerData.student ?? outerData.data?.student ?? sub?.student ?? null;
 
-      if (!sub && (outerData.id || outerData.note !== undefined || outerData.attachments)) {
+      if (
+        !sub &&
+        (outerData.id || outerData.note !== undefined || outerData.attachments)
+      ) {
         sub = outerData;
         hw = hw ?? outerData.homework;
         student = student ?? outerData.student;
@@ -722,18 +899,33 @@ export async function getSubmissionDetails(submissionId: string, homeworkId?: st
           id: sub.id || submissionId,
           note: sub.note ?? null,
           attachments: Array.isArray(sub.attachments) ? sub.attachments : [],
-          submittedAt: sub.submittedAt || sub.submitted_at || new Date().toISOString(),
+          submittedAt:
+            sub.submittedAt || sub.submitted_at || new Date().toISOString(),
           isLate: sub.isLate ?? sub.is_late ?? false,
           status: sub.status || "SUBMITTED",
           score: sub.score ?? sub.grade ?? null,
           feedback: sub.feedback ?? null,
           gradedAt: sub.gradedAt ?? null,
-          student: student || sub.student || { id: "student_1", name: "Student", studentCode: "STU" },
-          homework: hw || sub.homework || { id: homeworkId || "", title: "Homework", instruction: "", dueDate: "", maxScore: 100 },
+          student: student ||
+            sub.student || {
+              id: "student_1",
+              name: "Student",
+              studentCode: "STU",
+            },
+          homework: hw ||
+            sub.homework || {
+              id: homeworkId || "",
+              title: "Homework",
+              instruction: "",
+              dueDate: "",
+              maxScore: 100,
+            },
           isCompleted:
             outerData.isCompleted ??
             sub.isCompleted ??
-            (sub.score !== null && sub.score !== undefined ? sub.score > 0 : null),
+            (sub.score !== null && sub.score !== undefined
+              ? sub.score > 0
+              : null),
         };
         return { ok: true, data: details };
       }
@@ -744,24 +936,38 @@ export async function getSubmissionDetails(submissionId: string, homeworkId?: st
       const rosterRes = await getHomeworkSubmissions(homeworkId);
       if (rosterRes.ok && rosterRes.data?.results) {
         const matchingItem = rosterRes.data.results.find(
-          (r: any) => r.submissionId === submissionId || r.assignmentId === submissionId || r.student?.id === submissionId
+          (r: any) =>
+            r.submissionId === submissionId ||
+            r.assignmentId === submissionId ||
+            r.student?.id === submissionId,
         );
 
         if (matchingItem) {
-          const hwDetail = rosterRes.data.homework || { id: homeworkId, title: "Homework", instruction: "", dueDate: "", maxScore: 100 };
+          const hwDetail = rosterRes.data.homework || {
+            id: homeworkId,
+            title: "Homework",
+            instruction: "",
+            dueDate: "",
+            maxScore: 100,
+          };
           const details: SubmissionDetails = {
             id: matchingItem.submissionId || submissionId,
             note: (matchingItem as any).note || null,
-            attachments: Array.isArray((matchingItem as any).attachments) ? (matchingItem as any).attachments : [],
+            attachments: Array.isArray((matchingItem as any).attachments)
+              ? (matchingItem as any).attachments
+              : [],
             submittedAt: matchingItem.submittedAt || new Date().toISOString(),
             isLate: matchingItem.isLate || false,
-            status: (matchingItem.status === "GRADED" ? "GRADED" : "SUBMITTED") as any,
+            status: (matchingItem.status === "GRADED"
+              ? "GRADED"
+              : "SUBMITTED") as any,
             score: matchingItem.score,
             feedback: (matchingItem as any).feedback || null,
             gradedAt: matchingItem.gradedAt || null,
             student: matchingItem.student,
             homework: hwDetail as any,
-            isCompleted: matchingItem.score !== null ? matchingItem.score > 0 : null,
+            isCompleted:
+              matchingItem.score !== null ? matchingItem.score > 0 : null,
           };
           return { ok: true, data: details };
         }
@@ -774,7 +980,9 @@ export async function getSubmissionDetails(submissionId: string, homeworkId?: st
       if (initialMockSubmissions) {
         for (const hwId of Object.keys(initialMockSubmissions)) {
           const list = initialMockSubmissions[hwId] || [];
-          const found = list.find((s: any) => s.id === submissionId || `sub_${s.id}` === submissionId);
+          const found = list.find(
+            (s: any) => s.id === submissionId || `sub_${s.id}` === submissionId,
+          );
           if (found) {
             const detailRes = await getHomeworkDetail(hwId);
             const hw = detailRes.ok ? detailRes.data : null;
@@ -782,8 +990,18 @@ export async function getSubmissionDetails(submissionId: string, homeworkId?: st
               ok: true,
               data: {
                 ...found,
-                student: found.student || { id: "student_1", name: "Student", studentCode: "STU-001" },
-                homework: hw || { id: hwId, title: "Homework", instruction: "", dueDate: "", maxScore: 100 },
+                student: found.student || {
+                  id: "student_1",
+                  name: "Student",
+                  studentCode: "STU-001",
+                },
+                homework: hw || {
+                  id: hwId,
+                  title: "Homework",
+                  instruction: "",
+                  dueDate: "",
+                  maxScore: 100,
+                },
                 isCompleted: found.score !== null ? found.score > 0 : null,
               } as any,
             };
@@ -794,7 +1012,10 @@ export async function getSubmissionDetails(submissionId: string, homeworkId?: st
 
     return { ok: false, error: "Failed to fetch submission details" };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch submission details" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch submission details",
+    };
   }
 }
 
@@ -808,7 +1029,7 @@ export async function gradeSubmission(
     score?: number | null;
     feedback?: string | null;
     isCompleted?: boolean;
-  }
+  },
 ): Promise<ActionResult<Submission>> {
   try {
     const cleanData: Record<string, any> = {};
@@ -820,7 +1041,11 @@ export async function gradeSubmission(
       cleanData.score = Number(payload.score);
     }
 
-    if (payload.feedback && typeof payload.feedback === "string" && payload.feedback.trim() !== "") {
+    if (
+      payload.feedback &&
+      typeof payload.feedback === "string" &&
+      payload.feedback.trim() !== ""
+    ) {
       cleanData.feedback = payload.feedback.trim();
     }
 
@@ -840,7 +1065,11 @@ export async function gradeSubmission(
     }
     revalidatePath("/dashboard/teacher/homework");
     revalidatePath(`/dashboard/teacher/homework/submissions/${submissionId}`);
-    return { ok: true, data: unwrap<Submission>(res.data), message: res.data?.message };
+    return {
+      ok: true,
+      data: unwrap<Submission>(res.data),
+      message: res.data?.message,
+    };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to grade submission" };
   }
@@ -850,12 +1079,14 @@ export async function gradeSubmission(
  * PATCH /homeworks/teacher/submissions/bulk-grade
  * Bulk grades multiple homework submissions at once.
  */
-export async function bulkGradeSubmissions(grades: {
-  submissionId: string;
-  isCompleted?: boolean;
-  score?: number | null;
-  feedback?: string | null;
-}[]): Promise<ActionResult<any>> {
+export async function bulkGradeSubmissions(
+  grades: {
+    submissionId: string;
+    isCompleted?: boolean;
+    score?: number | null;
+    feedback?: string | null;
+  }[],
+): Promise<ActionResult<any>> {
   try {
     const res = await universalApi<any>({
       endpoint: "/homeworks/teacher/submissions/bulk-grade",
@@ -864,13 +1095,23 @@ export async function bulkGradeSubmissions(grades: {
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to execute bulk grading" };
+      return {
+        ok: false,
+        error: res.message || "Failed to execute bulk grading",
+      };
     }
 
     revalidatePath("/dashboard/teacher/homework");
-    return { ok: true, data: unwrap<any>(res.data), message: res.data?.message };
+    return {
+      ok: true,
+      data: unwrap<any>(res.data),
+      message: res.data?.message,
+    };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to execute bulk grading" };
+    return {
+      ok: false,
+      error: error.message || "Failed to execute bulk grading",
+    };
   }
 }
 
@@ -902,11 +1143,16 @@ export async function getTeacherHomeworkHistory(filters?: {
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch homework history" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch homework history",
+      };
     }
 
     const payload = res.data || {};
-    const days = unwrapList<any>(payload.days !== undefined ? payload.days : payload.data?.days);
+    const days = unwrapList<any>(
+      payload.days !== undefined ? payload.days : payload.data?.days,
+    );
     const meta = payload.meta !== undefined ? payload.meta : payload.data?.meta;
     return {
       ok: true,
@@ -915,7 +1161,10 @@ export async function getTeacherHomeworkHistory(filters?: {
       message: payload.message,
     } as any;
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch homework history" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch homework history",
+    };
   }
 }
 
@@ -923,7 +1172,10 @@ export async function getTeacherHomeworkHistory(filters?: {
  * GET /homeworks/teacher/overview
  * Retrieves an overview summary of homework metrics (stats/graphs) for the teacher.
  */
-export async function getTeacherHomeworkOverview(month?: string, batchId?: string): Promise<ActionResult<TeacherOverviewResponse>> {
+export async function getTeacherHomeworkOverview(
+  month?: string,
+  batchId?: string,
+): Promise<ActionResult<TeacherOverviewResponse>> {
   try {
     const query = new URLSearchParams();
     if (month) query.set("month", month);
@@ -937,12 +1189,18 @@ export async function getTeacherHomeworkOverview(month?: string, batchId?: strin
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch teacher overview" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch teacher overview",
+      };
     }
 
     return { ok: true, data: unwrap<TeacherOverviewResponse>(res.data) };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch teacher overview" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch teacher overview",
+    };
   }
 }
 
@@ -976,7 +1234,10 @@ export async function getStudentHomeworks(filters?: {
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch student homeworks" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch student homeworks",
+      };
     }
 
     const payload = res.data || {};
@@ -988,7 +1249,10 @@ export async function getStudentHomeworks(filters?: {
       message: payload.message,
     } as any;
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch student homeworks" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch student homeworks",
+    };
   }
 }
 
@@ -996,7 +1260,9 @@ export async function getStudentHomeworks(filters?: {
  * GET /homeworks/student/:homeworkId
  * Retrieves detailed homework information and submission status for the student.
  */
-export async function getStudentHomeworkDetail(homeworkId: string): Promise<ActionResult<StudentHomeworkDetail>> {
+export async function getStudentHomeworkDetail(
+  homeworkId: string,
+): Promise<ActionResult<StudentHomeworkDetail>> {
   try {
     const res = await universalApi<any>({
       endpoint: `/homeworks/student/${homeworkId}`,
@@ -1004,7 +1270,10 @@ export async function getStudentHomeworkDetail(homeworkId: string): Promise<Acti
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch student homework detail" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch student homework detail",
+      };
     }
 
     const payload = unwrap<any>(res.data) || {};
@@ -1020,7 +1289,11 @@ export async function getStudentHomeworkDetail(homeworkId: string): Promise<Acti
     if (!submission) {
       try {
         const { initialMockSubmissions } = require("@/data/mock-homework");
-        if (initialMockSubmissions && initialMockSubmissions[homeworkId] && initialMockSubmissions[homeworkId].length > 0) {
+        if (
+          initialMockSubmissions &&
+          initialMockSubmissions[homeworkId] &&
+          initialMockSubmissions[homeworkId].length > 0
+        ) {
           const subs = initialMockSubmissions[homeworkId];
           submission = subs[subs.length - 1];
         }
@@ -1040,7 +1313,10 @@ export async function getStudentHomeworkDetail(homeworkId: string): Promise<Acti
       },
     };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch student homework detail" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch student homework detail",
+    };
   }
 }
 
@@ -1057,7 +1333,7 @@ export async function submitStudentHomework(
       url: string;
       fileName: string | null;
     }[];
-  }
+  },
 ): Promise<ActionResult<Submission>> {
   try {
     const res = await universalApi<any>({
@@ -1124,7 +1400,11 @@ export async function submitStudentHomework(
     revalidatePath("/dashboard/parent/children");
     revalidatePath("/dashboard/student");
     revalidatePath("/dashboard/parent");
-    return { ok: true, data: unwrap<Submission>(res.data), message: res.data?.message };
+    return {
+      ok: true,
+      data: unwrap<Submission>(res.data),
+      message: res.data?.message,
+    };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to submit homework" };
   }
@@ -1134,7 +1414,9 @@ export async function submitStudentHomework(
  * GET /homeworks/student/overview
  * Retrieves an overview summary of homework metrics (stats/graphs) for the student.
  */
-export async function getStudentHomeworkOverview(month?: string): Promise<ActionResult<StudentOverviewResponse>> {
+export async function getStudentHomeworkOverview(
+  month?: string,
+): Promise<ActionResult<StudentOverviewResponse>> {
   try {
     const query = new URLSearchParams();
     if (month) query.set("month", month);
@@ -1147,12 +1429,18 @@ export async function getStudentHomeworkOverview(month?: string): Promise<Action
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch student overview" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch student overview",
+      };
     }
 
     return { ok: true, data: unwrap<StudentOverviewResponse>(res.data) };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch student overview" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch student overview",
+    };
   }
 }
 
@@ -1214,14 +1502,20 @@ export async function getParentHomeworkData(filters?: {
       method: "GET",
     });
 
-    let rawPayload = res.success ? (unwrap<any>(res.data) || {}) : {};
+    const rawPayload = res.success ? unwrap<any>(res.data) || {} : {};
     let rawChildren = unwrapList<any>(
-      rawPayload.children ?? rawPayload.students ?? rawPayload.data?.children ?? rawPayload.myChildren
+      rawPayload.children ??
+        rawPayload.students ??
+        rawPayload.data?.children ??
+        rawPayload.myChildren,
     );
 
     // If children is empty, try fetching from parent children endpoint
     if (rawChildren.length === 0) {
-      const childrenRes = await universalApi<any>({ endpoint: "/parents/my-children", method: "GET" });
+      const childrenRes = await universalApi<any>({
+        endpoint: "/parents/my-children",
+        method: "GET",
+      });
       if (childrenRes.success) {
         rawChildren = unwrapList<any>(childrenRes.data);
       }
@@ -1236,13 +1530,21 @@ export async function getParentHomeworkData(filters?: {
       };
     });
 
-    let results = unwrapList<any>(
-      rawPayload.results ?? rawPayload.homeworks ?? rawPayload.assignments ?? rawPayload.data?.results ?? rawPayload.data?.homeworks ?? rawPayload.data
+    const results = unwrapList<any>(
+      rawPayload.results ??
+        rawPayload.homeworks ??
+        rawPayload.assignments ??
+        rawPayload.data?.results ??
+        rawPayload.data?.homeworks ??
+        rawPayload.data,
     );
 
     // Always fetch student homeworks to ensure ALL assigned homeworks (e.g. all 3 records) are included
     const studentHwsRes = await getStudentHomeworks();
-    const studentHws = studentHwsRes.ok && Array.isArray(studentHwsRes.data) ? studentHwsRes.data : [];
+    const studentHws =
+      studentHwsRes.ok && Array.isArray(studentHwsRes.data)
+        ? studentHwsRes.data
+        : [];
 
     const existingHwIds = new Set<string>();
     results.forEach((r: any) => {
@@ -1261,21 +1563,34 @@ export async function getParentHomeworkData(filters?: {
     // Enrich items in results with full homework details if missing title/instruction
     for (let i = 0; i < results.length; i++) {
       const item = results[i];
-      const hwObj = item?.homework && typeof item.homework === "object" ? item.homework : null;
-      const hwId = hwObj?.id || (typeof item?.homework === "string" ? item.homework : null) || item?.homeworkId || item?.id;
-      
+      const hwObj =
+        item?.homework && typeof item.homework === "object"
+          ? item.homework
+          : null;
+      const hwId =
+        hwObj?.id ||
+        (typeof item?.homework === "string" ? item.homework : null) ||
+        item?.homeworkId ||
+        item?.id;
+
       let title = hwObj?.title || item?.title || item?.name;
-      let instruction = hwObj?.instruction || item?.instruction || item?.description;
+      let instruction =
+        hwObj?.instruction || item?.instruction || item?.description;
       let dueDate = hwObj?.dueDate || item?.dueDate || item?.due_date;
       let maxScore = hwObj?.maxScore ?? item?.maxScore ?? item?.max_score;
-      let batchName = hwObj?.batch?.name || item?.batchName || item?.batch?.name;
-      let teacherName = hwObj?.teacher?.name || item?.teacherName || item?.teacher?.name;
+      let batchName =
+        hwObj?.batch?.name || item?.batchName || item?.batch?.name;
+      let teacherName =
+        hwObj?.teacher?.name || item?.teacherName || item?.teacher?.name;
       let status = item?.status || hwObj?.status;
       let score = item?.score ?? hwObj?.score;
       let feedback = item?.feedback ?? hwObj?.feedback;
 
       // Fetch via student endpoint (accessible to Parent) if detailed title/instruction/dueDate are missing
-      if (hwId && (!title || title === "Homework" || !instruction || !dueDate)) {
+      if (
+        hwId &&
+        (!title || title === "Homework" || !instruction || !dueDate)
+      ) {
         const detailRes = await getStudentHomeworkDetail(hwId);
         if (detailRes.ok && detailRes.data) {
           const detailHw = detailRes.data.homework || detailRes.data;
@@ -1297,7 +1612,14 @@ export async function getParentHomeworkData(filters?: {
 
       results[i] = {
         ...item,
-        homework: item.homework || { title, instruction, dueDate, maxScore, batch: { name: batchName }, teacher: { name: teacherName } },
+        homework: item.homework || {
+          title,
+          instruction,
+          dueDate,
+          maxScore,
+          batch: { name: batchName },
+          teacher: { name: teacherName },
+        },
         title,
         instruction,
         dueDate,
@@ -1317,7 +1639,10 @@ export async function getParentHomeworkData(filters?: {
       message: rawPayload.message,
     } as any;
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch parent homework dashboard" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch parent homework dashboard",
+    };
   }
 }
 
@@ -1325,7 +1650,10 @@ export async function getParentHomeworkData(filters?: {
  * GET /homeworks/parent/overview
  * Retrieves homework performance overview metrics for a parent's student children.
  */
-export async function getParentHomeworkOverview(studentId?: string, month?: string): Promise<ActionResult<ParentOverviewResponse>> {
+export async function getParentHomeworkOverview(
+  studentId?: string,
+  month?: string,
+): Promise<ActionResult<ParentOverviewResponse>> {
   try {
     const query = new URLSearchParams();
     if (studentId) query.set("studentId", studentId);
@@ -1339,11 +1667,17 @@ export async function getParentHomeworkOverview(studentId?: string, month?: stri
     });
 
     if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch parent overview" };
+      return {
+        ok: false,
+        error: res.message || "Failed to fetch parent overview",
+      };
     }
 
     return { ok: true, data: unwrap<ParentOverviewResponse>(res.data) };
   } catch (error: any) {
-    return { ok: false, error: error.message || "Failed to fetch parent overview" };
+    return {
+      ok: false,
+      error: error.message || "Failed to fetch parent overview",
+    };
   }
 }

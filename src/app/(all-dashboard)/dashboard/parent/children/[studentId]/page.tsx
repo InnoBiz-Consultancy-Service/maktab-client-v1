@@ -54,7 +54,9 @@ export default async function ParentChildDetailPage({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-night-900">{student.name}</h1>
+                <h1 className="text-2xl font-bold text-night-900">
+                  {student.name}
+                </h1>
                 <span className="rounded-full bg-cream-100 px-2.5 py-0.5 text-xs font-semibold text-night-900">
                   {student.studentCode}
                 </span>
@@ -67,13 +69,18 @@ export default async function ParentChildDetailPage({
 
           <div className="flex items-center gap-3">
             <div className="flex flex-col gap-1 rounded-xl bg-gold-500/10 p-3 text-right">
-              <span className="text-xs font-medium text-ink-soft">Batch Rank</span>
-              <span className="font-display text-xl font-bold text-night-900 flex items-center gap-1">
-                <Trophy className="h-4 w-4 text-gold-500" /> #{rank?.rank ?? "-"}
+              <span className="text-xs font-medium text-ink-soft">
+                Batch Rank
+              </span>
+              <span className="flex items-center gap-1 font-display text-xl font-bold text-night-900">
+                <Trophy className="h-4 w-4 text-gold-500" /> #
+                {rank?.rank ?? "-"}
               </span>
             </div>
             <div className="flex flex-col gap-1 rounded-xl bg-cream-100 p-3 text-right">
-              <span className="text-xs font-medium text-ink-soft">Total Points</span>
+              <span className="text-xs font-medium text-ink-soft">
+                Total Points
+              </span>
               <span className="font-display text-xl font-bold text-night-900">
                 {points} pts
               </span>
@@ -82,7 +89,10 @@ export default async function ParentChildDetailPage({
         </div>
       </Card>
 
-      <ProgressGauges progress={progressRates} title="Detailed Progress Breakdown" />
+      <ProgressGauges
+        progress={progressRates}
+        title="Detailed Progress Breakdown"
+      />
       <PointsBreakdownCard points={points} breakdown={pointsBreakdown} />
     </div>
   );

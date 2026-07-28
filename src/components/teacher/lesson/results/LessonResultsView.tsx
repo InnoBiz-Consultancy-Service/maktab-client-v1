@@ -111,7 +111,7 @@ export function LessonResultsView({
         <>
           <div className="hidden overflow-hidden rounded-lg bg-cream-50 shadow-soft sm:block">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-cream-200 text-xs uppercase tracking-wide text-ink-soft">
+              <thead className="border-b border-cream-200 text-xs tracking-wide text-ink-soft uppercase">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Student</th>
                   <th className="px-4 py-3 font-semibold">Video</th>

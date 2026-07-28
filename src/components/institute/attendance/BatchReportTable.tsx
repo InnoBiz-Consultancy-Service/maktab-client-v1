@@ -9,7 +9,7 @@ import { getBatchReportAction } from "@/actions/attendance/get-batch-report";
 import { Skeleton } from "@/components/ui";
 import type { BatchReport } from "@/types/attendance";
 import {
-  DatePreset,
+  type DatePreset,
   DateRangeFilter,
   presetToParams,
 } from "@/components/shared/attendance/DateRangeFilter";

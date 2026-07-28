@@ -33,15 +33,19 @@ export default async function TeacherStudentsPage({
       <div>
         <h1 className="text-2xl font-bold text-night-900">My Students</h1>
         <p className="mt-1 text-sm text-ink-soft">
-          {meta ? `${meta.total} students in your batches` : "Students in your assigned batches."}
+          {meta
+            ? `${meta.total} students in your batches`
+            : "Students in your assigned batches."}
         </p>
       </div>
 
-      <Card className="p-0 overflow-hidden">
+      <Card className="overflow-hidden p-0">
         {students.length === 0 ? (
           <div className="flex flex-col items-center gap-3 px-4 py-14 text-center">
             <Inbox className="h-8 w-8 text-cream-200" aria-hidden />
-            <p className="text-sm text-ink-soft">No students in your batches.</p>
+            <p className="text-sm text-ink-soft">
+              No students in your batches.
+            </p>
           </div>
         ) : (
           <ul className="divide-y divide-cream-200">
@@ -67,21 +71,34 @@ export default async function TeacherStudentsPage({
                       </span>
                     </div>
                     <p className="truncate text-xs text-ink-soft">
-                      {s.class} {s.batches?.map((b) => b.name).join(", ") ? `· ${s.batches.map((b) => b.name).join(", ")}` : ""}
+                      {s.class}{" "}
+                      {s.batches?.map((b) => b.name).join(", ")
+                        ? `· ${s.batches.map((b) => b.name).join(", ")}`
+                        : ""}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-4 sm:justify-end">
                   <div className="flex items-center gap-3 text-xs text-ink-soft">
-                    <span>Lesson: <strong>{s.progress?.lessonCompletionRate ?? 0}%</strong></span>
+                    <span>
+                      Lesson:{" "}
+                      <strong>{s.progress?.lessonCompletionRate ?? 0}%</strong>
+                    </span>
                     <span>•</span>
-                    <span>HW: <strong>{s.progress?.homeworkSubmissionRate ?? 0}%</strong></span>
+                    <span>
+                      HW:{" "}
+                      <strong>
+                        {s.progress?.homeworkSubmissionRate ?? 0}%
+                      </strong>
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 rounded-full bg-gold-500/10 px-3 py-1 text-gold-700">
+                  <div className="text-gold-700 flex items-center gap-1.5 rounded-full bg-gold-500/10 px-3 py-1">
                     <Award className="h-3.5 w-3.5" />
-                    <span className="font-bold text-xs">{s.points ?? 0} pts</span>
+                    <span className="text-xs font-bold">
+                      {s.points ?? 0} pts
+                    </span>
                   </div>
 
                   <Link

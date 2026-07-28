@@ -28,7 +28,7 @@ export function StudentDashboard({
       {/* Hero — night sky, the "welcome to the game" moment */}
       <section className="relative mb-6 overflow-hidden rounded-lg bg-night-900 p-5 text-cream-50 sm:p-6">
         <Sparkles
-          className="absolute right-4 top-4 h-5 w-5 animate-twinkle text-gold-300"
+          className="animate-twinkle absolute top-4 right-4 h-5 w-5 text-gold-300"
           aria-hidden
         />
         <div className="flex items-center justify-between gap-4">
@@ -57,31 +57,32 @@ export function StudentDashboard({
       </section>
 
       {/* Leaderboard & Standings Shortcut Card */}
-      <Link href="/dashboard/leaderboard" className="block mb-6 group">
-        <div className="relative overflow-hidden rounded-xl border border-gold-500/40 bg-gradient-to-r from-gold-500/15 via-gold-500/10 to-cream-50/80 p-4 transition-all duration-300 hover:border-gold-500 hover:shadow-[0_0_24px_rgba(245,184,51,0.25)] hover:scale-[1.01]">
+      <Link href="/dashboard/leaderboard" className="group mb-6 block">
+        <div className="relative overflow-hidden rounded-xl border border-gold-500/40 bg-gradient-to-r from-gold-500/15 via-gold-500/10 to-cream-50/80 p-4 transition-all duration-300 hover:scale-[1.01] hover:border-gold-500 hover:shadow-[0_0_24px_rgba(245,184,51,0.25)]">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5 min-w-0">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-500 text-night-900 shadow-md group-hover:scale-110 transition-transform">
+            <div className="flex min-w-0 items-center gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-500 text-night-900 shadow-md transition-transform group-hover:scale-110">
                 <Trophy className="h-6 w-6" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h2 className="font-display text-base font-bold text-night-900 group-hover:text-gold-700 transition-colors">
+                  <h2 className="group-hover:text-gold-700 font-display text-base font-bold text-night-900 transition-colors">
                     Leaderboard & Standings
                   </h2>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-gold-500/20 px-2 py-0.5 text-[10px] font-extrabold text-gold-800">
+                  <span className="text-gold-800 inline-flex items-center gap-1 rounded-full bg-gold-500/20 px-2 py-0.5 text-[10px] font-extrabold">
                     <Sparkles className="h-3 w-3 text-gold-600" /> Live Rankings
                   </span>
                 </div>
-                <p className="text-xs text-ink-soft truncate mt-0.5">
-                  View your class position, live points ranking & frozen final batch standings.
+                <p className="mt-0.5 truncate text-xs text-ink-soft">
+                  View your class position, live points ranking & frozen final
+                  batch standings.
                 </p>
               </div>
             </div>
 
-            <div className="shrink-0 flex items-center gap-1 text-xs font-extrabold text-night-900 bg-gold-500 px-3.5 py-2 rounded-lg shadow-sm group-hover:bg-gold-400 transition-colors">
+            <div className="flex shrink-0 items-center gap-1 rounded-lg bg-gold-500 px-3.5 py-2 text-xs font-extrabold text-night-900 shadow-sm transition-colors group-hover:bg-gold-400">
               <span>View Leaderboard</span>
-              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </div>
           </div>
         </div>
@@ -188,27 +189,48 @@ export function StudentDashboard({
       {homeworkOverview && (
         <section className="mb-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-night-900">Homework Progress ({homeworkOverview.month || ""})</h2>
-            <Link href="/dashboard/student/homework" className="text-xs font-bold text-gold-600 hover:underline">
+            <h2 className="font-display text-lg font-bold text-night-900">
+              Homework Progress ({homeworkOverview.month || ""})
+            </h2>
+            <Link
+              href="/dashboard/student/homework"
+              className="text-xs font-bold text-gold-600 hover:underline"
+            >
               View All &rarr;
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
-              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Assigned</span>
-              <span className="text-xl font-bold text-night-900 block mt-1">{homeworkOverview.summary?.assigned ?? 0}</span>
+            <Card className="border border-cream-200 p-3.5 text-center shadow-sm">
+              <span className="block text-[10px] font-semibold tracking-wider text-ink-soft uppercase">
+                Assigned
+              </span>
+              <span className="mt-1 block text-xl font-bold text-night-900">
+                {homeworkOverview.summary?.assigned ?? 0}
+              </span>
             </Card>
-            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
-              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Submitted</span>
-              <span className="text-xl font-bold text-night-900 block mt-1">{homeworkOverview.summary?.submitted ?? 0}</span>
+            <Card className="border border-cream-200 p-3.5 text-center shadow-sm">
+              <span className="block text-[10px] font-semibold tracking-wider text-ink-soft uppercase">
+                Submitted
+              </span>
+              <span className="mt-1 block text-xl font-bold text-night-900">
+                {homeworkOverview.summary?.submitted ?? 0}
+              </span>
             </Card>
-            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
-              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Submission Rate</span>
-              <span className="text-xl font-bold text-quran block mt-1">{homeworkOverview.summary?.submissionRate ?? 0}%</span>
+            <Card className="border border-cream-200 p-3.5 text-center shadow-sm">
+              <span className="block text-[10px] font-semibold tracking-wider text-ink-soft uppercase">
+                Submission Rate
+              </span>
+              <span className="mt-1 block text-xl font-bold text-quran">
+                {homeworkOverview.summary?.submissionRate ?? 0}%
+              </span>
             </Card>
-            <Card className="p-3.5 border border-cream-200 text-center shadow-sm">
-              <span className="text-[10px] text-ink-soft block font-semibold uppercase tracking-wider">Overdue</span>
-              <span className={`text-xl font-bold block mt-1 ${(homeworkOverview.summary?.overdue ?? 0) > 0 ? 'text-error animate-pulse font-extrabold' : 'text-night-900'}`}>
+            <Card className="border border-cream-200 p-3.5 text-center shadow-sm">
+              <span className="block text-[10px] font-semibold tracking-wider text-ink-soft uppercase">
+                Overdue
+              </span>
+              <span
+                className={`mt-1 block text-xl font-bold ${(homeworkOverview.summary?.overdue ?? 0) > 0 ? "animate-pulse font-extrabold text-error" : "text-night-900"}`}
+              >
                 {homeworkOverview.summary?.overdue ?? 0}
               </span>
             </Card>
@@ -216,20 +238,32 @@ export function StudentDashboard({
 
           {/* Upcoming assignments */}
           {(homeworkOverview.upcoming || []).length > 0 && (
-            <Card className="p-0 border border-cream-200 overflow-hidden shadow-sm">
+            <Card className="overflow-hidden border border-cream-200 p-0 shadow-sm">
               <div className="border-b border-cream-100 bg-cream-50/50 px-4 py-3">
-                <h3 className="text-sm font-bold text-night-900">Upcoming Homework Tasks</h3>
+                <h3 className="text-sm font-bold text-night-900">
+                  Upcoming Homework Tasks
+                </h3>
               </div>
               <ul className="divide-y divide-cream-100">
                 {(homeworkOverview.upcoming || []).map((item) => (
-                  <li key={item.assignmentId} className="hover:bg-cream-50/30 transition-all">
-                    <Link href={`/dashboard/student/homework/${item.homework?.id}`} className="flex items-center justify-between px-4 py-3.5 text-xs">
+                  <li
+                    key={item.assignmentId}
+                    className="transition-all hover:bg-cream-50/30"
+                  >
+                    <Link
+                      href={`/dashboard/student/homework/${item.homework?.id}`}
+                      className="flex items-center justify-between px-4 py-3.5 text-xs"
+                    >
                       <div>
-                        <p className="font-semibold text-night-900">{item.homework?.title || "Homework"}</p>
-                        <p className="text-[10px] text-ink-soft mt-0.5">Due: {formatCalendarDate(item.homework?.dueDate)}</p>
+                        <p className="font-semibold text-night-900">
+                          {item.homework?.title || "Homework"}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-ink-soft">
+                          Due: {formatCalendarDate(item.homework?.dueDate)}
+                        </p>
                       </div>
-                      <span className="shrink-0 bg-gold-500/10 text-gold-600 font-bold px-2.5 py-1 rounded text-[10px]">
-                        {item.daysLeft} day{item.daysLeft !== 1 ? 's' : ''} left
+                      <span className="shrink-0 rounded bg-gold-500/10 px-2.5 py-1 text-[10px] font-bold text-gold-600">
+                        {item.daysLeft} day{item.daysLeft !== 1 ? "s" : ""} left
                       </span>
                     </Link>
                   </li>

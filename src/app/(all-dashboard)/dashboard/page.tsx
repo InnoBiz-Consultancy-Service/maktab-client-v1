@@ -11,7 +11,7 @@ export default async function DashboardPage() {
       </h1>
       <p className="mb-8 text-ink-soft">
         You&rsquo;re signed in as{" "}
-        <span className="font-medium capitalize text-night-900">
+        <span className="font-medium text-night-900 capitalize">
           {session.role.toLowerCase()}
         </span>
         .

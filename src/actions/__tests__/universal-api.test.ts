@@ -148,7 +148,9 @@ describe("universalApi", () => {
   });
 
   it("catches network errors and returns a friendly message", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("offline"));
 
     const result = await universalApi({ endpoint: "/batches" });
