@@ -21,7 +21,7 @@ import {
   type PickerItem,
 } from "@/components/shared/SearchPicker";
 import { newParentSchema } from "@/lib/utils/validation";
-import { CreatedStudent } from "@/types/institute/student";
+import { type CreatedStudent } from "@/types/institute/student";
 import { searchTeachersAction } from "@/actions/institute/teacher/get-teacher";
 import { searchParentsAction } from "@/actions/institute/parent/get-parents";
 import { createStudentAction } from "@/actions/institute/student/create-student";

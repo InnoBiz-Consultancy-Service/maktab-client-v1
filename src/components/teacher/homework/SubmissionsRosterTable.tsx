@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { HomeworkSubmissionSummary } from "@/types/shared/homework";
+import { type HomeworkSubmissionSummary } from "@/types/shared/homework";
 import { Button, Card } from "@/components/ui";
 import { StatusChip } from "@/components/shared/homework/StatusChip";
 import { bulkGradeSubmissions } from "@/actions/homework";

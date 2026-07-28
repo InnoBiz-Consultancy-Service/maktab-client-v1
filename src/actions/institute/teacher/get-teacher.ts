@@ -2,7 +2,7 @@
 
 import { universalApi } from "@/actions/universal-api";
 import { unwrapList } from "@/lib/utils/unwrap";
-import { TeacherSearchResult } from "@/types/institute/teachers";
+import { type TeacherSearchResult } from "@/types/institute/teachers";
 import type { ActionResult } from "@/types/shared";
 
 export async function searchTeachersAction(

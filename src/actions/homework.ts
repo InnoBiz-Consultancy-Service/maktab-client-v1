@@ -1,24 +1,24 @@
 "use server";
 
 import { universalApi } from "@/actions/universal-api";
-import { ActionResult } from "@/types/shared";
+import { type ActionResult } from "@/types/shared";
 import { revalidatePath } from "next/cache";
 import {
-  Homework,
-  Submission,
-  Batch,
-  Lesson,
-  Student,
-  TeacherHomeworkListItem,
-  TeacherHomeworkDetail,
-  StudentHomeworkListItem,
-  StudentHomeworkDetail,
-  HomeworkSubmissionSummary,
-  SubmissionDetails,
-  HistoryResponse,
-  TeacherOverviewResponse,
-  StudentOverviewResponse,
-  ParentOverviewResponse,
+  type Homework,
+  type Submission,
+  type Batch,
+  type Lesson,
+  type Student,
+  type TeacherHomeworkListItem,
+  type TeacherHomeworkDetail,
+  type StudentHomeworkListItem,
+  type StudentHomeworkDetail,
+  type HomeworkSubmissionSummary,
+  type SubmissionDetails,
+  type HistoryResponse,
+  type TeacherOverviewResponse,
+  type StudentOverviewResponse,
+  type ParentOverviewResponse,
 } from "@/types/shared/homework";
 
 // Helper to unwrap nested data property
@@ -1502,7 +1502,7 @@ export async function getParentHomeworkData(filters?: {
       method: "GET",
     });
 
-    let rawPayload = res.success ? unwrap<any>(res.data) || {} : {};
+    const rawPayload = res.success ? unwrap<any>(res.data) || {} : {};
     let rawChildren = unwrapList<any>(
       rawPayload.children ??
         rawPayload.students ??
@@ -1530,7 +1530,7 @@ export async function getParentHomeworkData(filters?: {
       };
     });
 
-    let results = unwrapList<any>(
+    const results = unwrapList<any>(
       rawPayload.results ??
         rawPayload.homeworks ??
         rawPayload.assignments ??

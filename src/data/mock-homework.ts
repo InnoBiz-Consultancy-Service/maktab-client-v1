@@ -1,10 +1,10 @@
 import {
-  Homework,
-  Submission,
-  Batch,
-  Lesson,
-  Student,
-  Teacher,
+  type Homework,
+  type Submission,
+  type Batch,
+  type Lesson,
+  type Student,
+  type Teacher,
 } from "@/types/shared/homework";
 
 export const mockTeacher: Teacher = {

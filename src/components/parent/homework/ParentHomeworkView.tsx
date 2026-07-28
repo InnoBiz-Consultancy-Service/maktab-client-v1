@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ParentHomeworkData } from "@/actions/homework";
+import { type ParentHomeworkData } from "@/actions/homework";
 import { Card, Button } from "@/components/ui";
 import { StatusChip } from "@/components/shared/homework/StatusChip";
 import {

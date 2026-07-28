@@ -20,11 +20,11 @@ import {
 import { Input, Card } from "@/components/ui";
 import {
   createTeacherAction,
-  CreateTeacherState,
+  type CreateTeacherState,
 } from "@/actions/institute/teacher/create-teacher";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { Batch } from "../../../../types/institute/batch/index";
+import { type Batch } from "../../../../types/institute/batch/index";
 
 const initialState: CreateTeacherState = { success: false };
 

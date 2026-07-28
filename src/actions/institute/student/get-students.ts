@@ -2,7 +2,7 @@
 
 import { universalApi } from "@/actions/universal-api";
 import { unwrapList } from "@/lib/utils/unwrap";
-import { StudentSearchResult } from "@/types/institute/student";
+import { type StudentSearchResult } from "@/types/institute/student";
 import type { ActionResult } from "@/types/shared";
 
 /** GET /students?search= — name, studentCode, or class. */

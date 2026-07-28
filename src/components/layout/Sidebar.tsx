@@ -7,7 +7,7 @@ import { SignOutButton } from "@/components/layout/SignOutButton";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { cn } from "@/lib/utils/cn";
 import type { Session } from "@/types/auth";
-import { NavItem } from "./nav-item";
+import { type NavItem } from "./nav-item";
 import { navIcons } from "./nav-icons";
 
 /** Is this nav item the current page? Exact for the index, prefix otherwise. */

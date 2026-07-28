@@ -1,6 +1,6 @@
 "use client";
 
-import { Lesson } from "@/types/teacher/lesson/page";
+import { type Lesson } from "@/types/teacher/lesson/page";
 import LessonCard from "./LessonCard";
 import { useState } from "react";
 import VideoPlayer from "@/components/ui/VideoPlayer";

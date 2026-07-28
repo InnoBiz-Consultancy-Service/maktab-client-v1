@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Homework, Submission } from "@/types/shared/homework";
+import { type Homework, type Submission } from "@/types/shared/homework";
 import { Button, Card, Input, Textarea, Select } from "@/components/ui";
 import { submitStudentHomework } from "@/actions/homework";
 import { toast } from "sonner";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Homework, Batch, Lesson, Student } from "@/types/shared/homework";
+import { type Homework, type Batch, type Lesson, type Student } from "@/types/shared/homework";
 import { Button, Card, Input, Textarea, Select } from "@/components/ui";
 import {
   updateHomework,

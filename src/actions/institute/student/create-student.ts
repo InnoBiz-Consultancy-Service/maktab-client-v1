@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { universalApi } from "@/actions/universal-api";
 import { createStudentSchema } from "@/lib/utils/validation";
 import type { ActionResult } from "@/types/shared";
-import { CreatedStudent } from "@/types/institute/student";
+import { type CreatedStudent } from "@/types/institute/student";
 
 function unwrap<T>(raw: unknown): T {
   if (
