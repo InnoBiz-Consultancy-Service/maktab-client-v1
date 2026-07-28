@@ -14,5 +14,4 @@ export interface ApiEnvelope<T> {
 
 /** Result shape returned by every server action, so the UI never sees a throw. */
 export type ActionResult<T = void> =
-  | { ok: true; data: T; message?: string }
-  | { ok: false; error: string };
+  { ok: true; data: T; message?: string } | { ok: false; error: string };

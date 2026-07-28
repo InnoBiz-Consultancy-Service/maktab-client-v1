@@ -54,7 +54,7 @@ export function DateRangeFilter({
   return (
     <div
       className={cn(
-        "flex gap-2 overflow-x-auto pb-1 scrollbar-none",
+        "flex scrollbar-none gap-2 overflow-x-auto pb-1",
         className,
       )}
       role="radiogroup"

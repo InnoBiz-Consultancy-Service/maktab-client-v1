@@ -147,7 +147,11 @@ export interface DashboardTeacherItem {
 
 export interface TeacherDetailData extends DashboardTeacherItem {
   studentProgress?: ProgressRates;
-  batchStatuses?: { id: string; name: string; status: "ACTIVE" | "COMPLETED" }[];
+  batchStatuses?: {
+    id: string;
+    name: string;
+    status: "ACTIVE" | "COMPLETED";
+  }[];
 }
 
 /* ---------------- Teacher Dashboard ---------------- */

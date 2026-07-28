@@ -114,8 +114,8 @@
 //           <Button
 //             onClick={handleSubmit}
 //             disabled={!allQuestionsAnswered}
-//             className={`rounded px-5 py-2 text-white transition 
-             
+//             className={`rounded px-5 py-2 text-white transition
+
 //                 `}
 //           >
 //             Submit Quiz

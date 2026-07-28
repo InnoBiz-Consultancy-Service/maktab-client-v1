@@ -35,7 +35,7 @@ export function ErrorCard({
         <button
           type="button"
           onClick={() => router.refresh()}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-gold-500 px-6 font-display text-sm font-semibold text-night-900 shadow-soft transition-all active:scale-95 hover:scale-[1.02]"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-gold-500 px-6 font-display text-sm font-semibold text-night-900 shadow-soft transition-all hover:scale-[1.02] active:scale-95"
         >
           <RotateCcw className="h-4 w-4" aria-hidden />
           Try again

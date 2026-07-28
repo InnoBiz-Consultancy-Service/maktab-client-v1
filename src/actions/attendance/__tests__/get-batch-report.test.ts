@@ -21,7 +21,11 @@ describe("getBatchReportAction", () => {
 
   it("builds a query string from from/to/below", async () => {
     mockedApi.mockResolvedValue({ success: true, data: {} });
-    await getBatchReportAction("b1", { from: "2026-07-01", to: "2026-07-18", below: 75 });
+    await getBatchReportAction("b1", {
+      from: "2026-07-01",
+      to: "2026-07-18",
+      below: 75,
+    });
     expect(mockedApi).toHaveBeenCalledWith(
       expect.objectContaining({
         endpoint:
@@ -41,7 +45,12 @@ describe("getBatchReportAction", () => {
   });
 
   it("unwraps the report on success", async () => {
-    const report = { batch: { id: "b1" }, totalStudents: 10, batchAverage: 90, students: [] };
+    const report = {
+      batch: { id: "b1" },
+      totalStudents: 10,
+      batchAverage: 90,
+      students: [],
+    };
     mockedApi.mockResolvedValue({ success: true, data: { data: report } });
     const result = await getBatchReportAction("b1");
     expect(result).toEqual({ ok: true, data: report });

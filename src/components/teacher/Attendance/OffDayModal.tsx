@@ -119,7 +119,7 @@ export function OffDayModal({
           type="button"
           onClick={handleSubmit}
           disabled={saving || !reason.trim()}
-          className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-night-900 font-display text-sm font-semibold text-cream-50 shadow-soft transition-all active:scale-95 hover:bg-night-800 disabled:opacity-60 disabled:pointer-events-none"
+          className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-night-900 font-display text-sm font-semibold text-cream-50 shadow-soft transition-all hover:bg-night-800 active:scale-95 disabled:pointer-events-none disabled:opacity-60"
         >
           {saving ? (
             <>

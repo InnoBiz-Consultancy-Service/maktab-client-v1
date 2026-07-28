@@ -21,14 +21,23 @@ describe("editRecordAction", () => {
   });
 
   it("unwraps the updated record on success", async () => {
-    const record = { id: "r1", dayId: "d1", studentId: "s1", status: "LATE", markedById: "t1" };
+    const record = {
+      id: "r1",
+      dayId: "d1",
+      studentId: "s1",
+      status: "LATE",
+      markedById: "t1",
+    };
     mockedApi.mockResolvedValue({ success: true, data: { data: record } });
     const result = await editRecordAction("r1", { status: "LATE" });
     expect(result).toEqual({ ok: true, data: record });
   });
 
   it("maps a failed call to an ActionResult error", async () => {
-    mockedApi.mockResolvedValue({ success: false, message: "Not the day owner" });
+    mockedApi.mockResolvedValue({
+      success: false,
+      message: "Not the day owner",
+    });
     const result = await editRecordAction("r1", { status: "ABSENT" });
     expect(result).toEqual({ ok: false, error: "Not the day owner" });
   });

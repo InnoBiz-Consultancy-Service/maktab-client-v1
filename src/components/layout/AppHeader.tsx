@@ -11,8 +11,10 @@ export function AppHeader({ session }: { session: Session }) {
     <header className="sticky top-0 z-20 bg-night-900 text-cream-50 shadow-soft">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 md:px-10 md:py-4">
         <div className="flex items-center gap-2">
-          <LanternMark className="text-gold-400 animate-float" />
-          <span className="font-display text-lg font-bold md:text-xl">Maktab</span>
+          <LanternMark className="animate-float text-gold-400" />
+          <span className="font-display text-lg font-bold md:text-xl">
+            Maktab
+          </span>
         </div>
 
         <div className="flex items-center gap-3">

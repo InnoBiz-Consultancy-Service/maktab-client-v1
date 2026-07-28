@@ -8,7 +8,7 @@ interface PageProps {
 
 export default async function StudentHomeworkDetailPage({ params }: PageProps) {
   const { id } = await params;
-  
+
   const result = await getStudentHomeworkDetail(id);
 
   if (!result.ok) {
@@ -21,7 +21,12 @@ export default async function StudentHomeworkDetailPage({ params }: PageProps) {
     );
   }
 
-  const { homework, canSubmit = false, submission = null, submitBlockedReason = null } = result.data || {};
+  const {
+    homework,
+    canSubmit = false,
+    submission = null,
+    submitBlockedReason = null,
+  } = result.data || {};
 
   if (!homework) {
     return (

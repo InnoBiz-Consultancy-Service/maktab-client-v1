@@ -1,4 +1,9 @@
-import { getHomeworkDetail, getBatches, getLessons, getHomeworkSubmissions } from "@/actions/homework";
+import {
+  getHomeworkDetail,
+  getBatches,
+  getLessons,
+  getHomeworkSubmissions,
+} from "@/actions/homework";
 import { mockStudents } from "@/data/mock-homework";
 import { EditHomeworkForm } from "@/components/teacher/homework/EditHomeworkForm";
 import { Card } from "@/components/ui";
@@ -28,11 +33,13 @@ export default async function EditHomeworkPage({ params }: PageProps) {
   const homework = homeworkRes.data;
   const batches = batchesRes.ok ? batchesRes.data : [];
   const lessons = lessonsRes.ok ? lessonsRes.data : [];
-  
+
   // Count how many students have actually submitted
-  const submissionCount = submissionsRes.ok && submissionsRes.data?.results
-    ? submissionsRes.data.results.filter(r => r.status !== "NOT_SUBMITTED").length 
-    : 0;
+  const submissionCount =
+    submissionsRes.ok && submissionsRes.data?.results
+      ? submissionsRes.data.results.filter((r) => r.status !== "NOT_SUBMITTED")
+          .length
+      : 0;
 
   return (
     <EditHomeworkForm

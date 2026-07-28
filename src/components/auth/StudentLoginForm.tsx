@@ -36,7 +36,7 @@ export function StudentLoginForm() {
         name="studentCode"
         placeholder="STU-ABCD2345"
         autoCapitalize="characters"
-        className="font-display uppercase tracking-wide"
+        className="font-display tracking-wide uppercase"
         value={code}
         onChange={(e) => setCode(e.target.value.toUpperCase())}
         onKeyDown={(e) => e.key === "Enter" && submit()}

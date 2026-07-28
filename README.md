@@ -31,7 +31,7 @@ The token never reaches the browser. To call the backend from a new action:
 ```ts
 import { api } from "@/lib/api";
 const list = await api.get<Institute[]>("/institutes");
-const one  = await api.post<Institute>("/institutes", { body });
+const one = await api.post<Institute>("/institutes", { body });
 ```
 
 ## Folder structure

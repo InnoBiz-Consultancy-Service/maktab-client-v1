@@ -54,7 +54,9 @@ export default async function TeacherStudentDetailPage({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-night-900">{profile.name}</h1>
+                <h1 className="text-2xl font-bold text-night-900">
+                  {profile.name}
+                </h1>
                 <span className="rounded-full bg-cream-100 px-2.5 py-0.5 text-xs font-semibold text-night-900">
                   {profile.studentCode}
                 </span>
@@ -64,7 +66,9 @@ export default async function TeacherStudentDetailPage({
           </div>
 
           <div className="flex flex-col gap-1 rounded-xl bg-gold-500/10 p-3 text-right">
-            <span className="text-xs font-medium text-ink-soft">Total Points</span>
+            <span className="text-xs font-medium text-ink-soft">
+              Total Points
+            </span>
             <span className="font-display text-2xl font-bold text-night-900">
               {points} pts
             </span>

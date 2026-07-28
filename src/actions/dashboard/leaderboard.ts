@@ -29,9 +29,11 @@ export async function getLeaderboardAction(
   params: LeaderboardQueryParams,
 ): Promise<ActionResult<LeaderboardData>> {
   const query = new URLSearchParams();
-  const effectiveScope = (params.scope === "batch" && !params.batchId) ? "institute" : params.scope;
+  const effectiveScope =
+    params.scope === "batch" && !params.batchId ? "institute" : params.scope;
   query.set("scope", effectiveScope);
-  if (effectiveScope === "batch" && params.batchId) query.set("batchId", params.batchId);
+  if (effectiveScope === "batch" && params.batchId)
+    query.set("batchId", params.batchId);
   if (params.period) query.set("period", params.period);
 
   const endpoint = `/leaderboard?${query.toString()}`;

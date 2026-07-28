@@ -11,7 +11,10 @@ describe("Input", () => {
   it("shows an error message and marks the field invalid", () => {
     render(<Input label="Email" name="email" error="Enter a valid email" />);
     expect(screen.getByRole("alert")).toHaveTextContent("Enter a valid email");
-    expect(screen.getByLabelText("Email")).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByLabelText("Email")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
   });
 
   it("accepts typed input", async () => {

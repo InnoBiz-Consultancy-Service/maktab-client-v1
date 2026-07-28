@@ -98,7 +98,7 @@ export function MultiSearchPicker({
         <ul className="flex flex-wrap gap-2">
           {selected.map((item) => (
             <li key={item.id}>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-success/10 py-1.5 pl-3 pr-1.5 text-sm text-night-900">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-success/10 py-1.5 pr-1.5 pl-3 text-sm text-night-900">
                 <span className="max-w-[10rem] truncate">{item.title}</span>
                 <button
                   type="button"
@@ -117,7 +117,7 @@ export function MultiSearchPicker({
       {/* Search box */}
       <div className="relative">
         <Search
-          className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft"
+          className="pointer-events-none absolute top-1/2 left-3.5 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft"
           aria-hidden
         />
         <input
@@ -127,8 +127,8 @@ export function MultiSearchPicker({
           placeholder={placeholder}
           autoComplete="off"
           className={cn(
-            "min-h-[44px] w-full rounded-sm border bg-cream-50 py-2.5 pl-11 pr-10 text-[15px] text-night-900",
-            "placeholder:text-ink-soft/60 outline-none transition-colors",
+            "min-h-[44px] w-full rounded-sm border bg-cream-50 py-2.5 pr-10 pl-11 text-[15px] text-night-900",
+            "transition-colors outline-none placeholder:text-ink-soft/60",
             "focus-visible:outline-2 focus-visible:outline-gold-500",
             error ? "border-error" : "border-cream-200",
           )}
@@ -136,7 +136,7 @@ export function MultiSearchPicker({
         />
         {pending && (
           <Loader2
-            className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gold-500"
+            className="absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 animate-spin text-gold-500"
             aria-hidden
           />
         )}

@@ -23,10 +23,13 @@ export default async function GradeSubmissionPage({ params }: PageProps) {
           <span>Back to Homework</span>
         </Link>
         <Card className="py-12 text-center">
-          <FileText className="mx-auto h-10 w-10 text-ink-soft/30 mb-3" />
-          <h3 className="font-display font-semibold text-night-900 mb-1">Submission Unavailable</h3>
-          <p className="text-sm text-ink-soft max-w-sm mx-auto">
-            This submission could not be loaded. The grading feature may not be available yet.
+          <FileText className="mx-auto mb-3 h-10 w-10 text-ink-soft/30" />
+          <h3 className="mb-1 font-display font-semibold text-night-900">
+            Submission Unavailable
+          </h3>
+          <p className="mx-auto max-w-sm text-sm text-ink-soft">
+            This submission could not be loaded. The grading feature may not be
+            available yet.
           </p>
         </Card>
       </div>

@@ -51,7 +51,7 @@ export const registerTeacherSchema = z.object({
     .min(2, "Start date is required")
     .refine(
       (value) => !isNaN(Date.parse(value)),
-      "Please select a valid start date"
+      "Please select a valid start date",
     )
     .transform((value) => new Date(value)),
 

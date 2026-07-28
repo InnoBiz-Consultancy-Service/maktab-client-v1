@@ -21,7 +21,11 @@ describe("getInstituteOverviewAction (attendance)", () => {
 
   it("builds a query string from from/to/below", async () => {
     mockedApi.mockResolvedValue({ success: true, data: {} });
-    await getInstituteOverviewAction({ from: "2026-07-01", to: "2026-07-18", below: 60 });
+    await getInstituteOverviewAction({
+      from: "2026-07-01",
+      to: "2026-07-18",
+      below: 60,
+    });
     expect(mockedApi).toHaveBeenCalledWith(
       expect.objectContaining({
         endpoint:

@@ -50,7 +50,7 @@ export function BatchList({ initialBatches }: { initialBatches: Batch[] }) {
     <div className="flex flex-col gap-4">
       <div className="relative">
         <Search
-          className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft"
+          className="pointer-events-none absolute top-1/2 left-3.5 h-[18px] w-[18px] -translate-y-1/2 text-ink-soft"
           aria-hidden
         />
         <input
@@ -58,11 +58,11 @@ export function BatchList({ initialBatches }: { initialBatches: Batch[] }) {
           onChange={(e) => setTerm(e.target.value)}
           placeholder="Search batches by name…"
           autoComplete="off"
-          className="min-h-[44px] w-full rounded-sm border border-cream-200 bg-cream-50 py-2.5 pl-11 pr-10 text-[15px] text-night-900 outline-none transition-colors placeholder:text-ink-soft/60 focus-visible:outline-2 focus-visible:outline-gold-500"
+          className="min-h-[44px] w-full rounded-sm border border-cream-200 bg-cream-50 py-2.5 pr-10 pl-11 text-[15px] text-night-900 transition-colors outline-none placeholder:text-ink-soft/60 focus-visible:outline-2 focus-visible:outline-gold-500"
         />
         {pending && (
           <Loader2
-            className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gold-500"
+            className="absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 animate-spin text-gold-500"
             aria-hidden
           />
         )}

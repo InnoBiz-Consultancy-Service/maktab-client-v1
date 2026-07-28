@@ -4,9 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Homework, Batch, Lesson, Student } from "@/types/shared/homework";
 import { Button, Card, Input, Textarea, Select } from "@/components/ui";
-import { updateHomework, deleteHomework, getBatchStudents } from "@/actions/homework";
+import {
+  updateHomework,
+  deleteHomework,
+  getBatchStudents,
+} from "@/actions/homework";
 import { toast } from "sonner";
-import { ArrowLeft, Check, Sparkles, Trash2, AlertTriangle, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Sparkles,
+  Trash2,
+  AlertTriangle,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -42,12 +53,20 @@ export function EditHomeworkForm({
   const [dueDate, setDueDate] = useState(homework.dueDate);
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED">(homework.status);
   const [gradingType, setGradingType] = useState<"graded" | "completion">(
-    homework.maxScore !== null ? "graded" : "completion"
+    homework.maxScore !== null ? "graded" : "completion",
   );
-  const [maxScore, setMaxScore] = useState<string>(homework.maxScore?.toString() || "10");
-  const [allowLateSubmission, setAllowLateSubmission] = useState(homework.allowLateSubmission);
-  const [targetType, setTargetType] = useState<"BATCH" | "SPECIFIC">(homework.targetType);
-  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>(homework.studentIds || []);
+  const [maxScore, setMaxScore] = useState<string>(
+    homework.maxScore?.toString() || "10",
+  );
+  const [allowLateSubmission, setAllowLateSubmission] = useState(
+    homework.allowLateSubmission,
+  );
+  const [targetType, setTargetType] = useState<"BATCH" | "SPECIFIC">(
+    homework.targetType,
+  );
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>(
+    homework.studentIds || [],
+  );
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -80,7 +99,9 @@ export function EditHomeworkForm({
   const handleStudentToggle = (studentId: string) => {
     if (hasSubmissions) return; // Cannot edit target audience
     setSelectedStudentIds((prev) =>
-      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
+      prev.includes(studentId)
+        ? prev.filter((id) => id !== studentId)
+        : [...prev, studentId],
     );
   };
 
@@ -88,10 +109,13 @@ export function EditHomeworkForm({
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) newErrors.title = "Title cannot be empty";
-    else if (title.length > 200) newErrors.title = "Title cannot exceed 200 characters";
+    else if (title.length > 200)
+      newErrors.title = "Title cannot exceed 200 characters";
 
-    if (!instruction.trim()) newErrors.instruction = "Instructions cannot be empty";
-    else if (instruction.length > 5000) newErrors.instruction = "Instructions cannot exceed 5000 characters";
+    if (!instruction.trim())
+      newErrors.instruction = "Instructions cannot be empty";
+    else if (instruction.length > 5000)
+      newErrors.instruction = "Instructions cannot exceed 5000 characters";
 
     if (!dueDate) newErrors.dueDate = "Please select a due date";
     else if (dueDate < assignedDate) {
@@ -146,7 +170,10 @@ export function EditHomeworkForm({
       router.push("/dashboard/teacher/homework");
       router.refresh();
     } else {
-      if ((result as any).errorSource && (result as any).errorSource.length > 0) {
+      if (
+        (result as any).errorSource &&
+        (result as any).errorSource.length > 0
+      ) {
         const fieldErrors: Record<string, string> = {};
         (result as any).errorSource.forEach((err: any) => {
           fieldErrors[err.path] = err.message;
@@ -174,7 +201,7 @@ export function EditHomeworkForm({
   };
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/teacher/homework"
@@ -185,39 +212,47 @@ export function EditHomeworkForm({
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-night-900">Edit Homework</h1>
-          <p className="text-sm text-ink-soft">Update your homework assignment details or delete it.</p>
+          <p className="text-sm text-ink-soft">
+            Update your homework assignment details or delete it.
+          </p>
         </div>
       </div>
 
       {hasSubmissions && (
-        <div className="flex gap-3 bg-warn/10 border border-warn/20 rounded-lg p-4 text-sm text-night-900">
-          <AlertTriangle className="h-5 w-5 text-warn shrink-0" />
+        <div className="flex gap-3 rounded-lg border border-warn/20 bg-warn/10 p-4 text-sm text-night-900">
+          <AlertTriangle className="h-5 w-5 shrink-0 text-warn" />
           <div>
             <p className="font-semibold text-warn">Target Controls Locked</p>
-            <p className="text-ink-soft text-xs mt-0.5">
-              Some configurations (Batch, Target Audience, and Student List) cannot be edited because students have already submitted their homework.
+            <p className="mt-0.5 text-xs text-ink-soft">
+              Some configurations (Batch, Target Audience, and Student List)
+              cannot be edited because students have already submitted their
+              homework.
             </p>
           </div>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-          <div className="flex items-center gap-2 text-quran font-bold text-sm bg-quran-soft/30 px-3 py-1.5 rounded-md w-fit">
+        <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
+          <div className="flex w-fit items-center gap-2 rounded-md bg-quran-soft/30 px-3 py-1.5 text-sm font-bold text-quran">
             <Sparkles className="h-4 w-4" />
             <span>Basic Details</span>
           </div>
 
           {/* Title */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Homework Title *</label>
+            <label className="text-sm font-semibold text-night-900">
+              Homework Title *
+            </label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Surah Al-Fatiha"
               disabled={loading}
             />
-            {errors.title && <p className="text-xs text-error">{errors.title}</p>}
+            {errors.title && (
+              <p className="text-xs text-error">{errors.title}</p>
+            )}
           </div>
 
           {/* Instructions */}
@@ -231,13 +266,17 @@ export function EditHomeworkForm({
               disabled={loading}
               error={errors.instruction}
             />
-            <p className="text-right text-xs text-ink-soft/60">{instruction.length}/5000 chars</p>
+            <p className="text-right text-xs text-ink-soft/60">
+              {instruction.length}/5000 chars
+            </p>
           </div>
 
           {/* Batch and Lesson */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-night-900">Batch *</label>
+              <label className="text-sm font-semibold text-night-900">
+                Batch *
+              </label>
               <Select
                 value={batchId}
                 onChange={(e) => setBatchId(e.target.value)}
@@ -252,8 +291,14 @@ export function EditHomeworkForm({
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-night-900">Link Lesson (Optional)</label>
-              <Select value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={loading}>
+              <label className="text-sm font-semibold text-night-900">
+                Link Lesson (Optional)
+              </label>
+              <Select
+                value={lessonId}
+                onChange={(e) => setLessonId(e.target.value)}
+                disabled={loading}
+              >
                 <option value="">None</option>
                 {lessons.map((l) => (
                   <option key={l.id} value={l.id}>
@@ -265,8 +310,8 @@ export function EditHomeworkForm({
           </div>
         </Card>
 
-        <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-          <div className="flex items-center gap-2 text-studies font-bold text-sm bg-studies-soft/30 px-3 py-1.5 rounded-md w-fit">
+        <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
+          <div className="flex w-fit items-center gap-2 rounded-md bg-studies-soft/30 px-3 py-1.5 text-sm font-bold text-studies">
             <Sparkles className="h-4 w-4" />
             <span>Grading & Timeline</span>
           </div>
@@ -274,7 +319,9 @@ export function EditHomeworkForm({
           {/* Dates */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-night-900">Start Date</label>
+              <label className="text-sm font-semibold text-night-900">
+                Start Date
+              </label>
               <Input
                 type="date"
                 value={assignedDate}
@@ -284,21 +331,27 @@ export function EditHomeworkForm({
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-night-900">Due Date *</label>
+              <label className="text-sm font-semibold text-night-900">
+                Due Date *
+              </label>
               <Input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 disabled={loading}
               />
-              {errors.dueDate && <p className="text-xs text-error">{errors.dueDate}</p>}
+              {errors.dueDate && (
+                <p className="text-xs text-error">{errors.dueDate}</p>
+              )}
             </div>
           </div>
 
           {/* Grading settings */}
-          <div className="grid gap-4 sm:grid-cols-2 items-end">
+          <div className="grid items-end gap-4 sm:grid-cols-2">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-night-900">Grading Option</label>
+              <label className="text-sm font-semibold text-night-900">
+                Grading Option
+              </label>
               <Select
                 value={gradingType}
                 onChange={(e) => setGradingType(e.target.value as any)}
@@ -311,7 +364,9 @@ export function EditHomeworkForm({
 
             {gradingType === "graded" && (
               <div className="space-y-1">
-                <label className="text-sm font-semibold text-night-900">Maximum Score</label>
+                <label className="text-sm font-semibold text-night-900">
+                  Maximum Score
+                </label>
                 <Input
                   type="number"
                   min="1"
@@ -319,40 +374,48 @@ export function EditHomeworkForm({
                   onChange={(e) => setMaxScore(e.target.value)}
                   disabled={loading}
                 />
-                {errors.maxScore && <p className="text-xs text-error">{errors.maxScore}</p>}
+                {errors.maxScore && (
+                  <p className="text-xs text-error">{errors.maxScore}</p>
+                )}
               </div>
             )}
           </div>
 
           {/* Allow late submission */}
-          <div className="flex items-center gap-3 bg-cream-50/50 p-3 rounded-lg border border-cream-200/50">
+          <div className="flex items-center gap-3 rounded-lg border border-cream-200/50 bg-cream-50/50 p-3">
             <input
               type="checkbox"
               id="allowLate"
               checked={allowLateSubmission}
               onChange={(e) => setAllowLateSubmission(e.target.checked)}
-              className="h-4.5 w-4.5 rounded border-cream-300 text-gold-500 accent-gold-500"
+              className="border-cream-300 h-4.5 w-4.5 rounded text-gold-500 accent-gold-500"
               disabled={loading}
             />
-            <label htmlFor="allowLate" className="text-sm font-medium text-night-900 select-none">
+            <label
+              htmlFor="allowLate"
+              className="text-sm font-medium text-night-900 select-none"
+            >
               Allow Late Submissions
               <span className="block text-xs font-normal text-ink-soft">
-                When checked, students can submit homework after the due date, marked as "Submitted late".
+                When checked, students can submit homework after the due date,
+                marked as "Submitted late".
               </span>
             </label>
           </div>
         </Card>
 
-        <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
-          <div className="flex items-center gap-2 text-arabic font-bold text-sm bg-arabic-soft/30 px-3 py-1.5 rounded-md w-fit">
+        <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
+          <div className="flex w-fit items-center gap-2 rounded-md bg-arabic-soft/30 px-3 py-1.5 text-sm font-bold text-arabic">
             <Sparkles className="h-4 w-4" />
             <span>Audience & Publishing</span>
           </div>
 
           {/* Student list */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-4 mb-1">
-              <label className="text-sm font-semibold text-night-900">Assign to Students *</label>
+            <div className="mb-1 flex items-center justify-between gap-4">
+              <label className="text-sm font-semibold text-night-900">
+                Assign to Students *
+              </label>
               {students.length > 0 && !hasSubmissions && (
                 <button
                   type="button"
@@ -363,20 +426,22 @@ export function EditHomeworkForm({
                       setSelectedStudentIds(students.map((s) => s.id));
                     }
                   }}
-                  className="text-xs font-semibold text-gold-600 hover:text-gold-700 transition-colors"
+                  className="hover:text-gold-700 text-xs font-semibold text-gold-600 transition-colors"
                 >
-                  {selectedStudentIds.length === students.length ? "Deselect All" : "Select All"}
+                  {selectedStudentIds.length === students.length
+                    ? "Deselect All"
+                    : "Select All"}
                 </button>
               )}
             </div>
-            <div className="grid gap-2 sm:grid-cols-2 max-h-60 overflow-y-auto border border-cream-200 rounded-lg p-3 bg-cream-50/20 min-h-[100px] items-center justify-center">
+            <div className="grid max-h-60 min-h-[100px] items-center justify-center gap-2 overflow-y-auto rounded-lg border border-cream-200 bg-cream-50/20 p-3 sm:grid-cols-2">
               {loadingStudents ? (
                 <div className="col-span-2 flex flex-col items-center justify-center gap-2 py-4">
-                  <Loader2 className="h-5 w-5 text-gold-500 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin text-gold-500" />
                   <p className="text-xs text-ink-soft">Loading students...</p>
                 </div>
               ) : students.length === 0 ? (
-                <div className="col-span-2 text-center text-xs text-ink-soft py-4">
+                <div className="col-span-2 py-4 text-center text-xs text-ink-soft">
                   No students found in this batch
                 </div>
               ) : (
@@ -385,23 +450,27 @@ export function EditHomeworkForm({
                   return (
                     <div
                       key={student.id}
-                      onClick={() => !hasSubmissions && handleStudentToggle(student.id)}
-                      className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-all ${
+                      onClick={() =>
+                        !hasSubmissions && handleStudentToggle(student.id)
+                      }
+                      className={`flex cursor-pointer items-center justify-between rounded-md border p-2.5 transition-all select-none ${
                         isSelected
-                          ? "bg-gold-500/10 border-gold-500/40 text-night-900"
-                          : "bg-white border-cream-200 hover:bg-cream-50/50 hover:border-cream-300 text-night-900"
+                          ? "border-gold-500/40 bg-gold-500/10 text-night-900"
+                          : "hover:border-cream-300 border-cream-200 bg-white text-night-900 hover:bg-cream-50/50"
                       } ${hasSubmissions ? "pointer-events-none opacity-80" : ""}`}
                     >
                       <div>
                         <p className="text-sm font-semibold">{student.name}</p>
-                        <p className="text-xs text-ink-soft">{student.studentCode}</p>
+                        <p className="text-xs text-ink-soft">
+                          {student.studentCode}
+                        </p>
                       </div>
                       {isSelected ? (
-                        <div className="h-5 w-5 rounded-full bg-gold-500 text-white flex items-center justify-center p-0.5 shrink-0 shadow-sm">
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold-500 p-0.5 text-white shadow-sm">
                           <Check className="h-3.5 w-3.5 stroke-[3]" />
                         </div>
                       ) : (
-                        <div className="h-5 w-5 rounded-full border-2 border-cream-300 bg-white shrink-0 transition-colors" />
+                        <div className="border-cream-300 h-5 w-5 shrink-0 rounded-full border-2 bg-white transition-colors" />
                       )}
                     </div>
                   );
@@ -409,14 +478,22 @@ export function EditHomeworkForm({
               )}
             </div>
             {(errors.students || errors.studentIds) && (
-              <p className="text-xs text-error">{errors.students || errors.studentIds}</p>
+              <p className="text-xs text-error">
+                {errors.students || errors.studentIds}
+              </p>
             )}
           </div>
 
           {/* Publish status */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-night-900">Status</label>
-            <Select value={status} onChange={(e) => setStatus(e.target.value as any)} disabled={loading}>
+            <label className="text-sm font-semibold text-night-900">
+              Status
+            </label>
+            <Select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as any)}
+              disabled={loading}
+            >
               <option value="PUBLISHED">Published (Visible to students)</option>
               <option value="DRAFT">Draft (Only visible to you)</option>
             </Select>
@@ -439,7 +516,7 @@ export function EditHomeworkForm({
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard/teacher/homework"
-              className="inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[44px] px-6 text-[15px]"
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-cream-200 bg-transparent px-6 font-display text-[15px] font-semibold text-night-900 transition-all duration-150 hover:scale-[1.02] hover:bg-cream-50 active:scale-95"
             >
               Cancel
             </Link>
@@ -453,19 +530,26 @@ export function EditHomeworkForm({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-night-900/50 p-4 backdrop-blur-sm">
-          <Card className="w-full max-w-md p-6 border border-cream-200 shadow-lift space-y-4">
+          <Card className="w-full max-w-md space-y-4 border border-cream-200 p-6 shadow-lift">
             <div className="flex items-center gap-3 text-error">
               <AlertTriangle className="h-6 w-6 shrink-0" />
               <h3 className="text-lg font-bold">Confirm Deletion</h3>
             </div>
             <p className="text-sm text-ink">
-              Are you sure you want to delete this homework? This is a permanent action.
+              Are you sure you want to delete this homework? This is a permanent
+              action.
             </p>
-            <div className="bg-error/10 text-error p-3 rounded text-xs font-semibold">
-              ⚠️ WARNING: Deleting this homework will permanently lose {submissionCount} student submission{submissionCount !== 1 ? "s" : ""}.
+            <div className="rounded bg-error/10 p-3 text-xs font-semibold text-error">
+              ⚠️ WARNING: Deleting this homework will permanently lose{" "}
+              {submissionCount} student submission
+              {submissionCount !== 1 ? "s" : ""}.
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} disabled={loading}>
+              <Button
+                variant="ghost"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={loading}
+              >
                 Cancel
               </Button>
               <Button variant="danger" onClick={handleDelete} loading={loading}>

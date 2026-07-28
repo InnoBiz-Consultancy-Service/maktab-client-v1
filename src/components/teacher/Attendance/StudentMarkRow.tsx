@@ -80,7 +80,7 @@ export function StudentMarkRow({
                 isActive
                   ? o.active
                   : "border border-cream-200 bg-cream-50 text-ink-soft hover:bg-cream-100",
-                disabled && "opacity-50 pointer-events-none",
+                disabled && "pointer-events-none opacity-50",
               )}
             >
               <Icon className="h-4 w-4" aria-hidden />

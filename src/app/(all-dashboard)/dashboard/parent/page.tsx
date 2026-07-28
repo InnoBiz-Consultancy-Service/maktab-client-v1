@@ -9,7 +9,8 @@ export default async function ParentDashboardHomePage() {
     return (
       <div className="mx-auto w-full max-w-4xl space-y-4">
         <Card className="py-12 text-center text-sm text-ink-soft">
-          {res.error || "Could not load parent dashboard details. Please try again."}
+          {res.error ||
+            "Could not load parent dashboard details. Please try again."}
         </Card>
       </div>
     );

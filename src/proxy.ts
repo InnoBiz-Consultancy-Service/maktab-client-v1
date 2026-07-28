@@ -75,7 +75,6 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(home, request.url));
   }
 
-
   // Guard the dashboard: a user may only be inside their own role's section.
   // e.g. a PARENT hitting /dashboard/teacher gets bounced to /dashboard/parent
   if (pathname.startsWith("/dashboard")) {

@@ -1,8 +1,21 @@
 import { cn } from "@/lib/utils/cn";
-import { AlertCircle, CheckCircle2, Clock, FileText, HelpCircle } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  FileText,
+  HelpCircle,
+} from "lucide-react";
 
 interface StatusChipProps {
-  chip?: "NOT_SUBMITTED" | "OVERDUE" | "SUBMITTED" | "SUBMITTED_LATE" | "GRADED" | "GRADED_LATE" | string;
+  chip?:
+    | "NOT_SUBMITTED"
+    | "OVERDUE"
+    | "SUBMITTED"
+    | "SUBMITTED_LATE"
+    | "GRADED"
+    | "GRADED_LATE"
+    | string;
   // Fallbacks for backward compatibility
   status?: "NOT_SUBMITTED" | "SUBMITTED" | "GRADED";
   isLate?: boolean;
@@ -10,7 +23,13 @@ interface StatusChipProps {
   className?: string;
 }
 
-export function StatusChip({ chip, status, isLate, dueDate, className }: StatusChipProps) {
+export function StatusChip({
+  chip,
+  status,
+  isLate,
+  dueDate,
+  className,
+}: StatusChipProps) {
   let resolvedChip = chip;
 
   // Fallback conversion logic
@@ -91,16 +110,16 @@ export function StatusChip({ chip, status, isLate, dueDate, className }: StatusC
     <div className="flex items-center gap-1.5">
       <span
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold font-display shadow-sm",
+          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-display text-xs font-semibold shadow-sm",
           config.color,
-          className
+          className,
         )}
       >
         <IconComponent className="h-3.5 w-3.5" aria-hidden="true" />
         {config.label}
       </span>
       {config.showLateBadge && (
-        <span className="inline-flex items-center rounded-full bg-warn/10 border border-warn/20 px-2 py-0.5 text-[10px] font-bold text-warn uppercase">
+        <span className="inline-flex items-center rounded-full border border-warn/20 bg-warn/10 px-2 py-0.5 text-[10px] font-bold text-warn uppercase">
           Late
         </span>
       )}

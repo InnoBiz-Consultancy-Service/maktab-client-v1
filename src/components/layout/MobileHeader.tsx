@@ -19,7 +19,7 @@ export function MobileHeader({ session }: { session: Session }) {
         <div className="flex items-center gap-1">
           <NotificationBell
             role={session.role}
-            className="text-cream-100/70 hover:text-cream-50 hover:bg-night-800"
+            className="text-cream-100/70 hover:bg-night-800 hover:text-cream-50"
           />
           <span className="hidden text-sm text-cream-100/70 sm:inline">
             {session.label}

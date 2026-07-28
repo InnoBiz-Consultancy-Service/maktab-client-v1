@@ -47,7 +47,7 @@ export function NotificationBell({ role, className }: NotificationBellProps) {
       >
         <Bell className="h-5 w-5" aria-hidden />
         {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-error px-1 text-[10px] font-bold leading-none text-cream-50">
+          <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-error px-1 text-[10px] leading-none font-bold text-cream-50">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}

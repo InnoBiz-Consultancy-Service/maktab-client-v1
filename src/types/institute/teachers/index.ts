@@ -10,4 +10,3 @@ export interface TeacherSearchResult {
   createdAt: string;
   user: { email: string | null } | null;
 }
-

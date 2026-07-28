@@ -71,7 +71,7 @@ export function TeacherLessonCard({
 
       <div className="pointer-events-none relative z-10 flex flex-1 flex-col">
         <div className="mb-3 flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 font-display text-lg font-bold leading-snug text-night-900">
+          <h3 className="line-clamp-2 font-display text-lg leading-snug font-bold text-night-900">
             {title}
           </h3>
           <span

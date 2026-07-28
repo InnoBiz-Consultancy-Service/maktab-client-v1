@@ -21,10 +21,14 @@ import { ProgressGauges } from "@/components/dashboard/shared/ProgressGauges";
 
 export default async function TeacherPage() {
   const session = await getSession();
-  
+
   const [overviewRes, studentsRes] = await Promise.all([
     getTeacherDashboardOverviewAction(),
-    getTeacherDashboardStudentsAction({ limit: 5, sortBy: "rank", sortOrder: "asc" }),
+    getTeacherDashboardStudentsAction({
+      limit: 5,
+      sortBy: "rank",
+      sortOrder: "asc",
+    }),
   ]);
 
   if (!overviewRes.ok) {
@@ -53,7 +57,8 @@ export default async function TeacherPage() {
           Welcome back, {session?.label ?? "Ustadh"}.
         </h1>
         <p className="mt-1 text-ink-soft">
-          Here is the overview for your assigned batches, student progress, and daily actions.
+          Here is the overview for your assigned batches, student progress, and
+          daily actions.
         </p>
       </header>
 
@@ -64,20 +69,29 @@ export default async function TeacherPage() {
             <Layers className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-xs font-medium text-ink-soft">Assigned Batches</p>
-            <p className="text-2xl font-bold text-night-900">{counts.batches}</p>
+            <p className="text-xs font-medium text-ink-soft">
+              Assigned Batches
+            </p>
+            <p className="text-2xl font-bold text-night-900">
+              {counts.batches}
+            </p>
           </div>
         </Card>
 
         <Link href="/dashboard/teacher/students" className="block">
-          <Card interactive className="flex items-center justify-between p-5 h-full">
+          <Card
+            interactive
+            className="flex h-full items-center justify-between p-5"
+          >
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-arabic-soft text-arabic">
                 <Users className="h-6 w-6" />
               </div>
               <div>
                 <p className="text-xs font-medium text-ink-soft">My Students</p>
-                <p className="text-2xl font-bold text-night-900">{counts.students}</p>
+                <p className="text-2xl font-bold text-night-900">
+                  {counts.students}
+                </p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-ink-soft" />
@@ -85,14 +99,21 @@ export default async function TeacherPage() {
         </Link>
 
         <Link href="/dashboard/leaderboard?scope=batch" className="block">
-          <Card interactive className="flex items-center justify-between p-5 h-full">
+          <Card
+            interactive
+            className="flex h-full items-center justify-between p-5"
+          >
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-quran-soft text-quran">
                 <Trophy className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-xs font-medium text-ink-soft">Batch Leaderboard</p>
-                <p className="text-sm font-bold text-night-900">View Rankings &rarr;</p>
+                <p className="text-xs font-medium text-ink-soft">
+                  Batch Leaderboard
+                </p>
+                <p className="text-sm font-bold text-night-900">
+                  View Rankings &rarr;
+                </p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-ink-soft" />
@@ -101,7 +122,10 @@ export default async function TeacherPage() {
       </section>
 
       {/* Progress Gauges */}
-      <ProgressGauges progress={progressRates} title="Teacher Batch Progress Summary" />
+      <ProgressGauges
+        progress={progressRates}
+        title="Teacher Batch Progress Summary"
+      />
 
       {/* Quick Actions */}
       <section>
@@ -110,49 +134,65 @@ export default async function TeacherPage() {
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Link href="/dashboard/teacher/attendance" className="block">
-            <Card interactive className="h-full p-4 flex items-center gap-3">
+            <Card interactive className="flex h-full items-center gap-3 p-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-quran-soft text-quran">
                 <CalendarCheck className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-night-900 text-sm">Attendance</p>
-                <p className="truncate text-xs text-ink-soft">Mark daily attendance</p>
+                <p className="text-sm font-semibold text-night-900">
+                  Attendance
+                </p>
+                <p className="truncate text-xs text-ink-soft">
+                  Mark daily attendance
+                </p>
               </div>
             </Card>
           </Link>
 
           <Link href="/dashboard/teacher/create-homework" className="block">
-            <Card interactive className="h-full p-4 flex items-center gap-3">
+            <Card interactive className="flex h-full items-center gap-3 p-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-arabic-soft text-arabic">
                 <FileText className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-night-900 text-sm">Assign Homework</p>
-                <p className="truncate text-xs text-ink-soft">Publish new assignment</p>
+                <p className="text-sm font-semibold text-night-900">
+                  Assign Homework
+                </p>
+                <p className="truncate text-xs text-ink-soft">
+                  Publish new assignment
+                </p>
               </div>
             </Card>
           </Link>
 
           <Link href="/dashboard/teacher/create-lesson" className="block">
-            <Card interactive className="h-full p-4 flex items-center gap-3">
+            <Card interactive className="flex h-full items-center gap-3 p-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold-500/20 text-gold-600">
                 <PlusCircle className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-night-900 text-sm">Create Lesson</p>
-                <p className="truncate text-xs text-ink-soft">Add video/quiz material</p>
+                <p className="text-sm font-semibold text-night-900">
+                  Create Lesson
+                </p>
+                <p className="truncate text-xs text-ink-soft">
+                  Add video/quiz material
+                </p>
               </div>
             </Card>
           </Link>
 
           <Link href="/dashboard/teacher/students" className="block">
-            <Card interactive className="h-full p-4 flex items-center gap-3">
+            <Card interactive className="flex h-full items-center gap-3 p-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-duas-soft text-duas">
                 <UserCheck className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-night-900 text-sm">Student Roster</p>
-                <p className="truncate text-xs text-ink-soft">View student records</p>
+                <p className="text-sm font-semibold text-night-900">
+                  Student Roster
+                </p>
+                <p className="truncate text-xs text-ink-soft">
+                  View student records
+                </p>
               </div>
             </Card>
           </Link>
@@ -173,7 +213,7 @@ export default async function TeacherPage() {
           </Link>
         </div>
 
-        <Card className="p-0 overflow-hidden">
+        <Card className="overflow-hidden p-0">
           {recentStudents.length === 0 ? (
             <div className="py-8 text-center text-sm text-ink-soft">
               No student records loaded.
@@ -192,7 +232,7 @@ export default async function TeacherPage() {
                     <div>
                       <Link
                         href={`/dashboard/teacher/students/${s.id}`}
-                        className="font-semibold text-night-900 text-sm hover:text-gold-600 hover:underline"
+                        className="text-sm font-semibold text-night-900 hover:text-gold-600 hover:underline"
                       >
                         {s.name}
                       </Link>
@@ -202,9 +242,10 @@ export default async function TeacherPage() {
 
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-ink-soft">
-                      Lesson: <strong>{s.progress?.lessonCompletionRate ?? 0}%</strong>
+                      Lesson:{" "}
+                      <strong>{s.progress?.lessonCompletionRate ?? 0}%</strong>
                     </span>
-                    <div className="flex items-center gap-1 rounded-full bg-gold-500/10 px-2.5 py-0.5 text-xs font-bold text-gold-700">
+                    <div className="text-gold-700 flex items-center gap-1 rounded-full bg-gold-500/10 px-2.5 py-0.5 text-xs font-bold">
                       <Award className="h-3.5 w-3.5" />
                       <span>{s.points ?? 0} pts</span>
                     </div>

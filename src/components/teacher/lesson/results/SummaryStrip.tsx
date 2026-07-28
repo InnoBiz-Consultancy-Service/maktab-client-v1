@@ -28,7 +28,7 @@ function Stat({
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="font-display text-xl font-bold leading-none text-night-900">
+        <p className="font-display text-xl leading-none font-bold text-night-900">
           {value}
         </p>
         <p className="mt-1 truncate text-xs text-ink-soft">{label}</p>

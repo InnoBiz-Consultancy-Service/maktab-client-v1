@@ -7,7 +7,11 @@ jest.mock("@/actions/attendance/get-today");
 
 const mockedGetToday = getTodayAction as jest.Mock;
 
-function batch(id: string, state: TodayBatch["state"], extra: Partial<TodayBatch> = {}): TodayBatch {
+function batch(
+  id: string,
+  state: TodayBatch["state"],
+  extra: Partial<TodayBatch> = {},
+): TodayBatch {
   return {
     batch: { id, name: `Batch ${id}` },
     totalStudents: 10,

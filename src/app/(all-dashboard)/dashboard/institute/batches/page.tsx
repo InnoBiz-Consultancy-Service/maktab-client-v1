@@ -26,7 +26,9 @@ export default async function BatchesPage() {
     <div className="mx-auto w-full max-w-4xl space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-night-900">Batches & Progress</h1>
+          <h1 className="text-2xl font-bold text-night-900">
+            Batches & Progress
+          </h1>
           <p className="mt-1 text-sm text-ink-soft">
             {batches.length} total batches (active & completed)
           </p>
@@ -42,8 +44,8 @@ export default async function BatchesPage() {
 
       <div className="grid grid-cols-1 gap-4">
         {batches.map((b) => (
-          <Card key={b.id} className="p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cream-200 pb-3">
+          <Card key={b.id} className="space-y-4 p-5">
+            <div className="flex flex-col justify-between gap-2 border-b border-cream-200 pb-3 sm:flex-row sm:items-center">
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="font-display text-xl font-bold text-night-900">
@@ -59,15 +61,19 @@ export default async function BatchesPage() {
                     {b.status === "COMPLETED" ? "COMPLETED (Frozen)" : "ACTIVE"}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-ink-soft flex items-center gap-2">
-                  <Users className="h-3.5 w-3.5" /> {b.studentCount} Students • Teachers:{" "}
+                <p className="mt-1 flex items-center gap-2 text-xs text-ink-soft">
+                  <Users className="h-3.5 w-3.5" /> {b.studentCount} Students •
+                  Teachers:{" "}
                   {b.teachers?.map((t) => t.name).join(", ") || "None"}
                 </p>
               </div>
 
               {b.status === "COMPLETED" ? (
-                <div className="flex items-center gap-1 text-xs text-amber-700 font-semibold bg-amber-50 px-3 py-1.5 rounded-lg">
-                  <Lock className="h-3.5 w-3.5" /> Completed on {b.completedAt ? new Date(b.completedAt).toLocaleDateString() : "Finalized"}
+                <div className="flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
+                  <Lock className="h-3.5 w-3.5" /> Completed on{" "}
+                  {b.completedAt
+                    ? new Date(b.completedAt).toLocaleDateString()
+                    : "Finalized"}
                 </div>
               ) : (
                 <Link
@@ -80,7 +86,10 @@ export default async function BatchesPage() {
             </div>
 
             {/* Progress Gauges for Batch */}
-            <ProgressGauges progress={b.progress} title="Batch Average Progress" />
+            <ProgressGauges
+              progress={b.progress}
+              title="Batch Average Progress"
+            />
           </Card>
         ))}
       </div>

@@ -8,7 +8,6 @@ import {
 import { Card } from "@/components/ui";
 import { ActivityEntry } from "@/lib/dummy/institute";
 
-
 const kindStyles: Record<
   ActivityEntry["kind"],
   { icon: LucideIcon; tone: string }

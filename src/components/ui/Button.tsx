@@ -31,7 +31,8 @@ const variants: Record<Variant, string> = {
   primary:
     "bg-gold-500 text-night-900 shadow-soft hover:shadow-[0_0_28px_rgba(245,184,51,0.4)]",
   night: "bg-night-900 text-cream-50 shadow-soft hover:bg-night-800",
-  ghost: "bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50",
+  ghost:
+    "bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50",
   danger: "bg-error text-cream-50 shadow-soft hover:brightness-105",
 };
 

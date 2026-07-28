@@ -1,6 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { SearchPicker, type PickerItem } from "@/components/shared/SearchPicker";
+import {
+  SearchPicker,
+  type PickerItem,
+} from "@/components/shared/SearchPicker";
 
 const items: PickerItem[] = [
   { id: "1", title: "Rahim Uddin", subtitle: "rahim@example.com" },

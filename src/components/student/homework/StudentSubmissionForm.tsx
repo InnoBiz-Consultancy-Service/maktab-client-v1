@@ -47,14 +47,18 @@ export function StudentSubmissionForm({
 
   // Submit states
   const [note, setNote] = useState("");
-  const [attachments, setAttachments] = useState<{
-    type: "IMAGE" | "PDF" | "YOUTUBE" | "LINK";
-    url: string;
-    fileName: string | null;
-  }[]>([]);
+  const [attachments, setAttachments] = useState<
+    {
+      type: "IMAGE" | "PDF" | "YOUTUBE" | "LINK";
+      url: string;
+      fileName: string | null;
+    }[]
+  >([]);
 
   // Local state for adding single attachment
-  const [attType, setAttType] = useState<"IMAGE" | "PDF" | "YOUTUBE" | "LINK">("IMAGE");
+  const [attType, setAttType] = useState<"IMAGE" | "PDF" | "YOUTUBE" | "LINK">(
+    "IMAGE",
+  );
   const [attUrl, setAttUrl] = useState("");
   const [attName, setAttName] = useState("");
   const [attError, setAttError] = useState<string | null>(null);
@@ -88,9 +92,10 @@ export function StudentSubmissionForm({
                 ...prev,
                 {
                   type: attType,
-                  url: attType === "IMAGE" 
-                    ? "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500&auto=format&fit=crop"
-                    : "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+                  url:
+                    attType === "IMAGE"
+                      ? "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500&auto=format&fit=crop"
+                      : "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
                   fileName: attName.trim(),
                 },
               ]);
@@ -112,7 +117,9 @@ export function StudentSubmissionForm({
       if (attType === "YOUTUBE") {
         const id = parseYoutubeId(attUrl);
         if (!id || id.length !== 11) {
-          setAttError("Please enter a valid YouTube link (e.g. watch?v=ID or youtu.be/ID)");
+          setAttError(
+            "Please enter a valid YouTube link (e.g. watch?v=ID or youtu.be/ID)",
+          );
           return;
         }
       }
@@ -122,7 +129,10 @@ export function StudentSubmissionForm({
         {
           type: attType,
           url: attUrl.trim(),
-          fileName: attType === "YOUTUBE" ? "YouTube Video" : attName.trim() || "Web Link",
+          fileName:
+            attType === "YOUTUBE"
+              ? "YouTube Video"
+              : attName.trim() || "Web Link",
         },
       ]);
       setAttUrl("");
@@ -165,7 +175,8 @@ export function StudentSubmissionForm({
 
   function parseYoutubeId(url: string): string | null {
     try {
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const regExp =
+        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
       const match = url.match(regExp);
       return match && match[2].length === 11 ? match[2] : null;
     } catch {
@@ -188,44 +199,57 @@ export function StudentSubmissionForm({
           <span>Back</span>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-night-900">Assignment Details</h1>
-          <p className="text-sm text-ink-soft">Review homework details and submit your work.</p>
+          <h1 className="text-2xl font-bold text-night-900">
+            Assignment Details
+          </h1>
+          <p className="text-sm text-ink-soft">
+            Review homework details and submit your work.
+          </p>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left column: Homework card & prompt */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="p-6 border border-cream-200 shadow-soft space-y-4">
+        <div className="space-y-6 lg:col-span-2">
+          <Card className="space-y-4 border border-cream-200 p-6 shadow-soft">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cream-100 pb-3">
               {homework?.batch?.name && (
-                <span className="text-xs font-semibold text-quran bg-quran-soft px-2.5 py-1 rounded">
+                <span className="rounded bg-quran-soft px-2.5 py-1 text-xs font-semibold text-quran">
                   {homework.batch.name}
                 </span>
               )}
-              <span className="text-xs text-ink-soft flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" /> Due Date: {homework?.dueDate ? formatCalendarDate(homework.dueDate) : "—"}
+              <span className="flex items-center gap-1 text-xs text-ink-soft">
+                <Calendar className="h-3.5 w-3.5" /> Due Date:{" "}
+                {homework?.dueDate ? formatCalendarDate(homework.dueDate) : "—"}
               </span>
             </div>
 
-            <h2 className="text-xl font-bold text-night-900">{homework?.title || "Homework Details"}</h2>
-            
+            <h2 className="text-xl font-bold text-night-900">
+              {homework?.title || "Homework Details"}
+            </h2>
+
             {/* Clamped show-more instructions */}
             <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-ink-soft">Instructions</h4>
-              <div className="text-sm text-ink bg-cream-50 p-4 rounded-lg border border-cream-200/50 whitespace-pre-wrap leading-relaxed">
+              <h4 className="text-xs font-bold tracking-wider text-ink-soft uppercase">
+                Instructions
+              </h4>
+              <div className="rounded-lg border border-cream-200/50 bg-cream-50 p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink">
                 {homework?.instruction || "No instructions provided."}
               </div>
             </div>
 
             {/* Lesson details if linked */}
             {homework?.lesson && (
-              <div className="bg-arabic-soft/20 border border-arabic/10 rounded-lg p-4 space-y-3">
-                <h4 className="text-xs font-bold text-arabic uppercase tracking-wider">Linked Lesson Reference</h4>
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="space-y-3 rounded-lg border border-arabic/10 bg-arabic-soft/20 p-4">
+                <h4 className="text-xs font-bold tracking-wider text-arabic uppercase">
+                  Linked Lesson Reference
+                </h4>
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-arabic" />
-                    <span className="text-sm font-semibold text-night-900">{homework.lesson.title || "Lesson"}</span>
+                    <span className="text-sm font-semibold text-night-900">
+                      {homework.lesson.title || "Lesson"}
+                    </span>
                   </div>
                   {homework.lesson.youtubeVideoId && (
                     <a
@@ -239,7 +263,10 @@ export function StudentSubmissionForm({
                   )}
                 </div>
                 {homework.lesson.youtubeVideoId && (
-                  <YouTubeEmbed url={`https://www.youtube.com/watch?v=${homework.lesson.youtubeVideoId}`} className="max-w-md mx-auto" />
+                  <YouTubeEmbed
+                    url={`https://www.youtube.com/watch?v=${homework.lesson.youtubeVideoId}`}
+                    className="mx-auto max-w-md"
+                  />
                 )}
               </div>
             )}
@@ -248,19 +275,31 @@ export function StudentSubmissionForm({
           {/* Student Work View / Form */}
           {submission ? (
             /* ==================== SUBMISSION PRESENT: STATES 3 & 4 ==================== */
-            <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
+            <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
               <div className="flex items-center justify-between border-b border-cream-100 pb-3">
                 <h3 className="font-bold text-night-900">Your Submission</h3>
                 <div className="flex items-center gap-2">
-                  <StatusChip chip={submission.status === "GRADED" ? (submission.isLate ? "GRADED_LATE" : "GRADED") : (submission.isLate ? "SUBMITTED_LATE" : "SUBMITTED")} />
+                  <StatusChip
+                    chip={
+                      submission.status === "GRADED"
+                        ? submission.isLate
+                          ? "GRADED_LATE"
+                          : "GRADED"
+                        : submission.isLate
+                          ? "SUBMITTED_LATE"
+                          : "SUBMITTED"
+                    }
+                  />
                 </div>
               </div>
 
               {/* Note */}
               {submission.note && (
                 <div className="space-y-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-ink-soft">My Notes</h4>
-                  <p className="text-sm text-ink whitespace-pre-wrap bg-cream-50/30 p-4 rounded-lg border border-cream-200/50 leading-relaxed">
+                  <h4 className="text-xs font-bold tracking-wider text-ink-soft uppercase">
+                    My Notes
+                  </h4>
+                  <p className="rounded-lg border border-cream-200/50 bg-cream-50/30 p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink">
                     {submission.note}
                   </p>
                 </div>
@@ -269,7 +308,9 @@ export function StudentSubmissionForm({
               {/* Attachments */}
               {submission.attachments.length > 0 && (
                 <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-ink-soft">My Attachments</h4>
+                  <h4 className="text-xs font-bold tracking-wider text-ink-soft uppercase">
+                    My Attachments
+                  </h4>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {submission.attachments
                       .sort((a, b) => a.order - b.order)
@@ -278,26 +319,34 @@ export function StudentSubmissionForm({
                           key={att.id}
                           className="flex flex-col gap-2 rounded-lg border border-cream-200 bg-white p-3 shadow-sm"
                         >
-                          <div className="flex items-center justify-between gap-2 border-b border-cream-100 pb-2 mb-1">
+                          <div className="mb-1 flex items-center justify-between gap-2 border-b border-cream-100 pb-2">
                             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-soft">
-                              {att.type === "IMAGE" && <ImageIcon className="h-3.5 w-3.5 text-success" />}
-                              {att.type === "PDF" && <FileText className="h-3.5 w-3.5 text-error" />}
-                              {att.type === "YOUTUBE" && <LinkIcon className="h-3.5 w-3.5 text-studies" />}
-                              {att.type === "LINK" && <ExternalLink className="h-3.5 w-3.5 text-arabic" />}
+                              {att.type === "IMAGE" && (
+                                <ImageIcon className="h-3.5 w-3.5 text-success" />
+                              )}
+                              {att.type === "PDF" && (
+                                <FileText className="h-3.5 w-3.5 text-error" />
+                              )}
+                              {att.type === "YOUTUBE" && (
+                                <LinkIcon className="h-3.5 w-3.5 text-studies" />
+                              )}
+                              {att.type === "LINK" && (
+                                <ExternalLink className="h-3.5 w-3.5 text-arabic" />
+                              )}
                               {att.type}
                             </span>
                             <a
                               href={att.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-xs font-bold text-quran flex items-center gap-1 hover:underline"
+                              className="flex items-center gap-1 text-xs font-bold text-quran hover:underline"
                             >
                               Open <ExternalLink className="h-3 w-3" />
                             </a>
                           </div>
 
                           {att.type === "IMAGE" && (
-                            <div className="relative aspect-video w-full rounded border overflow-hidden bg-cream-50">
+                            <div className="relative aspect-video w-full overflow-hidden rounded border bg-cream-50">
                               <img
                                 src={att.url}
                                 alt={att.fileName || "Uploaded file"}
@@ -311,7 +360,7 @@ export function StudentSubmissionForm({
                           )}
 
                           {att.fileName && (
-                            <span className="text-xs font-medium text-night-900 break-all">
+                            <span className="text-xs font-medium break-all text-night-900">
                               {att.fileName}
                             </span>
                           )}
@@ -324,9 +373,9 @@ export function StudentSubmissionForm({
           ) : canSubmit ? (
             /* ==================== STATE 1: ACTIVE SUBMIT FORM ==================== */
             <form onSubmit={handleSubmit} className="space-y-6">
-              <Card className="p-6 border border-cream-200 shadow-soft space-y-5">
+              <Card className="space-y-5 border border-cream-200 p-6 shadow-soft">
                 <div className="flex items-center justify-between border-b border-cream-100 pb-3">
-                  <h3 className="font-bold text-night-900 flex items-center gap-2">
+                  <h3 className="flex items-center gap-2 font-bold text-night-900">
                     <Sparkles className="h-5 w-5 text-gold-500" />
                     <span>Submit Your Homework</span>
                   </h3>
@@ -348,8 +397,10 @@ export function StudentSubmissionForm({
                 </div>
 
                 {/* Attachments Section */}
-                <div className="space-y-4 pt-3 border-t border-cream-100">
-                  <h4 className="text-sm font-bold text-night-900">Attachments</h4>
+                <div className="space-y-4 border-t border-cream-100 pt-3">
+                  <h4 className="text-sm font-bold text-night-900">
+                    Attachments
+                  </h4>
 
                   {/* Added Attachments List */}
                   {attachments.length > 0 && (
@@ -357,21 +408,29 @@ export function StudentSubmissionForm({
                       {attachments.map((att, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-cream-200 bg-cream-50/30"
+                          className="flex items-center justify-between gap-3 rounded-lg border border-cream-200 bg-cream-50/30 p-2.5"
                         >
                           <div className="flex items-center gap-2 overflow-hidden">
-                            {att.type === "IMAGE" && <ImageIcon className="h-4 w-4 text-success shrink-0" />}
-                            {att.type === "PDF" && <FileText className="h-4 w-4 text-error shrink-0" />}
-                            {att.type === "YOUTUBE" && <LinkIcon className="h-4 w-4 text-studies shrink-0" />}
-                            {att.type === "LINK" && <LinkIcon className="h-4 w-4 text-arabic shrink-0" />}
-                            <span className="text-xs font-medium text-night-900 truncate">
+                            {att.type === "IMAGE" && (
+                              <ImageIcon className="h-4 w-4 shrink-0 text-success" />
+                            )}
+                            {att.type === "PDF" && (
+                              <FileText className="h-4 w-4 shrink-0 text-error" />
+                            )}
+                            {att.type === "YOUTUBE" && (
+                              <LinkIcon className="h-4 w-4 shrink-0 text-studies" />
+                            )}
+                            {att.type === "LINK" && (
+                              <LinkIcon className="h-4 w-4 shrink-0 text-arabic" />
+                            )}
+                            <span className="truncate text-xs font-medium text-night-900">
                               {att.fileName}
                             </span>
                           </div>
                           <button
                             type="button"
                             onClick={() => handleRemoveAttachment(idx)}
-                            className="text-ink-soft hover:text-error p-1 transition-colors"
+                            className="p-1 text-ink-soft transition-colors hover:text-error"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -381,10 +440,12 @@ export function StudentSubmissionForm({
                   )}
 
                   {/* Add Attachment Panel */}
-                  <div className="bg-cream-50/50 border border-cream-200 rounded-lg p-4 space-y-3">
+                  <div className="space-y-3 rounded-lg border border-cream-200 bg-cream-50/50 p-4">
                     <div className="grid gap-3 sm:grid-cols-3">
                       <div>
-                        <label className="text-xs font-bold text-ink-soft uppercase tracking-wider">Type</label>
+                        <label className="text-xs font-bold tracking-wider text-ink-soft uppercase">
+                          Type
+                        </label>
                         <Select
                           value={attType}
                           onChange={(e) => {
@@ -403,9 +464,11 @@ export function StudentSubmissionForm({
                       </div>
 
                       {/* URL input for YouTube/Links, File name for Files */}
-                      {(attType === "IMAGE" || attType === "PDF") ? (
+                      {attType === "IMAGE" || attType === "PDF" ? (
                         <div className="sm:col-span-2">
-                          <label className="text-xs font-bold text-ink-soft uppercase tracking-wider">File Name</label>
+                          <label className="text-xs font-bold tracking-wider text-ink-soft uppercase">
+                            File Name
+                          </label>
                           <Input
                             placeholder="e.g. homework-page-1"
                             value={attName}
@@ -415,8 +478,10 @@ export function StudentSubmissionForm({
                         </div>
                       ) : (
                         <div className="sm:col-span-2">
-                          <label className="text-xs font-bold text-ink-soft uppercase tracking-wider">
-                            {attType === "YOUTUBE" ? "YouTube Video URL" : "Web URL"}
+                          <label className="text-xs font-bold tracking-wider text-ink-soft uppercase">
+                            {attType === "YOUTUBE"
+                              ? "YouTube Video URL"
+                              : "Web URL"}
                           </label>
                           <Input
                             placeholder={
@@ -432,18 +497,20 @@ export function StudentSubmissionForm({
                       )}
                     </div>
 
-                    {attError && <p className="text-xs text-error">{attError}</p>}
+                    {attError && (
+                      <p className="text-xs text-error">{attError}</p>
+                    )}
 
                     {/* Progress Bar for Mock Uploading */}
                     {uploading && (
                       <div className="space-y-1">
-                        <div className="flex justify-between text-xs text-ink-soft font-semibold">
+                        <div className="flex justify-between text-xs font-semibold text-ink-soft">
                           <span>Uploading...</span>
                           <span>{uploadProgress}%</span>
                         </div>
-                        <div className="w-full bg-cream-200 h-1.5 rounded-full overflow-hidden">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-cream-200">
                           <div
-                            className="bg-gold-500 h-1.5 rounded-full transition-all"
+                            className="h-1.5 rounded-full bg-gold-500 transition-all"
                             style={{ width: `${uploadProgress}%` }}
                           />
                         </div>
@@ -458,13 +525,22 @@ export function StudentSubmissionForm({
                       className="flex items-center gap-1.5"
                     >
                       <Plus className="h-4 w-4" />
-                      <span>{(attType === "IMAGE" || attType === "PDF") ? "Upload File" : "Add Link"}</span>
+                      <span>
+                        {attType === "IMAGE" || attType === "PDF"
+                          ? "Upload File"
+                          : "Add Link"}
+                      </span>
                     </Button>
                   </div>
                 </div>
 
                 <div className="flex justify-end pt-3">
-                  <Button type="submit" loading={loading} disabled={uploading} className="px-8">
+                  <Button
+                    type="submit"
+                    loading={loading}
+                    disabled={uploading}
+                    className="px-8"
+                  >
                     Submit Homework
                   </Button>
                 </div>
@@ -472,12 +548,13 @@ export function StudentSubmissionForm({
             </form>
           ) : (
             /* ==================== STATE 2: LOCKED PAST DUE ==================== */
-            <Card className="p-6 border border-error/20 bg-error/5 shadow-soft flex items-start gap-4">
-              <AlertTriangle className="h-6 w-6 text-error shrink-0 mt-0.5" />
+            <Card className="flex items-start gap-4 border border-error/20 bg-error/5 p-6 shadow-soft">
+              <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-error" />
               <div className="space-y-1">
                 <h3 className="font-bold text-error">Submissions Locked</h3>
-                <p className="text-sm text-ink leading-relaxed">
-                  {submitBlockedReason || `This homework is past the due date (${formattedDueDate}) and late submissions are disabled by your teacher. You can no longer submit work for this assignment.`}
+                <p className="text-sm leading-relaxed text-ink">
+                  {submitBlockedReason ||
+                    `This homework is past the due date (${formattedDueDate}) and late submissions are disabled by your teacher. You can no longer submit work for this assignment.`}
                 </p>
               </div>
             </Card>
@@ -486,54 +563,77 @@ export function StudentSubmissionForm({
 
         {/* Right column: Feedback panel / status */}
         <div className="space-y-6">
-          <Card className="p-6 border border-cream-200 shadow-soft bg-night-900 text-cream-50 space-y-4">
-            <h3 className="text-lg font-bold border-b border-night-800 pb-3 flex items-center gap-2">
+          <Card className="space-y-4 border border-cream-200 bg-night-900 p-6 text-cream-50 shadow-soft">
+            <h3 className="flex items-center gap-2 border-b border-night-800 pb-3 text-lg font-bold">
               <Award className="h-5 w-5 text-gold-500" />
               <span>Assessment Summary</span>
             </h3>
 
             {submission && submission.status === "GRADED" ? (
               <div className="space-y-5">
-                <div className="bg-night-800 p-4 rounded-lg border border-night-700 text-center space-y-1">
-                  <span className="text-xs text-cream-100/60 uppercase tracking-wider block">Graded Result</span>
-                  {homework?.maxScore !== null && homework?.maxScore !== undefined ? (
+                <div className="space-y-1 rounded-lg border border-night-700 bg-night-800 p-4 text-center">
+                  <span className="block text-xs tracking-wider text-cream-100/60 uppercase">
+                    Graded Result
+                  </span>
+                  {homework?.maxScore !== null &&
+                  homework?.maxScore !== undefined ? (
                     <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="text-4xl font-extrabold text-success">{submission.score}</span>
-                      <span className="text-sm text-cream-100/50">/ {homework.maxScore}</span>
+                      <span className="text-4xl font-extrabold text-success">
+                        {submission.score}
+                      </span>
+                      <span className="text-sm text-cream-100/50">
+                        / {homework.maxScore}
+                      </span>
                     </div>
                   ) : (
-                    <div className="text-success flex items-center justify-center gap-2 font-bold text-lg">
+                    <div className="flex items-center justify-center gap-2 text-lg font-bold text-success">
                       <CheckCircle2 className="h-6 w-6" /> Completed
                     </div>
                   )}
-                  <span className="text-[10px] text-cream-100/40 block mt-2">
-                    Graded on {new Date(submission.gradedAt!).toLocaleDateString("en-US", { dateStyle: "medium" })}
+                  <span className="mt-2 block text-[10px] text-cream-100/40">
+                    Graded on{" "}
+                    {new Date(submission.gradedAt!).toLocaleDateString(
+                      "en-US",
+                      { dateStyle: "medium" },
+                    )}
                   </span>
                 </div>
 
                 {submission.feedback && (
                   <div className="space-y-1.5">
-                    <h4 className="text-xs font-bold text-cream-100/60 uppercase tracking-wider">Teacher's Feedback</h4>
-                    <p className="text-sm text-cream-50 bg-night-800 p-3.5 rounded-lg border border-night-700 whitespace-pre-wrap leading-relaxed">
+                    <h4 className="text-xs font-bold tracking-wider text-cream-100/60 uppercase">
+                      Teacher's Feedback
+                    </h4>
+                    <p className="rounded-lg border border-night-700 bg-night-800 p-3.5 text-sm leading-relaxed whitespace-pre-wrap text-cream-50">
                       {submission.feedback}
                     </p>
                   </div>
                 )}
               </div>
             ) : submission ? (
-              <div className="space-y-4 text-center py-6 text-cream-100/70">
-                <Clock className="h-10 w-10 text-warn mx-auto animate-pulse" />
+              <div className="space-y-4 py-6 text-center text-cream-100/70">
+                <Clock className="mx-auto h-10 w-10 animate-pulse text-warn" />
                 <div>
-                  <p className="font-bold text-white text-base">Awaiting Grading</p>
-                  <p className="text-xs mt-1">Your homework has been submitted. Your teacher will grade it soon.</p>
+                  <p className="text-base font-bold text-white">
+                    Awaiting Grading
+                  </p>
+                  <p className="mt-1 text-xs">
+                    Your homework has been submitted. Your teacher will grade it
+                    soon.
+                  </p>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 text-center py-6 text-cream-100/50">
-                <AlertTriangle className="h-10 w-10 text-gold-500 mx-auto" />
+              <div className="space-y-4 py-6 text-center text-cream-100/50">
+                <AlertTriangle className="mx-auto h-10 w-10 text-gold-500" />
                 <div>
-                  <p className="font-bold text-white text-base">Not Submitted</p>
-                  <p className="text-xs mt-1">Submit your work using the form on the left to receive feedback.</p>
+                  <p className="text-base font-bold text-white">
+                    Not Submitted
+                  </p>
+                  <p className="mt-1 text-xs">
+                    Submit your work using the form on the left to receive
+                    feedback.
+                  </p>
                 </div>
               </div>
             )}

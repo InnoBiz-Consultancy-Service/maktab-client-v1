@@ -1,4 +1,11 @@
-import { Homework, Submission, Batch, Lesson, Student, Teacher } from "@/types/shared/homework";
+import {
+  Homework,
+  Submission,
+  Batch,
+  Lesson,
+  Student,
+  Teacher,
+} from "@/types/shared/homework";
 
 export const mockTeacher: Teacher = {
   id: "tch_01",
@@ -11,8 +18,16 @@ export const mockBatches: Batch[] = [
 ];
 
 export const mockLessons: Lesson[] = [
-  { id: "lesson_01", title: "Surah Al-Fatiha — Tafsir", youtubeVideoId: "jNQXAC9IVRw" },
-  { id: "lesson_02", title: "Tajweed Basics — Makhraj", youtubeVideoId: "dQw4w9WgXcQ" },
+  {
+    id: "lesson_01",
+    title: "Surah Al-Fatiha — Tafsir",
+    youtubeVideoId: "jNQXAC9IVRw",
+  },
+  {
+    id: "lesson_02",
+    title: "Tajweed Basics — Makhraj",
+    youtubeVideoId: "dQw4w9WgXcQ",
+  },
 ];
 
 export const mockStudents: Student[] = [
@@ -27,7 +42,8 @@ export const initialMockHomeworks: Homework[] = [
   {
     id: "hw_01",
     title: "Surah Al-Fatiha — memorise and write",
-    instruction: "Memorise Surah Al-Fatiha, write it in your notebook, photograph the page and submit it. Also upload a recitation video to YouTube as Unlisted and paste the link.",
+    instruction:
+      "Memorise Surah Al-Fatiha, write it in your notebook, photograph the page and submit it. Also upload a recitation video to YouTube as Unlisted and paste the link.",
     batch: mockBatches[0],
     teacher: mockTeacher,
     lesson: mockLessons[0],
@@ -42,7 +58,8 @@ export const initialMockHomeworks: Homework[] = [
   {
     id: "hw_02",
     title: "Tajweed practice — video submission",
-    instruction: "Upload a practice video demonstrating proper tajweed rules as learned in lesson 2.",
+    instruction:
+      "Upload a practice video demonstrating proper tajweed rules as learned in lesson 2.",
     batch: mockBatches[0],
     teacher: mockTeacher,
     lesson: mockLessons[1],
@@ -57,7 +74,8 @@ export const initialMockHomeworks: Homework[] = [
   {
     id: "hw_03",
     title: "Memorise the daily duas",
-    instruction: "Memorise the morning and evening duas. No written submission needed, just complete tracking.",
+    instruction:
+      "Memorise the morning and evening duas. No written submission needed, just complete tracking.",
     batch: mockBatches[1],
     teacher: mockTeacher,
     lesson: null,
@@ -80,7 +98,8 @@ export const initialMockSubmissions: Record<string, Submission[]> = {
       isLate: false,
       status: "GRADED",
       score: 9,
-      feedback: "Handwriting is neat. Pay a little more attention to makhraj in your recitation.",
+      feedback:
+        "Handwriting is neat. Pay a little more attention to makhraj in your recitation.",
       gradedAt: "2026-07-24T10:00:00.000Z",
       attachments: [
         {

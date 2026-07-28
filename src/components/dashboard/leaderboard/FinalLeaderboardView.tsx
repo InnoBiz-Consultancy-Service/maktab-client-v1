@@ -26,7 +26,7 @@ export function FinalLeaderboardView({
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-gold-500/20 px-3 py-1 text-xs font-semibold text-gold-700">
+            <span className="text-gold-700 inline-flex items-center gap-1 rounded-full bg-gold-500/20 px-3 py-1 text-xs font-semibold">
               <Lock className="h-3 w-3" /> Permanent Snapshot
             </span>
             {batchName && (
@@ -79,7 +79,7 @@ export function FinalLeaderboardView({
                       isTop1 ? "bg-amber-50/40" : ""
                     }`}
                   >
-                    <td className="px-4 py-3 whitespace-nowrap font-bold">
+                    <td className="px-4 py-3 font-bold whitespace-nowrap">
                       <div className="flex items-center gap-1.5">
                         {isTop1 && <Trophy className="h-4 w-4 text-gold-500" />}
                         {isTop2 && <Award className="h-4 w-4 text-slate-400" />}
@@ -89,10 +89,10 @@ export function FinalLeaderboardView({
                             isTop1
                               ? "bg-gold-500 text-night-900"
                               : isTop2
-                              ? "bg-slate-200 text-slate-800"
-                              : isTop3
-                              ? "bg-amber-100 text-amber-800"
-                              : "bg-cream-100 text-ink-soft"
+                                ? "bg-slate-200 text-slate-800"
+                                : isTop3
+                                  ? "bg-amber-100 text-amber-800"
+                                  : "bg-cream-100 text-ink-soft"
                           }`}
                         >
                           #{entry.rank}
@@ -101,8 +101,12 @@ export function FinalLeaderboardView({
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div>
-                        <p className="font-semibold text-night-900">{entry.name}</p>
-                        <p className="text-xs text-ink-soft">{entry.studentCode}</p>
+                        <p className="font-semibold text-night-900">
+                          {entry.name}
+                        </p>
+                        <p className="text-xs text-ink-soft">
+                          {entry.studentCode}
+                        </p>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center whitespace-nowrap">

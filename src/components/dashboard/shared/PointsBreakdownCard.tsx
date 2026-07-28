@@ -47,7 +47,7 @@ export function PointsBreakdownCard({
             Points earned from completed activities
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-full bg-gold-500/15 px-3 py-1.5 text-gold-700">
+        <div className="text-gold-700 flex items-center gap-2 rounded-full bg-gold-500/15 px-3 py-1.5">
           <Award className="h-4 w-4" />
           <span className="font-display font-bold text-night-900">
             {points} Total Points
@@ -70,7 +70,9 @@ export function PointsBreakdownCard({
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-ink-soft">{item.label}</p>
-                <p className="text-lg font-bold text-night-900">{item.value} pts</p>
+                <p className="text-lg font-bold text-night-900">
+                  {item.value} pts
+                </p>
               </div>
             </div>
           );

@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { UserPlus, GraduationCap, Calendar, FileText, ArrowRight } from "lucide-react";
+import {
+  UserPlus,
+  GraduationCap,
+  Calendar,
+  FileText,
+  ArrowRight,
+} from "lucide-react";
 import { Card } from "@/components/ui";
 import { getInstituteTeachersDashboardAction } from "@/actions/dashboard/institute-dashboard";
 
@@ -22,7 +28,9 @@ export default async function TeachersDashboardPage() {
     <div className="mx-auto w-full max-w-4xl space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-night-900">Teachers Dashboard</h1>
+          <h1 className="text-2xl font-bold text-night-900">
+            Teachers Dashboard
+          </h1>
           <p className="mt-1 text-sm text-ink-soft">
             {teachers.length} teachers and assignment activity
           </p>
@@ -57,7 +65,8 @@ export default async function TeachersDashboardPage() {
                     </span>
                   </div>
                   <p className="text-xs text-ink-soft">
-                    Phone: {t.phone || "N/A"} • Total Students: {t.totalStudents}
+                    Phone: {t.phone || "N/A"} • Total Students:{" "}
+                    {t.totalStudents}
                   </p>
                 </div>
               </div>
@@ -72,23 +81,31 @@ export default async function TeachersDashboardPage() {
 
             {/* Activity metrics */}
             {t.activity && (
-              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-cream-200 pt-3 sm:grid-cols-4 text-xs">
+              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-cream-200 pt-3 text-xs sm:grid-cols-4">
                 <div>
                   <span className="text-ink-soft">Published Homeworks</span>
-                  <p className="font-bold text-night-900">{t.activity.homeworksPublished}</p>
+                  <p className="font-bold text-night-900">
+                    {t.activity.homeworksPublished}
+                  </p>
                 </div>
                 <div>
                   <span className="text-ink-soft">Draft Homeworks</span>
-                  <p className="font-bold text-night-900">{t.activity.homeworksDraft}</p>
+                  <p className="font-bold text-night-900">
+                    {t.activity.homeworksDraft}
+                  </p>
                 </div>
                 <div>
                   <span className="text-ink-soft">Submission Rate</span>
-                  <p className="font-bold text-night-900">{t.activity.homeworkSubmissionRate}%</p>
+                  <p className="font-bold text-night-900">
+                    {t.activity.homeworkSubmissionRate}%
+                  </p>
                 </div>
                 <div>
                   <span className="text-ink-soft">Last Homework</span>
                   <p className="font-bold text-night-900">
-                    {t.activity.lastHomeworkAt ? `${t.activity.daysSinceLastHomework}d ago` : "Never"}
+                    {t.activity.lastHomeworkAt
+                      ? `${t.activity.daysSinceLastHomework}d ago`
+                      : "Never"}
                   </p>
                 </div>
               </div>

@@ -9,7 +9,6 @@ export interface QuizQuestion {
   text: string;
   marks: number;
   options: QuizOption[];
-
 }
 
 export interface Quiz {

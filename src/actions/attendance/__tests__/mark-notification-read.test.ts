@@ -21,7 +21,10 @@ describe("markNotificationReadAction", () => {
 
   it("unwraps the updated notification on success", async () => {
     const notification = { id: "n1", isRead: true };
-    mockedApi.mockResolvedValue({ success: true, data: { data: notification } });
+    mockedApi.mockResolvedValue({
+      success: true,
+      data: { data: notification },
+    });
     const result = await markNotificationReadAction("n1");
     expect(result).toEqual({ ok: true, data: notification });
   });

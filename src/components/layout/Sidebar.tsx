@@ -37,7 +37,7 @@ export function Sidebar({
         </div>
         <NotificationBell
           role={session.role}
-          className="text-cream-100/70 hover:text-cream-50 hover:bg-night-800"
+          className="text-cream-100/70 hover:bg-night-800 hover:text-cream-50"
         />
       </div>
 

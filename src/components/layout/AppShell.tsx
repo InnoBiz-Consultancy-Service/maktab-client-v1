@@ -4,7 +4,6 @@ import { Sidebar } from "./Sidebar";
 import { MobileHeader } from "./MobileHeader";
 import { BottomNav } from "./BottomNav";
 
-
 export function AppShell({
   session,
   children,

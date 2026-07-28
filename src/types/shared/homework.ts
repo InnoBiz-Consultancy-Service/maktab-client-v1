@@ -107,7 +107,13 @@ export interface StudentHomeworkListItem {
   isLate: boolean;
   score: number | null;
   feedback: string | null;
-  chip: "NOT_SUBMITTED" | "OVERDUE" | "SUBMITTED" | "SUBMITTED_LATE" | "GRADED" | "GRADED_LATE";
+  chip:
+    | "NOT_SUBMITTED"
+    | "OVERDUE"
+    | "SUBMITTED"
+    | "SUBMITTED_LATE"
+    | "GRADED"
+    | "GRADED_LATE";
   isOverdue: boolean;
   homework: {
     id: string;
@@ -159,7 +165,13 @@ export interface HomeworkSubmissionSummary {
     gradedAt: string | null;
     score: number | null;
     attachmentCount: number;
-    chip: "NOT_SUBMITTED" | "OVERDUE" | "SUBMITTED" | "SUBMITTED_LATE" | "GRADED" | "GRADED_LATE";
+    chip:
+      | "NOT_SUBMITTED"
+      | "OVERDUE"
+      | "SUBMITTED"
+      | "SUBMITTED_LATE"
+      | "GRADED"
+      | "GRADED_LATE";
   }[];
 }
 
@@ -307,4 +319,3 @@ export interface ApiError {
   message: string;
   errorSource?: { path: string; message: string }[];
 }
-

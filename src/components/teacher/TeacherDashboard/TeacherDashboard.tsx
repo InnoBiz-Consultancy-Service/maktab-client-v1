@@ -222,57 +222,102 @@ export function TeacherDashboard({
       {homeworkOverview && (
         <section aria-label="Homework Insights" className="mt-8 space-y-4">
           <div className="flex items-center justify-between border-b border-cream-200 pb-2">
-            <h2 className="font-display text-lg font-bold text-night-900 flex items-center gap-1.5">
+            <h2 className="flex items-center gap-1.5 font-display text-lg font-bold text-night-900">
               <Calendar className="h-5 w-5 text-gold-500" />
               <span>Homework Insights ({homeworkOverview.month})</span>
             </h2>
-            <Link href="/dashboard/teacher/homework" className="text-xs font-bold text-gold-600 hover:underline">
+            <Link
+              href="/dashboard/teacher/homework"
+              className="text-xs font-bold text-gold-600 hover:underline"
+            >
               Manage Homeworks &rarr;
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Card className="p-4 border border-cream-200 shadow-sm flex flex-col justify-between">
-              <span className="text-xs text-ink-soft block font-medium">Total Homeworks</span>
-              <span className="text-2xl font-bold text-night-900 mt-1">{homeworkOverview.summary.totalHomeworks}</span>
-              <span className="text-[10px] text-ink-soft block mt-1">({homeworkOverview.summary.publishedHomeworks} published, {homeworkOverview.summary.draftHomeworks} drafts)</span>
+            <Card className="flex flex-col justify-between border border-cream-200 p-4 shadow-sm">
+              <span className="block text-xs font-medium text-ink-soft">
+                Total Homeworks
+              </span>
+              <span className="mt-1 text-2xl font-bold text-night-900">
+                {homeworkOverview.summary.totalHomeworks}
+              </span>
+              <span className="mt-1 block text-[10px] text-ink-soft">
+                ({homeworkOverview.summary.publishedHomeworks} published,{" "}
+                {homeworkOverview.summary.draftHomeworks} drafts)
+              </span>
             </Card>
-            <Card className="p-4 border border-cream-200 shadow-sm flex flex-col justify-between">
-              <span className="text-xs text-ink-soft block font-medium">Assigned Rows</span>
-              <span className="text-2xl font-bold text-night-900 mt-1">{homeworkOverview.summary.totalAssigned}</span>
-              <span className="text-[10px] text-ink-soft block mt-1">Total active student records</span>
+            <Card className="flex flex-col justify-between border border-cream-200 p-4 shadow-sm">
+              <span className="block text-xs font-medium text-ink-soft">
+                Assigned Rows
+              </span>
+              <span className="mt-1 text-2xl font-bold text-night-900">
+                {homeworkOverview.summary.totalAssigned}
+              </span>
+              <span className="mt-1 block text-[10px] text-ink-soft">
+                Total active student records
+              </span>
             </Card>
-            <Card className="p-4 border border-cream-200 shadow-sm flex flex-col justify-between">
-              <span className="text-xs text-ink-soft block font-medium">Submission Rate</span>
-              <span className="text-2xl font-bold text-quran mt-1">{homeworkOverview.summary.submissionRate}%</span>
-              <span className="text-[10px] text-ink-soft block mt-1">({homeworkOverview.summary.totalSubmitted} submitted)</span>
+            <Card className="flex flex-col justify-between border border-cream-200 p-4 shadow-sm">
+              <span className="block text-xs font-medium text-ink-soft">
+                Submission Rate
+              </span>
+              <span className="mt-1 text-2xl font-bold text-quran">
+                {homeworkOverview.summary.submissionRate}%
+              </span>
+              <span className="mt-1 block text-[10px] text-ink-soft">
+                ({homeworkOverview.summary.totalSubmitted} submitted)
+              </span>
             </Card>
-            <Card className="p-4 border border-cream-200 shadow-sm flex flex-col justify-between">
-              <span className="text-xs text-ink-soft block font-medium">Punctuality Rate</span>
-              <span className="text-2xl font-bold text-arabic mt-1">{homeworkOverview.summary.punctualityRate}%</span>
-              <span className="text-[10px] text-ink-soft block mt-1">({homeworkOverview.summary.totalLate} late submissions)</span>
+            <Card className="flex flex-col justify-between border border-cream-200 p-4 shadow-sm">
+              <span className="block text-xs font-medium text-ink-soft">
+                Punctuality Rate
+              </span>
+              <span className="mt-1 text-2xl font-bold text-arabic">
+                {homeworkOverview.summary.punctualityRate}%
+              </span>
+              <span className="mt-1 block text-[10px] text-ink-soft">
+                ({homeworkOverview.summary.totalLate} late submissions)
+              </span>
             </Card>
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* Top Students */}
-            <Card className="p-0 border border-cream-200 shadow-sm overflow-hidden">
-              <div className="border-b border-cream-100 bg-cream-50/50 px-4 py-3 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-night-900">Top Students</h3>
-                <span className="text-[10px] bg-success/15 text-success font-bold px-2 py-0.5 rounded uppercase">High Submission Rate</span>
+            <Card className="overflow-hidden border border-cream-200 p-0 shadow-sm">
+              <div className="flex items-center justify-between border-b border-cream-100 bg-cream-50/50 px-4 py-3">
+                <h3 className="text-sm font-bold text-night-900">
+                  Top Students
+                </h3>
+                <span className="rounded bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success uppercase">
+                  High Submission Rate
+                </span>
               </div>
               {homeworkOverview.topStudents.length === 0 ? (
-                <div className="p-6 text-center text-xs text-ink-soft">Everyone is doing great!</div>
+                <div className="p-6 text-center text-xs text-ink-soft">
+                  Everyone is doing great!
+                </div>
               ) : (
                 <ul className="divide-y divide-cream-100">
                   {homeworkOverview.topStudents.map((item) => (
-                    <li key={item.student.id} className="flex items-center justify-between px-4 py-3.5 text-xs hover:bg-cream-50/30 transition-all">
+                    <li
+                      key={item.student.id}
+                      className="flex items-center justify-between px-4 py-3.5 text-xs transition-all hover:bg-cream-50/30"
+                    >
                       <div>
-                        <p className="font-semibold text-night-900">{item.student.name}</p>
-                        <p className="text-[10px] text-ink-soft">{item.student.studentCode}</p>
+                        <p className="font-semibold text-night-900">
+                          {item.student.name}
+                        </p>
+                        <p className="text-[10px] text-ink-soft">
+                          {item.student.studentCode}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-success">{item.submissionRate}% Submissions</p>
-                        <p className="text-[9px] text-ink-soft">{item.submitted}/{item.assigned} completed</p>
+                        <p className="font-bold text-success">
+                          {item.submissionRate}% Submissions
+                        </p>
+                        <p className="text-[9px] text-ink-soft">
+                          {item.submitted}/{item.assigned} completed
+                        </p>
                       </div>
                     </li>
                   ))}
@@ -281,24 +326,41 @@ export function TeacherDashboard({
             </Card>
 
             {/* Needs Attention */}
-            <Card className="p-0 border border-cream-200 shadow-sm overflow-hidden">
-              <div className="border-b border-cream-100 bg-cream-50/50 px-4 py-3 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-night-900">Needs Attention</h3>
-                <span className="text-[10px] bg-error/15 text-error font-bold px-2 py-0.5 rounded uppercase">Missing Homeworks</span>
+            <Card className="overflow-hidden border border-cream-200 p-0 shadow-sm">
+              <div className="flex items-center justify-between border-b border-cream-100 bg-cream-50/50 px-4 py-3">
+                <h3 className="text-sm font-bold text-night-900">
+                  Needs Attention
+                </h3>
+                <span className="rounded bg-error/15 px-2 py-0.5 text-[10px] font-bold text-error uppercase">
+                  Missing Homeworks
+                </span>
               </div>
               {homeworkOverview.needsAttention.length === 0 ? (
-                <div className="p-6 text-center text-xs text-ink-soft">Nobody needs attention right now!</div>
+                <div className="p-6 text-center text-xs text-ink-soft">
+                  Nobody needs attention right now!
+                </div>
               ) : (
                 <ul className="divide-y divide-cream-100">
                   {homeworkOverview.needsAttention.map((item) => (
-                    <li key={item.student.id} className="flex items-center justify-between px-4 py-3.5 text-xs hover:bg-cream-50/30 transition-all">
+                    <li
+                      key={item.student.id}
+                      className="flex items-center justify-between px-4 py-3.5 text-xs transition-all hover:bg-cream-50/30"
+                    >
                       <div>
-                        <p className="font-semibold text-night-900">{item.student.name}</p>
-                        <p className="text-[10px] text-ink-soft">{item.student.studentCode}</p>
+                        <p className="font-semibold text-night-900">
+                          {item.student.name}
+                        </p>
+                        <p className="text-[10px] text-ink-soft">
+                          {item.student.studentCode}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-error">{item.notSubmitted} Missing</p>
-                        <p className="text-[9px] text-ink-soft">{item.submitted}/{item.assigned} completed</p>
+                        <p className="font-bold text-error">
+                          {item.notSubmitted} Missing
+                        </p>
+                        <p className="text-[9px] text-ink-soft">
+                          {item.submitted}/{item.assigned} completed
+                        </p>
                       </div>
                     </li>
                   ))}

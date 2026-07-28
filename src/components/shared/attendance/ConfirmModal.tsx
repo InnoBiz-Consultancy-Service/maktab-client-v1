@@ -64,14 +64,14 @@ export function ConfirmModal({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-cream-200 bg-cream-50 font-display text-sm font-semibold text-night-900 transition-all active:scale-95 hover:bg-cream-100"
+            className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full border border-cream-200 bg-cream-50 font-display text-sm font-semibold text-night-900 transition-all hover:bg-cream-100 active:scale-95"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full font-display text-sm font-semibold shadow-soft transition-all active:scale-95 hover:scale-[1.02] ${
+            className={`inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full font-display text-sm font-semibold shadow-soft transition-all hover:scale-[1.02] active:scale-95 ${
               destructive
                 ? "bg-error text-cream-50"
                 : "bg-gold-500 text-night-900"

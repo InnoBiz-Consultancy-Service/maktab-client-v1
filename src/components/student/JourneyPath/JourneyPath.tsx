@@ -46,7 +46,7 @@ export function JourneyPath({ lessons }: { lessons: Lesson[] }) {
 
             {/* XP badge on completed nodes */}
             {done && (
-              <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 font-display text-[10px] font-bold text-night-900">
+              <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 font-display text-[10px] font-bold text-night-900">
                 <Star className="h-3 w-3 fill-current" aria-hidden />
               </span>
             )}

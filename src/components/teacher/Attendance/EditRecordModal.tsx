@@ -137,7 +137,7 @@ export function EditRecordModal({
           type="button"
           onClick={handleSubmit}
           disabled={saving || status === currentStatus}
-          className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-gold-500 font-display text-sm font-semibold text-night-900 shadow-soft transition-all active:scale-95 hover:scale-[1.02] disabled:opacity-60 disabled:pointer-events-none"
+          className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-gold-500 font-display text-sm font-semibold text-night-900 shadow-soft transition-all hover:scale-[1.02] active:scale-95 disabled:pointer-events-none disabled:opacity-60"
         >
           {saving ? (
             <>

@@ -109,17 +109,9 @@ export interface TeacherLessonDetail {
 
 /* ── Teacher: results ── */
 export type ResultRowStatus =
-  | "COMPLETED"
-  | "PASSED"
-  | "IN_PROGRESS"
-  | "FAILED"
-  | "NOT_STARTED";
+  "COMPLETED" | "PASSED" | "IN_PROGRESS" | "FAILED" | "NOT_STARTED";
 export type ResultsFilter =
-  | "ALL"
-  | "COMPLETED"
-  | "PASSED"
-  | "FAILED"
-  | "NOT_ATTEMPTED";
+  "ALL" | "COMPLETED" | "PASSED" | "FAILED" | "NOT_ATTEMPTED";
 
 export interface LessonResultsSummary {
   totalStudents: number;
