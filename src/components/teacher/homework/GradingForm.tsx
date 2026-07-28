@@ -13,9 +13,10 @@ import { formatCalendarDate } from "@/lib/utils/date";
 
 interface GradingFormProps {
   submission: SubmissionDetails;
+  homeworkId: string;
 }
 
-export function GradingForm({ submission }: GradingFormProps) {
+export function GradingForm({ submission, homeworkId }: GradingFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +45,10 @@ export function GradingForm({ submission }: GradingFormProps) {
         setError(`Score must be a number between 0 and ${hw?.maxScore || 0}`);
         return;
       }
+      if (!Number.isInteger(parsedScore)) {
+        setError("Score must be a whole number (e.g. 8 or 9). Decimal scores like 8.5 are not allowed.");
+        return;
+      }
     }
 
     setLoading(true);
@@ -56,10 +61,12 @@ export function GradingForm({ submission }: GradingFormProps) {
 
     if (result.ok) {
       toast.success("Submission graded successfully!");
-      router.push(`/dashboard/teacher/homework/${hw?.id}/submissions`);
+      router.push(`/dashboard/teacher/homework/${homeworkId}/submissions`);
       router.refresh();
     } else {
-      toast.error(result.error);
+      const msg = result.error || "Failed to grade submission";
+      toast.error(msg);
+      setError(msg);
     }
   };
 
@@ -75,7 +82,7 @@ export function GradingForm({ submission }: GradingFormProps) {
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
-          href={`/dashboard/teacher/homework/${hw?.id}/submissions`}
+          href={`/dashboard/teacher/homework/${homeworkId}/submissions`}
           className="mb-3 inline-flex items-center gap-1 text-sm text-ink-soft transition-colors hover:text-night-900"
         >
           <ArrowLeft className="h-4 w-4" />

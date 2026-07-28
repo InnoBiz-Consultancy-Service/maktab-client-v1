@@ -110,7 +110,6 @@ const teacherNav: RoleNav = {
       href: "/dashboard/teacher/attendance",
       label: "Attendance",
       icon: "attendance",
-      mobile: true,
     },
     {
       href: "/dashboard/teacher/lessons",
@@ -129,7 +128,6 @@ const teacherNav: RoleNav = {
       href: "/dashboard/teacher/settings",
       label: "Settings",
       icon: "settings",
-      mobile: true,
     },
   ],
 };

@@ -44,6 +44,10 @@ function unwrapList<T>(raw: any): T[] {
         return payload[key] as T[];
       }
     }
+    // If payload itself is a single item object (e.g. single submission or record), wrap in an array
+    if (payload.id || payload.submissionId || payload.studentId || payload.status || payload.submittedAt) {
+      return [payload as T];
+    }
   }
   return [];
 }
@@ -319,26 +323,67 @@ export async function getHomeworkSubmissions(
 
     const rawPayload = res.success ? (unwrap<any>(res.data) || {}) : {};
     const detailPayload = detailData ? (unwrap<any>(detailData) || {}) : {};
-    
-    let homework = rawPayload.homework ?? rawPayload.data?.homework ?? detailPayload.homework ?? detailData;
+
+    // The API wraps its response under a "homeworks" key:
+    // { data: { homeworks: { homework, summary, results }, meta } }
+    const homeworksPayload = rawPayload.homeworks ?? rawPayload.data?.homeworks ?? {};
+
+    let homework =
+      homeworksPayload.homework ??
+      rawPayload.homework ??
+      rawPayload.data?.homework ??
+      detailPayload.homework ??
+      detailData;
     if (!homework && detailData) homework = detailData;
 
-    const rawResults = unwrapList<any>(
-      rawPayload.results ?? 
-      rawPayload.roster ?? 
-      rawPayload.students ?? 
-      rawPayload.submissions ?? 
-      rawPayload.assignments ?? 
-      rawPayload.data?.results ??
-      rawPayload.data?.roster ??
-      rawPayload.data?.students ??
-      rawPayload.data?.submissions ??
-      detailPayload.submissions ??
-      detailPayload.results ??
-      detailPayload.roster ??
-      detailPayload.students ??
-      (Array.isArray(rawPayload) ? rawPayload : [])
-    );
+    // Pull the results array from the correct nested location
+    const rawResults: any[] = Array.isArray(homeworksPayload.results)
+      ? homeworksPayload.results
+      : unwrapList<any>(
+          rawPayload.results ??
+          rawPayload.roster ??
+          rawPayload.students ??
+          rawPayload.submissions ??
+          rawPayload.assignments ??
+          rawPayload.data?.results ??
+          rawPayload.data?.roster ??
+          rawPayload.data?.students ??
+          rawPayload.data?.submissions ??
+          detailPayload.submissions ??
+          detailPayload.results ??
+          detailPayload.roster ??
+          detailPayload.students ??
+          (Array.isArray(rawPayload) ? rawPayload : [])
+        );
+
+    // Whether the API returned a complete, authoritative roster (vs needing local fallback logic)
+    const apiReturnedFullRoster = Array.isArray(homeworksPayload.results);
+
+    // Pull the summary from the API if available
+    const apiSummary = homeworksPayload.summary ?? rawPayload.summary ?? rawPayload.data?.summary ?? null;
+
+
+    // Only merge local mock submissions when the API did NOT return a full roster.
+    // When the API returns homeworksPayload.results, it is the authoritative complete list —
+    // merging mock data on top causes duplicate assignmentIds (duplicate React key errors).
+    if (!apiReturnedFullRoster) {
+      try {
+        const { initialMockSubmissions } = require("@/data/mock-homework");
+        if (initialMockSubmissions && initialMockSubmissions[homeworkId]) {
+          const mockSubs = initialMockSubmissions[homeworkId] || [];
+          mockSubs.forEach((mockSub: any) => {
+            const mockSubId = mockSub.id;
+            const exists = rawResults.some(
+              (r: any) => r.id === mockSubId || r.submissionId === mockSubId || (r.studentId && r.studentId === mockSub.studentId)
+            );
+            if (!exists) {
+              rawResults.push(mockSub);
+            }
+          });
+        }
+      } catch (e) {}
+    }
+
 
     // Fetch batch students if available to guarantee ALL assigned students appear in the roster
     const batchId = homework?.batch?.id || homework?.batchId;
@@ -351,29 +396,41 @@ export async function getHomeworkSubmissions(
     }
 
     // Helper function to check if a raw submission item matches a student
-    const isStudentMatch = (item: any, student: Student, totalBatchCount: number, totalSubmissionsCount: number, studentIndex: number) => {
+    const isStudentMatch = (item: any, student: Student) => {
       if (!item || !student) return false;
 
-      // 1. Direct ID matching (student.id, student.userId, student.user_id, user.id, etc.)
+      // Collect all possible IDs from the submission item's student reference
       const itemStudentId = item.student?.id || item.studentId || item.student_id || item.userId || item.user_id || (typeof item.student === "string" ? item.student : null);
+      // Also pick up any secondary ID field that some backends swap (e.g. item.student.userId)
+      const itemStudentUserId = item.student?.userId || item.student?.user_id || item.student?.user?.id;
+
+      // Collect all possible IDs from the batch-student record
       const studentUserId = (student as any).userId || (student as any).user_id || (student as any).user?.id;
-      if (itemStudentId && student.id && String(itemStudentId).trim() === String(student.id).trim()) return true;
-      if (itemStudentId && studentUserId && String(itemStudentId).trim() === String(studentUserId).trim()) return true;
+
+      // 1. Direct ID matching — try every combination so we handle userId/studentId swaps
+      if (itemStudentId) {
+        if (student.id && String(itemStudentId).trim() === String(student.id).trim()) return true;
+        if (studentUserId && String(itemStudentId).trim() === String(studentUserId).trim()) return true;
+      }
+      if (itemStudentUserId) {
+        if (student.id && String(itemStudentUserId).trim() === String(student.id).trim()) return true;
+        if (studentUserId && String(itemStudentUserId).trim() === String(studentUserId).trim()) return true;
+      }
 
       // 2. Student code matching
       const itemCode = item.student?.studentCode || item.studentCode || item.code;
       if (itemCode && student.studentCode && String(itemCode).trim() === String(student.studentCode).trim()) return true;
 
-      // 3. Name matching (exact or substring)
-      const itemName = (item.student?.name || item.studentName || item.name || item.student?.user?.name || item.user?.name || "").trim().toLowerCase();
+      // 3. Name matching (exact only — substring matching is too risky and can produce false positives)
+      const itemName = (item.student?.name || item.studentName || item.student?.user?.name || item.user?.name || "").trim().toLowerCase();
       const sName = (student.name || (student as any).user?.name || "").trim().toLowerCase();
-      if (itemName && sName && (itemName === sName || itemName.includes(sName) || sName.includes(itemName))) return true;
+      if (itemName && sName && itemName === sName) return true;
 
-      // 4. Index-based match fallback if submission count equals batch student count or if single student
-      if (totalBatchCount === 1 || (totalSubmissionsCount === totalBatchCount && totalSubmissionsCount > 0)) return true;
-
-      // 5. Fallback: if rawResults has only 1 submission item and it hasn't been matched yet
-      if (totalSubmissionsCount === 1) return true;
+      // 4. Last-resort fallback ONLY when the item carries no identifying information at all
+      if (!itemStudentId && !itemStudentUserId && !itemCode && !itemName) {
+        // Only safe when there is exactly one student in the roster
+        return true;
+      }
 
       return false;
     };
@@ -384,16 +441,48 @@ export async function getHomeworkSubmissions(
     // Build complete roster by iterating through batchStudents
     let combinedResults: any[] = [];
 
-    if (batchStudents.length > 0) {
+    // If the API returned a complete roster (from homeworksPayload.results), use it directly.
+    // This avoids the need for complex re-matching against batchStudents.
+
+    if (apiReturnedFullRoster) {
+      combinedResults = rawResults.map((item: any) => {
+        const existingStatus = String(item.status || "").toUpperCase();
+        const isLate = item.isLate ?? item.is_late ?? false;
+        const dueDate = homework?.dueDate;
+        const isOverdue = item.isOverdue ?? item.is_overdue ?? (dueDate ? new Date() > new Date(dueDate) : false);
+
+        let chip = item.chip;
+        if (!chip) {
+          if (existingStatus === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
+          else if (existingStatus === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+          else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
+        }
+
+        return {
+          ...item,
+          assignmentId: item.assignmentId || item.id || item.student?.id,
+          submissionId: item.submissionId ?? null,
+          student: {
+            id: item.student?.id,
+            name: item.student?.name,
+            studentCode: item.student?.studentCode,
+          },
+          status: existingStatus || "NOT_SUBMITTED",
+          chip,
+          submittedAt: item.submittedAt ?? null,
+          score: item.score ?? null,
+        };
+      });
+    } else if (batchStudents.length > 0) {
       let targetStudents = batchStudents;
       if (homework?.targetType === "SPECIFIC" && Array.isArray(homework?.studentIds) && homework.studentIds.length > 0) {
         targetStudents = batchStudents.filter((s) => homework.studentIds.includes(s.id));
       }
 
-      combinedResults = targetStudents.map((student, studentIndex) => {
+      combinedResults = targetStudents.map((student) => {
         // Find matching submission in rawResults
         const existingIdx = rawResults.findIndex(
-          (item: any, idx: number) => !matchedRawItemIndexes.has(idx) && isStudentMatch(item, student, targetStudents.length, rawResults.length, studentIndex)
+          (item: any, idx: number) => !matchedRawItemIndexes.has(idx) && isStudentMatch(item, student)
         );
         
         if (existingIdx !== -1) {
@@ -496,39 +585,42 @@ export async function getHomeworkSubmissions(
     }
 
     // Include any remaining submissions in rawResults that didn't match batchStudents
-    rawResults.forEach((item: any, idx: number) => {
-      if (!matchedRawItemIndexes.has(idx)) {
-        const studentName = item.student?.name || item.studentName || item.name || item.student?.user?.name || "Student";
-        const studentCode = item.student?.studentCode || item.studentCode || item.code || "";
-        const studentId = item.student?.id || item.studentId || item.id || `stu_${idx}`;
-        const submissionId = item.submissionId ?? item.submission?.id ?? item.id;
-        const status = item.status && item.status !== "NOT_SUBMITTED" ? item.status : (submissionId ? "SUBMITTED" : "NOT_SUBMITTED");
-        const isLate = item.isLate ?? item.is_late ?? false;
-        const isOverdue = item.isOverdue ?? item.is_overdue ?? false;
+    // (only needed for the fallback path — when using the full API roster, all items are already included)
+    if (!apiReturnedFullRoster) {
+      rawResults.forEach((item: any, idx: number) => {
+        if (!matchedRawItemIndexes.has(idx)) {
+          const studentName = item.student?.name || item.studentName || item.name || item.student?.user?.name || "Student";
+          const studentCode = item.student?.studentCode || item.studentCode || item.code || "";
+          const studentId = item.student?.id || item.studentId || item.id || `stu_${idx}`;
+          const submissionId = item.submissionId ?? item.submission?.id ?? item.id;
+          const status = item.status && item.status !== "NOT_SUBMITTED" ? item.status : (submissionId ? "SUBMITTED" : "NOT_SUBMITTED");
+          const isLate = item.isLate ?? item.is_late ?? false;
+          const isOverdue = item.isOverdue ?? item.is_overdue ?? false;
 
-        let chip = item.chip;
-        if (!chip) {
-          if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
-          else if (status === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
-          else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
+          let chip = item.chip;
+          if (!chip) {
+            if (status === "GRADED") chip = isLate ? "GRADED_LATE" : "GRADED";
+            else if (status === "SUBMITTED") chip = isLate ? "SUBMITTED_LATE" : "SUBMITTED";
+            else chip = isOverdue ? "OVERDUE" : "NOT_SUBMITTED";
+          }
+
+          combinedResults.push({
+            ...item,
+            assignmentId: item.assignmentId || item.id || studentId,
+            submissionId,
+            student: {
+              id: studentId,
+              name: studentName,
+              studentCode,
+            },
+            status,
+            chip,
+            submittedAt: item.submittedAt || item.submitted_at || item.createdAt || null,
+            score: item.score ?? item.grade ?? null,
+          });
         }
-
-        combinedResults.push({
-          ...item,
-          assignmentId: item.assignmentId || item.id || studentId,
-          submissionId,
-          student: {
-            id: studentId,
-            name: studentName,
-            studentCode,
-          },
-          status,
-          chip,
-          submittedAt: item.submittedAt || item.submitted_at || item.createdAt || null,
-          score: item.score ?? item.grade ?? null,
-        });
-      }
-    });
+      });
+    }
 
     // Apply client filters if requested
     if (filters?.status) {
@@ -542,7 +634,7 @@ export async function getHomeworkSubmissions(
       }
     }
 
-    const summary = rawPayload.summary ?? rawPayload.data?.summary ?? {
+    const summary = apiSummary ?? {
       totalAssigned: combinedResults.length,
       submitted: combinedResults.filter((r) => r.submissionId || r.status === "SUBMITTED" || r.status === "GRADED").length,
       graded: combinedResults.filter((r) => r.status === "GRADED").length,
@@ -569,21 +661,138 @@ export async function getHomeworkSubmissions(
 }
 
 /**
- * GET /homeworks/teacher/submissions/:submissionId
+ * GET /homeworks/teacher/:homeworkId/submissions/:submissionId
  * Retrieves detailed submission data (student answer, files, note) for grading.
  */
-export async function getSubmissionDetails(submissionId: string): Promise<ActionResult<SubmissionDetails>> {
+export async function getSubmissionDetails(submissionId: string, homeworkId?: string): Promise<ActionResult<SubmissionDetails>> {
   try {
-    const res = await universalApi<any>({
-      endpoint: `/homeworks/teacher/submissions/${submissionId}`,
-      method: "GET",
-    });
+    const candidateEndpoints: string[] = [
+      `/homeworks/teacher/submissions/${submissionId}`,
+    ];
+    if (homeworkId) {
+      candidateEndpoints.push(`/homeworks/teacher/${homeworkId}/submissions/${submissionId}`);
+    }
+    candidateEndpoints.push(`/homeworks/submissions/${submissionId}`);
+    candidateEndpoints.push(`/homeworks/teacher/submission/${submissionId}`);
 
-    if (!res.success) {
-      return { ok: false, error: res.message || "Failed to fetch submission details" };
+    let res: any = null;
+    let successfulEndpoint = "";
+
+    for (const ep of candidateEndpoints) {
+      const response = await universalApi<any>({
+        endpoint: ep,
+        method: "GET",
+      });
+      console.log(`[DEBUG getSubmissionDetails] tried "${ep}": success=${response.success}`);
+      if (response.success && response.data) {
+        res = response;
+        successfulEndpoint = ep;
+        break;
+      }
     }
 
-    return { ok: true, data: unwrap<SubmissionDetails>(res.data) };
+    if (res && res.success) {
+      const outerData = res.data?.data ?? res.data ?? {};
+
+      let sub: any =
+        outerData.submission ??
+        outerData.data?.submission ??
+        null;
+
+      let hw: any =
+        outerData.homework ??
+        outerData.data?.homework ??
+        sub?.homework ??
+        null;
+
+      let student: any =
+        outerData.student ??
+        outerData.data?.student ??
+        sub?.student ??
+        null;
+
+      if (!sub && (outerData.id || outerData.note !== undefined || outerData.attachments)) {
+        sub = outerData;
+        hw = hw ?? outerData.homework;
+        student = student ?? outerData.student;
+      }
+
+      if (sub) {
+        const details: SubmissionDetails = {
+          id: sub.id || submissionId,
+          note: sub.note ?? null,
+          attachments: Array.isArray(sub.attachments) ? sub.attachments : [],
+          submittedAt: sub.submittedAt || sub.submitted_at || new Date().toISOString(),
+          isLate: sub.isLate ?? sub.is_late ?? false,
+          status: sub.status || "SUBMITTED",
+          score: sub.score ?? sub.grade ?? null,
+          feedback: sub.feedback ?? null,
+          gradedAt: sub.gradedAt ?? null,
+          student: student || sub.student || { id: "student_1", name: "Student", studentCode: "STU" },
+          homework: hw || sub.homework || { id: homeworkId || "", title: "Homework", instruction: "", dueDate: "", maxScore: 100 },
+          isCompleted:
+            outerData.isCompleted ??
+            sub.isCompleted ??
+            (sub.score !== null && sub.score !== undefined ? sub.score > 0 : null),
+        };
+        return { ok: true, data: details };
+      }
+    }
+
+    // Fallback: If direct single-submission API is not available, look up from homework roster
+    if (homeworkId) {
+      const rosterRes = await getHomeworkSubmissions(homeworkId);
+      if (rosterRes.ok && rosterRes.data?.results) {
+        const matchingItem = rosterRes.data.results.find(
+          (r: any) => r.submissionId === submissionId || r.assignmentId === submissionId || r.student?.id === submissionId
+        );
+
+        if (matchingItem) {
+          const hwDetail = rosterRes.data.homework || { id: homeworkId, title: "Homework", instruction: "", dueDate: "", maxScore: 100 };
+          const details: SubmissionDetails = {
+            id: matchingItem.submissionId || submissionId,
+            note: (matchingItem as any).note || null,
+            attachments: Array.isArray((matchingItem as any).attachments) ? (matchingItem as any).attachments : [],
+            submittedAt: matchingItem.submittedAt || new Date().toISOString(),
+            isLate: matchingItem.isLate || false,
+            status: (matchingItem.status === "GRADED" ? "GRADED" : "SUBMITTED") as any,
+            score: matchingItem.score,
+            feedback: (matchingItem as any).feedback || null,
+            gradedAt: matchingItem.gradedAt || null,
+            student: matchingItem.student,
+            homework: hwDetail as any,
+            isCompleted: matchingItem.score !== null ? matchingItem.score > 0 : null,
+          };
+          return { ok: true, data: details };
+        }
+      }
+    }
+
+    // Fallback to local mock submission store if available
+    try {
+      const { initialMockSubmissions } = require("@/data/mock-homework");
+      if (initialMockSubmissions) {
+        for (const hwId of Object.keys(initialMockSubmissions)) {
+          const list = initialMockSubmissions[hwId] || [];
+          const found = list.find((s: any) => s.id === submissionId || `sub_${s.id}` === submissionId);
+          if (found) {
+            const detailRes = await getHomeworkDetail(hwId);
+            const hw = detailRes.ok ? detailRes.data : null;
+            return {
+              ok: true,
+              data: {
+                ...found,
+                student: found.student || { id: "student_1", name: "Student", studentCode: "STU-001" },
+                homework: hw || { id: hwId, title: "Homework", instruction: "", dueDate: "", maxScore: 100 },
+                isCompleted: found.score !== null ? found.score > 0 : null,
+              } as any,
+            };
+          }
+        }
+      }
+    } catch (e) {}
+
+    return { ok: false, error: "Failed to fetch submission details" };
   } catch (error: any) {
     return { ok: false, error: error.message || "Failed to fetch submission details" };
   }
@@ -597,15 +806,28 @@ export async function gradeSubmission(
   submissionId: string,
   payload: {
     score?: number | null;
-    feedback: string | null;
+    feedback?: string | null;
     isCompleted?: boolean;
   }
 ): Promise<ActionResult<Submission>> {
   try {
+    const cleanData: Record<string, any> = {};
+
+    if (payload.isCompleted !== undefined && payload.isCompleted !== null) {
+      cleanData.isCompleted = Boolean(payload.isCompleted);
+      cleanData.completed = Boolean(payload.isCompleted);
+    } else if (payload.score !== undefined && payload.score !== null) {
+      cleanData.score = Number(payload.score);
+    }
+
+    if (payload.feedback && typeof payload.feedback === "string" && payload.feedback.trim() !== "") {
+      cleanData.feedback = payload.feedback.trim();
+    }
+
     const res = await universalApi<any>({
       endpoint: `/homeworks/teacher/submissions/${submissionId}/grade`,
       method: "PATCH",
-      data: payload,
+      data: cleanData,
     });
 
     if (!res.success) {
@@ -794,7 +1016,17 @@ export async function getStudentHomeworkDetail(homeworkId: string): Promise<Acti
       homework = payload.assignment.homework;
     }
 
-    const submission = payload.submission ?? null;
+    let submission = payload.submission ?? null;
+    if (!submission) {
+      try {
+        const { initialMockSubmissions } = require("@/data/mock-homework");
+        if (initialMockSubmissions && initialMockSubmissions[homeworkId] && initialMockSubmissions[homeworkId].length > 0) {
+          const subs = initialMockSubmissions[homeworkId];
+          submission = subs[subs.length - 1];
+        }
+      } catch (e) {}
+    }
+
     const canSubmit = payload.canSubmit ?? true;
     const submitBlockedReason = payload.submitBlockedReason ?? null;
 
@@ -841,7 +1073,16 @@ export async function submitStudentHomework(
         if (!initialMockSubmissions[homeworkId]) {
           initialMockSubmissions[homeworkId] = [];
         }
-        const newSub: Submission = {
+        let studentId = "stu_01";
+        let studentName = "Student";
+        try {
+          const { getSession } = require("@/lib/api/cookies");
+          const session = await getSession();
+          if (session?.id) studentId = session.id;
+          if ((session as any)?.label) studentName = (session as any).label;
+        } catch (e) {}
+
+        const newSub: any = {
           id: `sub_${Date.now()}`,
           note: payload.note,
           submittedAt: new Date().toISOString(),
@@ -850,6 +1091,12 @@ export async function submitStudentHomework(
           score: null,
           feedback: null,
           gradedAt: null,
+          studentId,
+          student: {
+            id: studentId,
+            name: studentName,
+            studentCode: "STU-2026-001",
+          },
           attachments: payload.attachments.map((att, i) => ({
             id: `att_${Date.now()}_${i}`,
             type: att.type,
