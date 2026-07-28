@@ -806,15 +806,28 @@ export async function gradeSubmission(
   submissionId: string,
   payload: {
     score?: number | null;
-    feedback: string | null;
+    feedback?: string | null;
     isCompleted?: boolean;
   }
 ): Promise<ActionResult<Submission>> {
   try {
+    const cleanData: Record<string, any> = {};
+
+    if (payload.isCompleted !== undefined && payload.isCompleted !== null) {
+      cleanData.isCompleted = Boolean(payload.isCompleted);
+      cleanData.completed = Boolean(payload.isCompleted);
+    } else if (payload.score !== undefined && payload.score !== null) {
+      cleanData.score = Number(payload.score);
+    }
+
+    if (payload.feedback && typeof payload.feedback === "string" && payload.feedback.trim() !== "") {
+      cleanData.feedback = payload.feedback.trim();
+    }
+
     const res = await universalApi<any>({
       endpoint: `/homeworks/teacher/submissions/${submissionId}/grade`,
       method: "PATCH",
-      data: payload,
+      data: cleanData,
     });
 
     if (!res.success) {
