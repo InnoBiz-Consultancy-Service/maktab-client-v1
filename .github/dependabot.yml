@@ -1,0 +1,35 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    labels: ["dependencies"]
+    groups:
+      react:
+        { patterns: ["react", "react-dom", "@types/react", "@types/react-dom"] }
+      next: { patterns: ["next", "eslint-config-next", "@next/*"] }
+      tailwind:
+        {
+          patterns:
+            ["tailwindcss", "@tailwindcss/*", "prettier-plugin-tailwindcss"],
+        }
+      testing:
+        { patterns: ["jest", "jest-*", "@testing-library/*", "@types/jest"] }
+      linting:
+        {
+          patterns:
+            ["eslint", "eslint-*", "@eslint/*", "prettier", "typescript"],
+        }
+      commit-tooling: { patterns: ["husky", "lint-staged", "@commitlint/*"] }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: monthly }
+    commit-message: { prefix: "ci(deps)" }

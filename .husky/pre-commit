@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+
+echo "🔍 pre-commit: running quality gate..."
+
+pnpm exec lint-staged || {
+  echo "❌ lint-staged failed. Fix the errors above, then commit again."
+  exit 1
+}
+
+echo "🧠 typechecking..."
+pnpm run typecheck || { echo "❌ TypeScript errors. Commit blocked."; exit 1; }
+
+echo "🧪 running related tests..."
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx)$' || true)
+if [ -n "$STAGED" ]; then
+  echo "$STAGED" | xargs pnpm exec jest --bail --passWithNoTests --findRelatedTests || {
+    echo "❌ Tests failed. Commit blocked."; exit 1;
+  }
+fi
+
+# STRICT MODE — uncomment to also require a full build on every commit.
+# Adds 1-3 min to EVERY commit. Read the note below before enabling.
+# pnpm run build || { echo "❌ Build failed. Commit blocked."; exit 1; }
+
+echo "✅ pre-commit passed."

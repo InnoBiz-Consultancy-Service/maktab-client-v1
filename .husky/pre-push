@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+echo "🚦 pre-push: full verification."
+
+echo "1/4 🧠 typecheck"; pnpm run typecheck || { echo "❌ Push blocked."; exit 1; }
+echo "2/4 🔎 lint";      pnpm run lint      || { echo "❌ Push blocked."; exit 1; }
+echo "3/4 🧪 tests";     pnpm run test:ci   || { echo "❌ Push blocked."; exit 1; }
+echo "4/4 🏗️  build";    pnpm run build     || { echo "❌ Push blocked."; exit 1; }
+
+echo "✅ All checks passed. Pushing."

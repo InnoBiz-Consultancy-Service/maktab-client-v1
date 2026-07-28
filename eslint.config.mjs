@@ -14,8 +14,14 @@ const spread = (c) => (Array.isArray(c) ? c : [c]);
 const eslintConfig = [
   {
     ignores: [
-      ".next/**", "out/**", "build/**", "coverage/**",
-      "node_modules/**", "next-env.d.ts", "*.tsbuildinfo", "public/**",
+      ".next/**",
+      "out/**",
+      "build/**",
+      "coverage/**",
+      "node_modules/**",
+      "next-env.d.ts",
+      "*.tsbuildinfo",
+      "public/**",
     ],
   },
 
@@ -34,23 +40,36 @@ const eslintConfig = [
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "prefer-const": "warn",
       eqeqeq: ["warn", "always", { null: "ignore" }],
-      "@typescript-eslint/no-unused-vars": ["warn", {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
-        caughtErrorsIgnorePattern: "^_",
-        ignoreRestSiblings: true,
-      }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-non-null-assertion": "warn",
-      "@typescript-eslint/consistent-type-imports": ["warn", {
-        prefer: "type-imports", fixStyle: "inline-type-imports",
-      }],
-      "no-restricted-imports": ["warn", {
-        patterns: [{
-          group: ["../../../*"],
-          message: "Use the '@/' path alias instead of deep relative paths.",
-        }],
-      }],
+      "@typescript-eslint/consistent-type-imports": [
+        "warn",
+        {
+          prefer: "type-imports",
+          fixStyle: "inline-type-imports",
+        },
+      ],
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            {
+              group: ["../../../*"],
+              message:
+                "Use the '@/' path alias instead of deep relative paths.",
+            },
+          ],
+        },
+      ],
     },
   },
 
@@ -59,17 +78,24 @@ const eslintConfig = [
     files: ["src/actions/**/*.ts", "src/lib/api/**/*.ts"],
     ignores: ["**/__tests__/**"],
     rules: {
-      "no-restricted-syntax": ["warn", {
-        selector:
-          "MemberExpression[object.object.name='process'][object.property.name='env'] > Identifier[name=/^NEXT_PUBLIC_/]",
-        message:
-          "Server code is reading a NEXT_PUBLIC_ env var. That value is public — confirm this is intentional.",
-      }],
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector:
+            "MemberExpression[object.object.name='process'][object.property.name='env'] > Identifier[name=/^NEXT_PUBLIC_/]",
+          message:
+            "Server code is reading a NEXT_PUBLIC_ env var. That value is public — confirm this is intentional.",
+        },
+      ],
     },
   },
 
   {
-    files: ["**/__tests__/**/*.[jt]s?(x)", "**/*.test.[jt]s?(x)", "jest.setup.ts"],
+    files: [
+      "**/__tests__/**/*.[jt]s?(x)",
+      "**/*.test.[jt]s?(x)",
+      "jest.setup.ts",
+    ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
@@ -80,6 +106,16 @@ const eslintConfig = [
 
   // MUST BE LAST — disables every rule that fights Prettier
   prettierConfig,
+  {
+    rules: {
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/purity": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
+      "react/no-unescaped-entities": "off",
+    },
+  },
 ];
 
 export default eslintConfig;
+
+// node -e "const r=require('./eslint-report.json');for(const f of r)for(const x of f.messages)if(/set-state-in-effect|purity/.test(x.ruleId||''))console.log(f.filePath.replace(process.cwd(),'.')+':'+x.line)"

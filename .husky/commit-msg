@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+pnpm exec commitlint --edit "$1" || {
+  echo ""
+  echo "❌ Commit message does not follow Conventional Commits."
+  echo "   Format:  <type>(<scope>): <subject>"
+  echo "   Example: feat(attendance): add bulk mark-present action"
+  echo "   Types: feat fix docs style refactor perf test build ci chore revert security"
+  echo ""
+  exit 1
+}
