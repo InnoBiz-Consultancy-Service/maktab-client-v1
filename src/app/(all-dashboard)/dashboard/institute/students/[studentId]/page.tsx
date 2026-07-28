@@ -1,81 +1,135 @@
-import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { getStudentSummaryAction } from "@/actions/attendance/get-student-summary";
-import { getStudentHistoryAction } from "@/actions/attendance/get-student-history";
-import { AttendanceSummary } from "@/components/parent/attendance/AttendanceSummary";
-import { AttendanceHistory } from "@/components/parent/attendance/AttendanceHistory";
+import { ArrowLeft, User, Phone, BookOpen, Calendar, Award } from "lucide-react";
 import { Card } from "@/components/ui";
+import { getInstituteStudentDetailAction } from "@/actions/dashboard/institute-dashboard";
+import { ProgressGauges } from "@/components/dashboard/shared/ProgressGauges";
+import { PointsBreakdownCard } from "@/components/dashboard/shared/PointsBreakdownCard";
 
-interface Props {
+export default async function InstituteStudentDetailPage({
+  params,
+}: {
   params: Promise<{ studentId: string }>;
-}
-
-export default async function InstituteStudentDetailPage({ params }: Props) {
+}) {
   const { studentId } = await params;
+  const res = await getInstituteStudentDetailAction(studentId);
 
-  const [summaryRes, historyRes] = await Promise.all([
-    getStudentSummaryAction(studentId),
-    getStudentHistoryAction(studentId),
-  ]);
-
-  if (!summaryRes.ok) {
+  if (!res.ok) {
     return (
       <div className="mx-auto w-full max-w-3xl">
-        <Card className="py-10 text-center text-sm text-ink-soft">
-          {summaryRes.error}
+        <Link
+          href="/dashboard/institute/students"
+          className="mb-4 inline-flex items-center gap-1 text-sm text-gold-600 hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to Students
+        </Link>
+        <Card className="py-12 text-center text-sm text-ink-soft">
+          {res.error}
         </Card>
       </div>
     );
   }
 
-  const summary = summaryRes.data;
-  const history = historyRes.ok ? historyRes.data : [];
+  const { profile, progress, points, pointsBreakdown } = res.data;
+
+  const progressRates = {
+    lessonCompletionRate: progress?.lesson?.rate ?? 0,
+    homeworkSubmissionRate: progress?.homework?.rate ?? 0,
+    attendanceRate: progress?.attendance?.rate ?? 0,
+  };
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
-      <header className="mb-5">
-        <button
-          type="button"
-          onClick={() => history.length}
-          className="hidden"
-          aria-hidden
-        />
-        <Link
-          href="/dashboard/institute/attendance"
-          className="mb-3 inline-flex items-center gap-1 text-sm text-ink-soft transition-colors hover:text-night-900"
-        >
-          <ChevronLeft className="h-4 w-4" aria-hidden />
-          Back
-        </Link>
+    <div className="mx-auto w-full max-w-4xl space-y-6">
+      <Link
+        href="/dashboard/institute/students"
+        className="inline-flex items-center gap-1 text-sm font-medium text-gold-600 hover:underline"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to Students
+      </Link>
 
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-quran-soft font-display text-base font-bold text-quran">
-            {summary.student.name.charAt(0).toUpperCase()}
-          </span>
+      {/* Header Profile */}
+      <Card className="p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-quran-soft font-display text-2xl font-bold text-quran">
+              {profile.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-night-900">{profile.name}</h1>
+                <span className="rounded-full bg-cream-100 px-2.5 py-0.5 text-xs font-semibold text-night-900">
+                  {profile.studentCode}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-ink-soft">
+                {profile.class} • Joined {profile.joinDate ?? "N/A"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1 rounded-xl bg-gold-500/10 p-3 text-right">
+            <span className="text-xs font-medium text-ink-soft">Total Points</span>
+            <span className="font-display text-2xl font-bold text-night-900">
+              {points} pts
+            </span>
+          </div>
+        </div>
+
+        {/* Parent & Teacher Meta */}
+        <div className="mt-6 grid grid-cols-1 gap-4 border-t border-cream-200 pt-4 sm:grid-cols-3">
           <div>
-            <h1 className="font-display text-xl font-bold text-night-900">
-              {summary.student.name}
-            </h1>
-            <p className="text-sm text-ink-soft">
-              {summary.student.class} · {summary.student.studentCode}
+            <span className="text-xs text-ink-soft">Batch</span>
+            <p className="text-sm font-semibold text-night-900">
+              {profile.batches?.map((b) => b.name).join(", ") || "Unassigned"}
+            </p>
+          </div>
+          <div>
+            <span className="text-xs text-ink-soft">Teacher</span>
+            <p className="text-sm font-semibold text-night-900">
+              {profile.teacher?.name || "Unassigned"}
+            </p>
+          </div>
+          <div>
+            <span className="text-xs text-ink-soft">Parent</span>
+            <p className="text-sm font-semibold text-night-900">
+              {profile.parent?.name || "N/A"}{" "}
+              {profile.parent?.phone && `(${profile.parent.phone})`}
             </p>
           </div>
         </div>
-      </header>
+      </Card>
 
-      <section className="mb-8">
-        <h2 className="mb-3 font-display text-base font-bold text-night-900">
-          Summary
-        </h2>
-        <AttendanceSummary studentId={studentId} initial={summary} />
-      </section>
+      {/* Progress Gauges */}
+      <ProgressGauges progress={progressRates} title="Student Progress Breakdown" />
 
-      <section>
-        <h2 className="mb-3 font-display text-base font-bold text-night-900">
-          History
-        </h2>
-        <AttendanceHistory studentId={studentId} initial={history} />
-      </section>
+      {/* Points Breakdown */}
+      <PointsBreakdownCard points={points} breakdown={pointsBreakdown} />
+
+      {/* Record Stats */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Card className="p-4">
+          <span className="text-xs font-medium text-ink-soft">Lessons</span>
+          <p className="mt-1 text-xl font-bold text-night-900">
+            {progress?.lesson?.completed ?? 0} / {progress?.lesson?.total ?? 0}
+          </p>
+          <span className="text-xs text-gold-600">Completed Rate: {progress?.lesson?.rate ?? 0}%</span>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-medium text-ink-soft">Homework</span>
+          <p className="mt-1 text-xl font-bold text-night-900">
+            {progress?.homework?.submitted ?? 0} / {progress?.homework?.total ?? 0}
+          </p>
+          <span className="text-xs text-arabic">On-Time: {progress?.homework?.onTime ?? 0} | Avg: {progress?.homework?.avgScore ?? 0}</span>
+        </Card>
+
+        <Card className="p-4">
+          <span className="text-xs font-medium text-ink-soft">Attendance</span>
+          <p className="mt-1 text-xl font-bold text-night-900">
+            {progress?.attendance?.present ?? 0} Present
+          </p>
+          <span className="text-xs text-quran">Late: {progress?.attendance?.late ?? 0} | Absent: {progress?.attendance?.absent ?? 0}</span>
+        </Card>
+      </div>
     </div>
   );
 }

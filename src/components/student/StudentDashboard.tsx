@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Play, ArrowRight, Target, Sparkles } from "lucide-react";
+import { Play, ArrowRight, Target, Sparkles, Trophy } from "lucide-react";
 import { Card } from "@/components/ui";
 import { subjects } from "@/lib/dummy/student";
 import type { StudentOverview } from "@/actions/student/overview";
@@ -55,6 +55,37 @@ export function StudentDashboard({
           </p>
         )}
       </section>
+
+      {/* Leaderboard & Standings Shortcut Card */}
+      <Link href="/dashboard/leaderboard" className="block mb-6 group">
+        <div className="relative overflow-hidden rounded-xl border border-gold-500/40 bg-gradient-to-r from-gold-500/15 via-gold-500/10 to-cream-50/80 p-4 transition-all duration-300 hover:border-gold-500 hover:shadow-[0_0_24px_rgba(245,184,51,0.25)] hover:scale-[1.01]">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-500 text-night-900 shadow-md group-hover:scale-110 transition-transform">
+                <Trophy className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display text-base font-bold text-night-900 group-hover:text-gold-700 transition-colors">
+                    Leaderboard & Standings
+                  </h2>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gold-500/20 px-2 py-0.5 text-[10px] font-extrabold text-gold-800">
+                    <Sparkles className="h-3 w-3 text-gold-600" /> Live Rankings
+                  </span>
+                </div>
+                <p className="text-xs text-ink-soft truncate mt-0.5">
+                  View your class position, live points ranking & frozen final batch standings.
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0 flex items-center gap-1 text-xs font-extrabold text-night-900 bg-gold-500 px-3.5 py-2 rounded-lg shadow-sm group-hover:bg-gold-400 transition-colors">
+              <span>View Leaderboard</span>
+              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </div>
+        </div>
+      </Link>
 
       {/* Streak + daily goal */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -152,6 +183,7 @@ export function StudentDashboard({
           <BadgeGrid badges={badges} />
         </Card>
       </section>
+
       {/* Homework Overview Section */}
       {homeworkOverview && (
         <section className="mb-6 space-y-4">

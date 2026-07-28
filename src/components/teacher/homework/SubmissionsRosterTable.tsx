@@ -187,7 +187,7 @@ export function SubmissionsRosterTable({ homeworkId, homework, results = [] }: S
                     <td className="px-6 py-4 text-right">
                       {canGrade ? (
                         <Link
-                          href={`/dashboard/teacher/homework/submissions/${activeSubmissionId}`}
+                          href={`/dashboard/teacher/homework/${homeworkId}/submissions/${activeSubmissionId}/grade`}
                           className={
                             row?.status === "GRADED"
                               ? "inline-flex items-center justify-center gap-2 font-display font-semibold rounded-full transition-all duration-150 active:scale-95 hover:scale-[1.02] bg-transparent text-night-900 border border-cream-200 hover:bg-cream-50 min-h-[38px] px-4 text-sm"

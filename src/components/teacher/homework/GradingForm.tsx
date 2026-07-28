@@ -13,9 +13,10 @@ import { formatCalendarDate } from "@/lib/utils/date";
 
 interface GradingFormProps {
   submission: SubmissionDetails;
+  homeworkId: string;
 }
 
-export function GradingForm({ submission }: GradingFormProps) {
+export function GradingForm({ submission, homeworkId }: GradingFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +57,7 @@ export function GradingForm({ submission }: GradingFormProps) {
 
     if (result.ok) {
       toast.success("Submission graded successfully!");
-      router.push(`/dashboard/teacher/homework/${hw?.id}/submissions`);
+      router.push(`/dashboard/teacher/homework/${homeworkId}/submissions`);
       router.refresh();
     } else {
       toast.error(result.error);
@@ -75,7 +76,7 @@ export function GradingForm({ submission }: GradingFormProps) {
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
-          href={`/dashboard/teacher/homework/${hw?.id}/submissions`}
+          href={`/dashboard/teacher/homework/${homeworkId}/submissions`}
           className="mb-3 inline-flex items-center gap-1 text-sm text-ink-soft transition-colors hover:text-night-900"
         >
           <ArrowLeft className="h-4 w-4" />
