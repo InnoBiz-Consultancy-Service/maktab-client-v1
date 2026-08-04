@@ -12,6 +12,7 @@ import {
   Wallet,
   MessageSquare,
   Trophy,
+  AlertCircle,
   type LucideIcon,
   Layers,
 } from "lucide-react";
@@ -34,4 +35,5 @@ export const navIcons: Record<NavIconName, LucideIcon> = {
   progress: Trophy,
   batches: Layers,
   homework: BookOpen,
+  complaints: AlertCircle,
 };

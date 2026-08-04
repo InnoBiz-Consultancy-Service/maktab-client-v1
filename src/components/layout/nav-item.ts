@@ -16,7 +16,8 @@ export type NavIconName =
   | "learn"
   | "progress"
   | "batches"
-  | "homework";
+  | "homework"
+  | "complaints";
 
 export interface NavItem {
   href: string;
@@ -48,6 +49,11 @@ const adminNav: RoleNav = {
       label: "Content",
       icon: "content",
       mobile: true,
+    },
+    {
+      href: "/dashboard/admin/complaints",
+      label: "Complaints",
+      icon: "complaints",
     },
     {
       href: "/dashboard/admin/settings",
@@ -85,6 +91,11 @@ const instituteNav: RoleNav = {
       href: "/dashboard/institute/batches",
       label: "Batches",
       icon: "batches",
+    },
+    {
+      href: "/dashboard/institute/complaints",
+      label: "Complaints",
+      icon: "complaints",
     },
     {
       href: "/dashboard/institute/settings",
@@ -125,6 +136,11 @@ const teacherNav: RoleNav = {
     },
     { href: "/dashboard/teacher/marks", label: "Marks", icon: "marks" },
     {
+      href: "/dashboard/teacher/complaints",
+      label: "Complaints",
+      icon: "complaints",
+    },
+    {
       href: "/dashboard/teacher/settings",
       label: "Settings",
       icon: "settings",
@@ -156,6 +172,11 @@ const parentNav: RoleNav = {
       mobile: true,
     },
     { href: "/dashboard/parent/messages", label: "Messages", icon: "messages" },
+    {
+      href: "/dashboard/parent/complaints",
+      label: "Complaints",
+      icon: "complaints",
+    },
     {
       href: "/dashboard/parent/settings",
       label: "Settings",
