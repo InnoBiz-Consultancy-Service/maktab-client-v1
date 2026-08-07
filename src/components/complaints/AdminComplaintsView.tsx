@@ -36,17 +36,17 @@ const STAT_CARDS = (stats: ComplaintStatistics) => [
     label: "Member Complaints",
     icon: Users,
     color: "text-arabic bg-arabic/10",
-    total: stats.totalMemberComplaints,
-    pending: stats.pendingMemberComplaints,
-    resolved: stats.resolvedMemberComplaints,
+    total: stats.memberComplaints.total,
+    pending: stats.memberComplaints.byStatus.PENDING,
+    resolved: stats.memberComplaints.byStatus.RESOLVED,
   },
   {
     label: "Institute Complaints",
     icon: Building2,
     color: "text-studies bg-studies/10",
-    total: stats.totalInstituteComplaints,
-    pending: stats.pendingInstituteComplaints,
-    resolved: stats.resolvedInstituteComplaints,
+    total: stats.instituteComplaints.total,
+    pending: stats.instituteComplaints.byStatus.PENDING,
+    resolved: stats.instituteComplaints.byStatus.RESOLVED,
   },
 ];
 
@@ -267,7 +267,7 @@ export function AdminComplaintsView({
                       })}
                     </span>
                   </div>
-                  <p className="line-clamp-2 text-sm text-night-900">{c.report}</p>
+                  <p className="line-clamp-2 text-sm text-night-900">{c.reportText}</p>
                   <p className="text-xs text-ink-soft">
                     {c.reporter?.name ?? "—"} · {c.institute?.name ?? "—"}
                   </p>
@@ -276,7 +276,7 @@ export function AdminComplaintsView({
                 {/* Desktop */}
                 <div className="hidden grid-cols-[1fr_160px_140px_80px] items-center gap-4 px-5 py-4 sm:grid">
                   <div>
-                    <p className="line-clamp-2 text-sm text-night-900">{c.report}</p>
+                    <p className="line-clamp-2 text-sm text-night-900">{c.reportText}</p>
                     <p className="mt-0.5 text-xs text-ink-soft">{c.institute?.name ?? "—"}</p>
                   </div>
                   <div>

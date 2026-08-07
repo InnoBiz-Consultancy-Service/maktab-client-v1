@@ -43,6 +43,17 @@ export function TeacherParentComplaintsView({
   const [detailComplaint, setDetailComplaint] = useState<AnyComplaint | null>(null);
   const [isRefreshing, startRefresh] = useTransition();
 
+  // Optimistically prepend newly filed complaint to the list —
+  // avoids depending on GET /complains/my which may not be live yet.
+  const handleComplaintFiled = (complaint: MemberComplaint | InstituteComplaint, layer: "MEMBER" | "INSTITUTE") => {
+    if (layer === "MEMBER") {
+      setMemberComplaints((prev) => [complaint as MemberComplaint, ...prev]);
+    } else {
+      setInstituteComplaints((prev) => [complaint as InstituteComplaint, ...prev]);
+    }
+    setPage(1);
+  };
+
   const refresh = () => {
     startRefresh(async () => {
       const res = await getMyComplaintsAction();
@@ -64,7 +75,7 @@ export function TeacherParentComplaintsView({
     if (filters.status !== "ALL" && c.status !== filters.status) return false;
     if (filters.search) {
       const q = filters.search.toLowerCase();
-      if (!c.report.toLowerCase().includes(q) && !c.institute.name.toLowerCase().includes(q))
+      if (!c.reportText.toLowerCase().includes(q) && !c.institute?.name?.toLowerCase().includes(q))
         return false;
     }
     if (filters.fromDate && c.createdAt < filters.fromDate) return false;
@@ -86,14 +97,15 @@ export function TeacherParentComplaintsView({
   const paginated = sorted.slice((page - 1) * PAGE_LIMIT, page * PAGE_LIMIT);
 
   const pagination: ComplaintPagination = {
-    total,
+    totalCount: total,
     page,
     limit: PAGE_LIMIT,
     totalPages,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
   };
 
   const handleWithdraw = async (id: string) => {
-    // Determine which layer
     const complaint = allComplaints.find((c) => c.id === id);
     if (!complaint) return;
 
@@ -106,7 +118,14 @@ export function TeacherParentComplaintsView({
       return;
     }
 
-    refresh();
+    // Optimistically remove from local state — refresh() depends on /complains/my
+    // which is not yet implemented on the backend.
+    if (complaint.layer === "MEMBER") {
+      setMemberComplaints((prev) => prev.filter((c) => c.id !== id));
+    } else {
+      setInstituteComplaints((prev) => prev.filter((c) => c.id !== id));
+    }
+    toast.success("Complaint withdrawn.");
     setDetailComplaint(null);
   };
 
@@ -192,18 +211,26 @@ export function TeacherParentComplaintsView({
                     </span>
                     <ComplaintStatusBadge status={c.status} />
                   </div>
-                  <p className="line-clamp-2 text-sm text-night-900">{c.report}</p>
+                  <p className="line-clamp-2 text-sm text-night-900">{c.reportText}</p>
                   <p className="text-xs text-ink-soft">
-                    Against: <span className="font-medium">{c.institute?.name ?? "—"}</span>
-                    {c.layer === "MEMBER" && (
-                      <>
-                        {" "}
-                        ·{" "}
-                        <span className="font-medium">
-                          {(c as MemberComplaint).reported?.name ?? "—"}
-                        </span>
-                      </>
-                    )}
+                    Against:{" "}
+                    <span className="font-medium">
+                      {(() => {
+                        if (c.layer === "INSTITUTE") {
+                          return c.institute?.name || (c.instituteId ? `Institute (ID: ${c.instituteId.slice(-8)})` : "Institute");
+                        }
+                        const mc = c as MemberComplaint;
+                        const targetName = mc.reported?.name;
+                        const targetRole = mc.reportedRole ? mc.reportedRole.charAt(0) + mc.reportedRole.slice(1).toLowerCase() : "";
+                        const targetId = mc.reportedId ? `ID: ${mc.reportedId.slice(-8)}` : "";
+
+                        if (targetName) return `${targetName}${targetRole ? ` (${targetRole})` : ""}`;
+                        if (targetRole && targetId) return `${targetRole} (${targetId})`;
+                        if (targetRole) return targetRole;
+                        if (targetId) return targetId;
+                        return c.institute?.name || (c.instituteId ? `Institute (ID: ${c.instituteId.slice(-8)})` : "—");
+                      })()}
+                    </span>
                   </p>
                 </div>
                 <p className="shrink-0 text-xs text-ink-soft">
@@ -229,7 +256,8 @@ export function TeacherParentComplaintsView({
       {/* Modals */}
       <FileComplaintModal
         open={fileModalOpen}
-        onClose={() => { setFileModalOpen(false); refresh(); }}
+        onClose={() => setFileModalOpen(false)}
+        onSuccess={handleComplaintFiled}
         defaultInstituteId={defaultInstituteId}
         role={role}
       />

@@ -121,7 +121,7 @@ export function ComplaintDetailModal({
               Report
             </p>
             <p className="rounded-lg border border-cream-200 bg-cream-100 p-3 text-sm leading-relaxed text-night-900 break-words">
-              {complaint.report}
+              {complaint.reportText}
             </p>
           </div>
 
@@ -130,10 +130,10 @@ export function ComplaintDetailModal({
             <div className="rounded-lg border border-cream-200 bg-cream-100 p-3">
               <p className="mb-1 text-xs text-ink-soft">Filed by</p>
               <p className="font-semibold text-night-900">
-                {complaint.reporter?.name ?? "—"}
+                {complaint.reporter?.name ?? complaint.reporterRole ?? "—"}
               </p>
               <p className="text-xs text-ink-soft capitalize">
-                {complaint.reporter?.role?.toLowerCase() ?? "—"}
+                {complaint.reporter?.role?.toLowerCase() ?? complaint.reporterRole?.toLowerCase() ?? "—"}
               </p>
             </div>
 
@@ -141,7 +141,10 @@ export function ComplaintDetailModal({
               <div className="rounded-lg border border-cream-200 bg-cream-100 p-3">
                 <p className="mb-1 text-xs text-ink-soft">Reported</p>
                 <p className="font-semibold text-night-900">
-                  {(complaint as MemberComplaint).reported?.name ?? "—"}
+                  {(complaint as MemberComplaint).reported?.name
+                    ?? ((complaint as MemberComplaint).reportedId
+                      ? `ID: ${(complaint as MemberComplaint).reportedId!.slice(-8)}`
+                      : "—")}
                 </p>
                 <p className="text-xs text-ink-soft capitalize">
                   {(complaint as MemberComplaint).reportedRole?.toLowerCase() ?? "—"}
@@ -152,7 +155,7 @@ export function ComplaintDetailModal({
             <div className="rounded-lg border border-cream-200 bg-cream-100 p-3">
               <p className="mb-1 text-xs text-ink-soft">Institute</p>
               <p className="font-semibold text-night-900">
-                {complaint.institute?.name ?? "—"}
+                {complaint.institute?.name ?? complaint.instituteId ?? "—"}
               </p>
             </div>
 

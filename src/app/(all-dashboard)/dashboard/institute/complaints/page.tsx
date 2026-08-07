@@ -25,7 +25,7 @@ export default async function InstituteComplaintsPage() {
     );
   }
 
-  const initialData = res.data ?? { data: [], pagination: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+  const initialData = res.data ?? { data: [], pagination: { totalCount: 0, page: 1, limit: 10, totalPages: 0, hasNextPage: false, hasPrevPage: false } };
 
   return <InstituteComplaintsView initialData={initialData} />;
 }

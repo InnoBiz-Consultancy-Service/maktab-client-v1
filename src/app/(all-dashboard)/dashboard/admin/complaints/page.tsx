@@ -15,16 +15,12 @@ export const metadata = {
 
 const EMPTY_PAGINATED = {
   data: [],
-  pagination: { total: 0, page: 1, limit: 10, totalPages: 0 },
+  pagination: { totalCount: 0, page: 1, limit: 10, totalPages: 0, hasNextPage: false, hasPrevPage: false },
 };
 
 const EMPTY_STATS = {
-  totalMemberComplaints: 0,
-  totalInstituteComplaints: 0,
-  pendingMemberComplaints: 0,
-  pendingInstituteComplaints: 0,
-  resolvedMemberComplaints: 0,
-  resolvedInstituteComplaints: 0,
+  memberComplaints: { total: 0, byStatus: { PENDING: 0, RESOLVED: 0 } },
+  instituteComplaints: { total: 0, byStatus: { PENDING: 0, RESOLVED: 0 } },
 };
 
 export default async function AdminComplaintsPage() {

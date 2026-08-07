@@ -82,8 +82,14 @@ export function InstituteComplaintsView({
     }
   };
 
-  const complaints = data?.data ?? [];
-  const pagination = data?.pagination;
+  const complaints: MemberComplaint[] = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.data)
+    ? data.data
+    : [];
+  const pagination = Array.isArray(data)
+    ? { totalCount: complaints.length, page: 1, limit: 10, totalPages: 1, hasNextPage: false, hasPrevPage: false }
+    : data?.pagination;
 
   return (
     <div className="space-y-6">
@@ -100,7 +106,7 @@ export function InstituteComplaintsView({
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         {[
-          { label: "Total", value: pagination?.total ?? 0 },
+          { label: "Total", value: pagination?.totalCount ?? 0 },
           { label: "Pending", value: complaints.filter((c) => c.status === "PENDING").length },
           { label: "Resolved", value: complaints.filter((c) => c.status === "RESOLVED").length },
         ].map((stat) => (
@@ -161,22 +167,32 @@ export function InstituteComplaintsView({
                     })}
                   </span>
                 </div>
-                <p className="line-clamp-2 text-sm text-night-900">{c.report}</p>
+                <p className="line-clamp-2 text-sm text-night-900">{c.reportText}</p>
                 <p className="text-xs text-ink-soft">
-                  {c.reporter?.name ?? "—"} → {c.reported?.name ?? "—"} ({c.reportedRole ?? "—"})
+                  {c.reporter?.name ?? c.reporterRole ?? "—"} &rarr;{" "}
+                  {c.reported?.name ?? (c.reportedId ? `ID: ${c.reportedId.slice(-8)}` : "—")}{" "}
+                  ({c.reportedRole ?? "—"})
                 </p>
               </div>
 
               {/* Desktop layout */}
               <div className="hidden grid-cols-[1fr_120px_140px_120px_80px] items-center gap-4 px-5 py-4 sm:grid">
-                <p className="line-clamp-2 text-sm text-night-900">{c.report}</p>
+                <p className="line-clamp-2 text-sm text-night-900">{c.reportText}</p>
                 <div>
-                  <p className="text-sm font-medium text-night-900">{c.reporter?.name ?? "—"}</p>
-                  <p className="text-xs capitalize text-ink-soft">{c.reporter?.role?.toLowerCase() ?? "—"}</p>
+                  <p className="text-sm font-medium text-night-900">
+                    {c.reporter?.name ?? c.reporterRole ?? "—"}
+                  </p>
+                  <p className="text-xs capitalize text-ink-soft">
+                    {c.reporter?.role?.toLowerCase() ?? c.reporterRole?.toLowerCase() ?? "—"}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-night-900">{c.reported?.name ?? "—"}</p>
-                  <p className="text-xs capitalize text-ink-soft">{c.reportedRole?.toLowerCase() ?? "—"}</p>
+                  <p className="text-sm font-medium text-night-900">
+                    {c.reported?.name ?? (c.reportedId ? `ID: ${c.reportedId.slice(-8)}` : "—")}
+                  </p>
+                  <p className="text-xs capitalize text-ink-soft">
+                    {c.reportedRole?.toLowerCase() ?? "—"}
+                  </p>
                 </div>
                 <p className="text-xs text-ink-soft">
                   {new Date(c.createdAt).toLocaleDateString("en-GB", {

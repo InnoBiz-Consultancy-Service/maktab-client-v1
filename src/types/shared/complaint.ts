@@ -9,7 +9,7 @@ export type ReportedRole = "TEACHER" | "STUDENT" | "PARENT";
 export type ComplaintSortBy = "createdAt" | "updatedAt" | "status";
 export type SortOrder = "asc" | "desc";
 
-// ─── Shared sub-shapes ───────────────────────────────────────────────────────
+// ─── Shared sub-shapes (from API response) ───────────────────────────────────
 
 export interface ComplaintReporter {
   id: string;
@@ -26,32 +26,46 @@ export interface ComplaintTarget {
 export interface ComplaintInstitute {
   id: string;
   name: string;
+  email?: string;
 }
 
 // ─── Layer 1 — Member Complaint ───────────────────────────────────────────────
 
 export interface MemberComplaint {
   id: string;
-  report: string;
+  reportText: string;
   status: ComplaintStatus;
-  reportedRole: ReportedRole;
-  reporter: ComplaintReporter;
-  reported: ComplaintTarget;
-  institute: ComplaintInstitute;
+  reportedRole: ReportedRole | null;
+  reportedId: string | null;
+  reporterId: string;
+  reporterRole: "TEACHER" | "PARENT";
+  instituteId: string;
+  isDeleted: boolean;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  // Populated by backend joins (may be present in responses)
+  reporter?: ComplaintReporter;
+  reported?: ComplaintTarget;
+  institute?: ComplaintInstitute;
 }
 
 // ─── Layer 2 — Institute Complaint ───────────────────────────────────────────
 
 export interface InstituteComplaint {
   id: string;
-  report: string;
+  reportText: string;
   status: ComplaintStatus;
-  reporter: ComplaintReporter;
-  institute: ComplaintInstitute;
+  reporterId: string;
+  reporterRole: "TEACHER" | "PARENT";
+  instituteId: string;
+  isDeleted: boolean;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  // Populated by backend joins (may be present in responses)
+  reporter?: ComplaintReporter;
+  institute?: ComplaintInstitute;
 }
 
 // ─── "My Complaints" — combined view for the reporter ────────────────────────
@@ -74,10 +88,12 @@ export interface MyComplaintsData {
 // ─── Pagination ───────────────────────────────────────────────────────────────
 
 export interface ComplaintPagination {
-  total: number;
   page: number;
   limit: number;
+  totalCount: number;
   totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 export interface PaginatedComplaints<T> {
@@ -103,28 +119,53 @@ export interface ComplaintQueryParams {
 // ─── Statistics (Admin) ───────────────────────────────────────────────────────
 
 export interface ComplaintStatistics {
-  totalMemberComplaints: number;
-  totalInstituteComplaints: number;
-  pendingMemberComplaints: number;
-  pendingInstituteComplaints: number;
-  resolvedMemberComplaints: number;
-  resolvedInstituteComplaints: number;
+  memberComplaints: {
+    total: number;
+    byStatus: {
+      PENDING: number;
+      RESOLVED: number;
+    };
+  };
+  instituteComplaints: {
+    total: number;
+    byStatus: {
+      PENDING: number;
+      RESOLVED: number;
+    };
+  };
 }
 
 // ─── Payloads ─────────────────────────────────────────────────────────────────
 
 export interface FileMemberComplaintPayload {
-  report: string;
-  reportedId: string;
-  reportedRole: ReportedRole;
-  instituteId: string;
+  reportText: string;
+  reportedId?: string;
+  reportedRole?: ReportedRole;
+  instituteId?: string;
 }
 
 export interface FileInstituteComplaintPayload {
-  report: string;
-  instituteId: string;
+  reportText: string;
+  instituteId?: string;
 }
 
 export interface UpdateComplaintStatusPayload {
   status: ComplaintStatus;
+}
+
+// ─── Directory & Lookup Types ──────────────────────────────────────────────────
+
+export interface TeacherDirectoryItem {
+  id: string;
+  name: string;
+}
+
+export interface ParentInstituteItem {
+  id: string;
+  name: string;
+}
+
+export interface GetTeacherDirectoryParams {
+  instituteId?: string;
+  search?: string;
 }

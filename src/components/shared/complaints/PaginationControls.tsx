@@ -17,10 +17,10 @@ export function PaginationControls({
   onPageChange,
   onLimitChange,
 }: PaginationControlsProps) {
-  const { page, totalPages, total, limit } = pagination;
+  const { page, totalPages, totalCount, limit } = pagination;
 
-  const from = total === 0 ? 0 : (page - 1) * limit + 1;
-  const to = Math.min(page * limit, total);
+  const from = totalCount === 0 ? 0 : (page - 1) * limit + 1;
+  const to = Math.min(page * limit, totalCount);
 
   return (
     <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
@@ -31,7 +31,7 @@ export function PaginationControls({
           {from}–{to}
         </span>{" "}
         of{" "}
-        <span className="font-semibold text-night-900">{total}</span>{" "}
+        <span className="font-semibold text-night-900">{totalCount}</span>{" "}
         complaints
       </p>
 

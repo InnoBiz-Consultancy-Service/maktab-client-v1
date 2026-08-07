@@ -13,16 +13,10 @@ import type {
   FileMemberComplaintPayload,
   FileInstituteComplaintPayload,
   UpdateComplaintStatusPayload,
+  TeacherDirectoryItem,
+  ParentInstituteItem,
+  GetTeacherDirectoryParams,
 } from "@/types/shared/complaint";
-import {
-  initialMockMemberComplaints,
-  initialMockInstituteComplaints,
-  initialMockStatistics,
-} from "@/data/mock-complaints";
-
-// In-memory mock store for fallbacks
-let mockMemberComplaints = [...initialMockMemberComplaints];
-let mockInstituteComplaints = [...initialMockInstituteComplaints];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -44,32 +38,24 @@ function buildQueryString(params: ComplaintQueryParams): string {
 }
 
 function unwrapData<T>(raw: unknown): T {
-  if (raw && typeof raw === "object" && "data" in raw) {
-    return (raw as { data: T }).data;
+  if (
+    raw &&
+    typeof raw === "object" &&
+    "data" in raw &&
+    (raw as { data: unknown }).data !== undefined
+  ) {
+    const rawObj = raw as { data: unknown; pagination?: unknown };
+    // If raw itself has 'pagination', it's already unwrapped PaginatedComplaints
+    if ("pagination" in rawObj) {
+      return raw as T;
+    }
+    return rawObj.data as T;
   }
   return raw as T;
 }
 
-function paginateArray<T>(
-  items: T[],
-  page = 1,
-  limit = 10,
-): PaginatedComplaints<T> {
-  const total = items.length;
-  const totalPages = Math.ceil(total / limit) || 1;
-  const safePage = Math.max(1, Math.min(page, totalPages));
-  const start = (safePage - 1) * limit;
-  const data = items.slice(start, start + limit);
-
-  return {
-    data,
-    pagination: {
-      total,
-      page: safePage,
-      limit,
-      totalPages,
-    },
-  };
+function extractError(res: { message?: string }): string {
+  return res.message ?? "Something went wrong. Please try again.";
 }
 
 // ─── Layer 1: Member Complaints ───────────────────────────────────────────────
@@ -87,38 +73,12 @@ export async function fileMemberComplaintAction(
   if (res.success && res.data) {
     revalidatePath("/dashboard/teacher/complaints");
     revalidatePath("/dashboard/parent/complaints");
+    revalidatePath("/dashboard/institute/complaints");
+    revalidatePath("/dashboard/admin/complaints");
     return { ok: true, data: unwrapData<MemberComplaint>(res.data) };
   }
 
-  // Fallback to mock creation
-  const newComplaint: MemberComplaint = {
-    id: `comp_m_${Date.now()}`,
-    report: payload.report,
-    status: "PENDING",
-    reportedRole: payload.reportedRole,
-    reporter: {
-      id: "u_current",
-      name: "Current User",
-      role: "TEACHER",
-    },
-    reported: {
-      id: payload.reportedId,
-      name: payload.reportedId,
-      role: payload.reportedRole,
-    },
-    institute: {
-      id: payload.instituteId,
-      name: "Al-Azhar Model Institute",
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  mockMemberComplaints.unshift(newComplaint);
-  revalidatePath("/dashboard/teacher/complaints");
-  revalidatePath("/dashboard/parent/complaints");
-
-  return { ok: true, data: newComplaint };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Institute fetches all Layer-1 complaints filed against its members. */
@@ -138,45 +98,7 @@ export async function getInstituteMemberComplaintsAction(
     };
   }
 
-  // Fallback to mock filtering
-  let filtered = [...mockMemberComplaints];
-  if (params.status && params.status !== "ALL") {
-    filtered = filtered.filter((c) => c.status === params.status);
-  }
-  if (params.reportedRole && params.reportedRole !== "ALL") {
-    filtered = filtered.filter((c) => c.reportedRole === params.reportedRole);
-  }
-  if (params.search) {
-    const q = params.search.toLowerCase();
-    filtered = filtered.filter(
-      (c) =>
-        c.report.toLowerCase().includes(q) ||
-        c.reporter.name.toLowerCase().includes(q) ||
-        c.reported.name.toLowerCase().includes(q),
-    );
-  }
-  if (params.fromDate) {
-    filtered = filtered.filter((c) => c.createdAt >= params.fromDate!);
-  }
-  if (params.toDate) {
-    filtered = filtered.filter((c) => c.createdAt <= `${params.toDate!}T23:59:59`);
-  }
-
-  // Sort
-  const sortBy = params.sortBy ?? "createdAt";
-  const sortOrder = params.sortOrder ?? "desc";
-  filtered.sort((a, b) => {
-    const aVal = String(a[sortBy as keyof MemberComplaint] ?? "");
-    const bVal = String(b[sortBy as keyof MemberComplaint] ?? "");
-    return sortOrder === "asc"
-      ? aVal.localeCompare(bVal)
-      : bVal.localeCompare(aVal);
-  });
-
-  return {
-    ok: true,
-    data: paginateArray(filtered, params.page, params.limit),
-  };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Get a single Layer-1 member complaint by ID. */
@@ -192,10 +114,7 @@ export async function getMemberComplaintByIdAction(
     return { ok: true, data: unwrapData<MemberComplaint>(res.data) };
   }
 
-  const found = mockMemberComplaints.find((c) => c.id === id);
-  if (found) return { ok: true, data: found };
-
-  return { ok: false, error: "Complaint not found." };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Institute updates the status of a Layer-1 complaint (PENDING → RESOLVED). */
@@ -214,18 +133,7 @@ export async function updateMemberComplaintStatusAction(
     return { ok: true, data: unwrapData<MemberComplaint>(res.data) };
   }
 
-  const idx = mockMemberComplaints.findIndex((c) => c.id === id);
-  if (idx !== -1) {
-    mockMemberComplaints[idx] = {
-      ...mockMemberComplaints[idx],
-      status,
-      updatedAt: new Date().toISOString(),
-    };
-    revalidatePath("/dashboard/institute/complaints");
-    return { ok: true, data: mockMemberComplaints[idx] };
-  }
-
-  return { ok: false, error: "Failed to update complaint status." };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Reporter (Teacher/Parent) soft-deletes (withdraws) their own Layer-1 complaint. */
@@ -240,14 +148,12 @@ export async function deleteMemberComplaintAction(
   if (res.success) {
     revalidatePath("/dashboard/teacher/complaints");
     revalidatePath("/dashboard/parent/complaints");
+    revalidatePath("/dashboard/institute/complaints");
+    revalidatePath("/dashboard/admin/complaints");
     return { ok: true, data: undefined };
   }
 
-  mockMemberComplaints = mockMemberComplaints.filter((c) => c.id !== id);
-  revalidatePath("/dashboard/teacher/complaints");
-  revalidatePath("/dashboard/parent/complaints");
-
-  return { ok: true, data: undefined };
+  return { ok: false, error: extractError(res) };
 }
 
 // ─── Layer 2: Institute Complaints ───────────────────────────────────────────
@@ -265,31 +171,11 @@ export async function fileInstituteComplaintAction(
   if (res.success && res.data) {
     revalidatePath("/dashboard/teacher/complaints");
     revalidatePath("/dashboard/parent/complaints");
+    revalidatePath("/dashboard/admin/complaints");
     return { ok: true, data: unwrapData<InstituteComplaint>(res.data) };
   }
 
-  const newComplaint: InstituteComplaint = {
-    id: `comp_i_${Date.now()}`,
-    report: payload.report,
-    status: "PENDING",
-    reporter: {
-      id: "u_current",
-      name: "Current User",
-      role: "TEACHER",
-    },
-    institute: {
-      id: payload.instituteId,
-      name: "Al-Azhar Model Institute",
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  mockInstituteComplaints.unshift(newComplaint);
-  revalidatePath("/dashboard/teacher/complaints");
-  revalidatePath("/dashboard/parent/complaints");
-
-  return { ok: true, data: newComplaint };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Admin fetches all Layer-2 institute complaints. */
@@ -309,19 +195,7 @@ export async function getAdminInstituteComplaintsAction(
     };
   }
 
-  let filtered = [...mockInstituteComplaints];
-  if (params.status && params.status !== "ALL") {
-    filtered = filtered.filter((c) => c.status === params.status);
-  }
-  if (params.search) {
-    const q = params.search.toLowerCase();
-    filtered = filtered.filter((c) => c.report.toLowerCase().includes(q));
-  }
-
-  return {
-    ok: true,
-    data: paginateArray(filtered, params.page, params.limit),
-  };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Admin gets a single Layer-2 institute complaint by ID. */
@@ -337,10 +211,7 @@ export async function getAdminInstituteComplaintByIdAction(
     return { ok: true, data: unwrapData<InstituteComplaint>(res.data) };
   }
 
-  const found = mockInstituteComplaints.find((c) => c.id === id);
-  if (found) return { ok: true, data: found };
-
-  return { ok: false, error: "Complaint not found." };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Admin updates the status of a Layer-2 institute complaint. */
@@ -359,18 +230,7 @@ export async function updateInstituteComplaintStatusAction(
     return { ok: true, data: unwrapData<InstituteComplaint>(res.data) };
   }
 
-  const idx = mockInstituteComplaints.findIndex((c) => c.id === id);
-  if (idx !== -1) {
-    mockInstituteComplaints[idx] = {
-      ...mockInstituteComplaints[idx],
-      status,
-      updatedAt: new Date().toISOString(),
-    };
-    revalidatePath("/dashboard/admin/complaints");
-    return { ok: true, data: mockInstituteComplaints[idx] };
-  }
-
-  return { ok: false, error: "Failed to update complaint status." };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Reporter soft-deletes their own Layer-2 institute complaint. */
@@ -385,14 +245,11 @@ export async function deleteInstituteComplaintAction(
   if (res.success) {
     revalidatePath("/dashboard/teacher/complaints");
     revalidatePath("/dashboard/parent/complaints");
+    revalidatePath("/dashboard/admin/complaints");
     return { ok: true, data: undefined };
   }
 
-  mockInstituteComplaints = mockInstituteComplaints.filter((c) => c.id !== id);
-  revalidatePath("/dashboard/teacher/complaints");
-  revalidatePath("/dashboard/parent/complaints");
-
-  return { ok: true, data: undefined };
+  return { ok: false, error: extractError(res) };
 }
 
 // ─── My Complaints (Reporter view) ───────────────────────────────────────────
@@ -408,17 +265,19 @@ export async function getMyComplaintsAction(
   });
 
   if (res.success && res.data) {
-    return { ok: true, data: unwrapData<MyComplaintsData>(res.data) };
+    // /complains/my wraps in { data: { memberComplaints, instituteComplaints }, pagination }
+    // unwrapData peels the outer envelope, leaving { data: { memberComplaints, ... }, pagination }
+    // We then pull .data off that to get the actual arrays.
+    const outer = unwrapData<{ data: MyComplaintsData; pagination: unknown } | MyComplaintsData>(res.data);
+    const inner: MyComplaintsData =
+      outer && typeof outer === "object" && "memberComplaints" in outer
+        ? (outer as MyComplaintsData)
+        : ((outer as { data: MyComplaintsData }).data ?? { memberComplaints: [], instituteComplaints: [] });
+
+    return { ok: true, data: inner };
   }
 
-  // Fallback to mock data for caller's complaints
-  return {
-    ok: true,
-    data: {
-      memberComplaints: mockMemberComplaints,
-      instituteComplaints: mockInstituteComplaints,
-    },
-  };
+  return { ok: false, error: extractError(res) };
 }
 
 // ─── Admin-specific endpoints ─────────────────────────────────────────────────
@@ -440,10 +299,7 @@ export async function getAdminAllMemberComplaintsAction(
     };
   }
 
-  return {
-    ok: true,
-    data: paginateArray(mockMemberComplaints, params.page, params.limit),
-  };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Admin fetches global complaint statistics. */
@@ -459,30 +315,7 @@ export async function getAdminComplaintStatisticsAction(): Promise<
     return { ok: true, data: unwrapData<ComplaintStatistics>(res.data) };
   }
 
-  const pendingMembers = mockMemberComplaints.filter(
-    (c) => c.status === "PENDING",
-  ).length;
-  const resolvedMembers = mockMemberComplaints.filter(
-    (c) => c.status === "RESOLVED",
-  ).length;
-  const pendingInstitutes = mockInstituteComplaints.filter(
-    (c) => c.status === "PENDING",
-  ).length;
-  const resolvedInstitutes = mockInstituteComplaints.filter(
-    (c) => c.status === "RESOLVED",
-  ).length;
-
-  return {
-    ok: true,
-    data: {
-      totalMemberComplaints: mockMemberComplaints.length,
-      totalInstituteComplaints: mockInstituteComplaints.length,
-      pendingMemberComplaints: pendingMembers,
-      pendingInstituteComplaints: pendingInstitutes,
-      resolvedMemberComplaints: resolvedMembers,
-      resolvedInstituteComplaints: resolvedInstitutes,
-    },
-  };
+  return { ok: false, error: extractError(res) };
 }
 
 /** Admin fetches complaints scoped to a specific institute. */
@@ -503,11 +336,53 @@ export async function getAdminComplaintsByInstituteAction(
     };
   }
 
-  const filtered = mockMemberComplaints.filter(
-    (c) => c.institute.id === instituteId,
-  );
-  return {
-    ok: true,
-    data: paginateArray(filtered, params.page, params.limit),
-  };
+  return { ok: false, error: extractError(res) };
+}
+
+// ─── Directory & Lookup Endpoints ─────────────────────────────────────────────
+
+/**
+ * Fetch teacher directory for resolving target teacher ID when filing a complaint.
+ * Endpoint: GET /teachers/directory
+ * Auth: TEACHER, PARENT
+ * Query params: instituteId (required for PARENT, ignored for TEACHER), search (optional)
+ */
+export async function getTeacherDirectoryAction(
+  params: GetTeacherDirectoryParams = {},
+): Promise<ActionResult<TeacherDirectoryItem[]>> {
+  const q = new URLSearchParams();
+  if (params.instituteId) q.set("instituteId", params.instituteId);
+  if (params.search) q.set("search", params.search);
+  const qs = q.toString() ? `?${q.toString()}` : "";
+
+  const res = await universalApi<TeacherDirectoryItem[]>({
+    endpoint: `/teachers/directory${qs}`,
+    method: "GET",
+  });
+
+  if (res.success && res.data) {
+    return { ok: true, data: unwrapData<TeacherDirectoryItem[]>(res.data) };
+  }
+
+  return { ok: false, error: extractError(res) };
+}
+
+/**
+ * Fetch distinct institutes where the parent has at least one active child.
+ * Endpoint: GET /parents/my-institutes
+ * Auth: PARENT
+ */
+export async function getParentInstitutesAction(): Promise<
+  ActionResult<ParentInstituteItem[]>
+> {
+  const res = await universalApi<ParentInstituteItem[]>({
+    endpoint: "/parents/my-institutes",
+    method: "GET",
+  });
+
+  if (res.success && res.data) {
+    return { ok: true, data: unwrapData<ParentInstituteItem[]>(res.data) };
+  }
+
+  return { ok: false, error: extractError(res) };
 }
